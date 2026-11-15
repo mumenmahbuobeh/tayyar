@@ -6,14 +6,17 @@ const { DownloadManager } = require('./engine');
 
 const BRIDGE_PORT = 6824;
 const THEMES = {
-  dark: { color: '#101C2C', symbolColor: '#9FB2CC' },
+  dark: { color: '#151f23', symbolColor: '#9FB2CC' },
   light: { color: '#EEF2F8', symbolColor: '#3A4B66' },
 };
 
 let win = null;
 let mgr = null;
 
-if (!app.requestSingleInstanceLock()) app.quit();
+if (!app.requestSingleInstanceLock()) {
+  console.log('Another instance is holding single instance lock! Quitting.');
+  app.quit();
+}
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.focus(); } });
 
 const send = (ch, payload) => { if (win && !win.isDestroyed()) win.webContents.send(ch, payload); };
@@ -21,25 +24,30 @@ const send = (ch, payload) => { if (win && !win.isDestroyed()) win.webContents.s
 function applyTheme() {
   if (!win || process.platform === 'darwin') return;
   const t = THEMES[mgr.settings.theme] || THEMES.dark;
-  win.setBackgroundColor(t.color);
-  win.setTitleBarOverlay({ color: t.color, symbolColor: t.symbolColor, height: 52 });
+  try { win.setBackgroundColor(t.color); } catch (_) {}
 }
 
 function createWindow() {
+  console.log('createWindow called');
   const t = THEMES[mgr.settings.theme] || THEMES.dark;
   win = new BrowserWindow({
     width: 1320, height: 820, minWidth: 920, minHeight: 560,
-    show: false, title: 'تيّار', backgroundColor: t.color,
-    titleBarStyle: 'hidden',
-    titleBarOverlay: process.platform === 'darwin' ? undefined : { color: t.color, symbolColor: t.symbolColor, height: 52 },
-    trafficLightPosition: { x: 20, y: 18 },
+    show: true, title: 'تيّار', backgroundColor: t.color,
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false },
   });
-  win.once('ready-to-show', () => win.show());
+  win.webContents.on('did-finish-load', () => {
+    console.log('HTML loaded successfully');
+    win.show();
+    win.focus();
+  });
+  win.webContents.on('did-fail-load', (_e, code, desc) => {
+    console.error('did-fail-load error:', code, desc);
+  });
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   win.webContents.on('will-navigate', (e) => e.preventDefault());
   win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
   win.on('closed', () => { win = null; });
+  console.log('loadFile dispatched');
 }
 
 /** Local bridge so the browser extension can hand links to the app (like IDM's browser integration). */
@@ -105,7 +113,15 @@ function wireIpc() {
   });
 }
 
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('UNHANDLED REJECTION:', reason);
+});
+
 app.whenReady().then(() => {
+  console.log('App ready triggered');
   if (process.platform !== 'darwin') Menu.setApplicationMenu(null);
   mgr = new DownloadManager({
     stateFile: path.join(app.getPath('userData'), 'state.json'),
@@ -122,7 +138,10 @@ app.whenReady().then(() => {
   createWindow();
   startBridge();
   watchClipboard();
+  console.log('All initialized');
   app.on('activate', () => { if (!win) createWindow(); });
+}).catch((err) => {
+  console.error('whenReady error:', err);
 });
 
 app.on('before-quit', () => { if (mgr) mgr.shutdown(); });
