@@ -424,6 +424,8 @@ html[dir="rtl"] .app-layout.sidebar-collapsed {
   margin-bottom: 22px;
   min-height: 40px;
   -webkit-app-region: drag;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .view-header button, .view-header input, .view-header a, .view-header select {
@@ -486,6 +488,7 @@ html[dir="rtl"] .app-layout.sidebar-collapsed {
   position: relative;
   transition: all 0.2s ease;
   min-height: 140px;
+  min-width: 0;
 }
 
 .bento-card:hover {
@@ -864,6 +867,8 @@ html[dir="rtl"] .select-pill-wrap .chevron-ic {
   flex-direction: column;
   gap: 6px;
   margin-top: 6px;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .heatmap-months {
@@ -2053,4 +2058,136 @@ html[dir="rtl"] .select-pill-wrap .chevron-ic {
   font-weight: 500;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   z-index: 1000;
+}
+
+/* ================= RESPONSIVE DESIGN (WINDOW SHRINK / RESIZE & MOBILE) ================= */
+
+@media (max-width: 1200px) {
+  .bento-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .bento-grid .card-engine { grid-column: span 1 !important; }
+  .bento-grid .card-nat { grid-column: span 1 !important; }
+  .bento-grid .card-upload { grid-column: span 1 !important; }
+  .bento-grid .card-download { grid-column: span 1 !important; }
+  .bento-grid .card-speed-limit { grid-column: span 1 !important; }
+  .bento-grid .card-transfer { grid-column: span 1 !important; }
+  .bento-grid .card-tasks { grid-column: span 2 !important; }
+  .bento-grid .card-active-tasks { grid-column: span 2 !important; }
+  .bento-grid .card-activity { grid-column: span 2 !important; }
+}
+
+@media (max-width: 960px) {
+  .app-layout {
+    grid-template-columns: 68px 1fr !important;
+  }
+  html[dir="rtl"] .app-layout {
+    grid-template-columns: 1fr 68px !important;
+  }
+  .sidebar {
+    padding: 14px 6px !important;
+    align-items: center;
+  }
+  .sidebar-top {
+    flex-direction: column;
+    gap: 10px;
+    padding: 0;
+    width: 100%;
+    align-items: center;
+  }
+  .brand-dropdown .chevron-ic {
+    display: none !important;
+  }
+  .sidebar-top-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    align-items: center;
+  }
+  .nav-list {
+    align-items: center;
+    width: 100%;
+  }
+  .nav-item {
+    width: 44px;
+    height: 44px;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: 10px;
+    position: relative;
+  }
+  .nav-item .nav-label {
+    display: none !important;
+  }
+  .nav-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 10px;
+    padding: 0 4px;
+  }
+  .sidebar-bottom {
+    width: 100%;
+    padding-top: 10px;
+  }
+  .sidebar-bottom .nav-item {
+    width: 44px;
+    height: 44px;
+    padding: 0 !important;
+    justify-content: center !important;
+  }
+  .sidebar-bottom .nav-item .nav-label {
+    display: none !important;
+  }
+  .view-panel {
+    padding: 18px 20px 32px !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-layout {
+    grid-template-columns: 56px 1fr !important;
+  }
+  html[dir="rtl"] .app-layout {
+    grid-template-columns: 1fr 56px !important;
+  }
+  .bento-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .bento-card {
+    grid-column: span 1 !important;
+    padding: 14px 16px !important;
+    min-height: auto;
+  }
+  .view-panel {
+    padding: 14px 12px 28px !important;
+  }
+  .card-main-val {
+    font-size: 24px !important;
+  }
+  .card-main-val.big-num {
+    font-size: 30px !important;
+  }
+  .heatmap-wrap {
+    overflow-x: auto;
+    max-width: 100%;
+    padding-bottom: 6px;
+  }
+  .downloads-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .downloads-filters {
+    overflow-x: auto;
+    max-width: 100%;
+    padding-bottom: 4px;
+  }
+  .modal-box {
+    max-width: 95vw !important;
+    padding: 18px 16px !important;
+  }
 }
