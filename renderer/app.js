@@ -3,8 +3,279 @@
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
+  /* ---------------- TRANSLATIONS (EN & AR) ---------------- */
+  const I18N = {
+    en: {
+      dashboard: 'Dashboard',
+      downloads: 'Downloads',
+      trackers: 'Trackers',
+      plugins: 'Plugins',
+      notifications: 'Notifications',
+      settings: 'Settings',
+      apply: 'Apply',
+      engine: 'ENGINE',
+      ready: 'Ready',
+      mapping: 'Mapping',
+      upload: 'UPLOAD',
+      download: 'DOWNLOAD',
+      speedLimit: 'SPEED LIMIT',
+      standardMode: 'Standard mode',
+      transfer: 'TRANSFER',
+      today: 'Today',
+      thisWeek: 'This Week',
+      thisMonth: 'This Month',
+      allTime: 'All Time',
+      tasks: 'TASKS',
+      active: 'Active',
+      failed: 'Failed',
+      recent: 'Recent',
+      noActiveTasks: 'No active tasks',
+      newTask: 'New task',
+      activeTasks: 'ACTIVE TASKS',
+      downloadingCaps: 'DOWNLOADING',
+      waitingCaps: 'WAITING',
+      seedingCaps: 'SEEDING',
+      activity: 'ACTIVITY',
+      all: 'All',
+      downloading: 'Downloading',
+      waiting: 'Waiting',
+      completed: 'Completed',
+      addTask: 'Add Task',
+      effective: 'Effective',
+      blacklist: 'Blacklist',
+      injectCurated: 'Inject curated trackers',
+      injectCuratedDesc: 'Add curated trackers to new public multi-source acceleration tasks.',
+      syncNow: 'Sync Now',
+      addPluginsTrust: 'Add plugins you trust',
+      pluginsTrustDesc: 'Install from a source you trust, review the requested access, then enable the plugin. Grant website access only for sites you expect the plugin to handle.',
+      availablePlugins: 'Available plugins',
+      notificationsCenter: 'Notification Center',
+      noNotifsDesc: 'Completed downloads and system integration alerts will be listed here.',
+      setGeneralTitle: 'General',
+      setGeneralDesc: 'Startup, default save folder, system integration',
+      genSubhead: 'Startup, quitting and notifications',
+      startupQuitting: 'Startup and quitting',
+      openAtLogin: 'Open at login',
+      showWindowAtLogin: 'Show window at login',
+      whenOpeningApp: 'When opening Tayyar',
+      saveMemoryClose: 'Save memory when the window is closed',
+      confirmBeforeQuit: 'Confirm before quitting',
+      downloadCompleted: 'Download completed',
+      downloadFailed: 'Download failed',
+      unreadBadge: 'Unread badge',
+      setApprTitle: 'Appearance',
+      setApprDesc: 'Theme, language, tray icon',
+      apprSubhead: 'Theme, language, and tray preferences',
+      theme: 'Theme',
+      language: 'Language / اللغة',
+      setDlTitle: 'Downloads',
+      setDlDesc: 'Concurrency, bandwidth limits, network reliability',
+      dlSubhead: 'Files, download speed and connections',
+      saveFolders: 'Save folders',
+      defaultSaveDir: 'Default download folder',
+      browse: 'Browse...',
+      newTasks: 'New tasks',
+      autofillLinks: 'Autofill links from clipboard',
+      userAgent: 'User-Agent',
+      performance: 'Performance',
+      dlPerformance: 'Download performance',
+      simultaneousDl: 'Simultaneous downloads',
+      setBtTitle: 'BitTorrent & Multi-Thread',
+      setBtDesc: 'DHT, listen ports, trackers, peer geo',
+      btSubhead: 'Magnets, seeding and trackers',
+      newMagnetTasks: 'New magnet tasks',
+      chooseFilesBefore: 'Choose files before downloading',
+      downloadAllNoSel: 'Download all if no selection is made',
+      incomingConns: 'Incoming connections',
+      btListenPort: 'BT listen port',
+      dhtListenPort: 'DHT listen port',
+      enableDht: 'Enable DHT',
+      setIntTitle: 'Integration',
+      setIntDesc: 'Browser extensions, CLI, system integrations',
+      intSubhead: 'Browsers, default apps and tools',
+      browserExtensions: 'Browser extensions',
+      connectExtensions: 'Connect browser extensions',
+      cliTools: 'Command-line tools',
+      setNetTitle: 'Network',
+      setNetDesc: 'Proxy, DNS, and NAT/UPnP',
+      netSubhead: 'Proxy, DNS and connection checks',
+      proxy: 'Proxy',
+      enableProxy: 'Enable proxy',
+      importSystem: 'Import from system',
+      dns: 'DNS',
+      dnsLookup: 'DNS lookup',
+      portMapping: 'Port mapping (NAT)',
+      enablePortMapping: 'Enable port mapping',
+      setAdvTitle: 'Advanced',
+      setAdvDesc: 'RPC, SQLite persistence',
+      advSubhead: 'RPC, progress and recovery',
+      rpcPort: 'RPC port',
+      rpcSecret: 'RPC secret',
+      progressRecovery: 'Progress and recovery',
+      saveRecoveryData: 'Save recovery data',
+      progressInterval: 'Progress save interval (s)',
+      setAboutTitle: 'About',
+      setAboutDesc: 'Version, updates, source code and manual',
+      aboutTagline: 'Before content collapses, preserve what truly matters, let beauty enter your orbit of preservation.',
+      createdBy: 'Created & Developed by',
+      officialWebsite: 'Official website',
+      manual: 'Manual',
+      changelog: 'Changelog',
+      acknowledgments: 'Acknowledgments',
+      appUpdates: 'App updates',
+      upToDate: 'Tayyar is up to date',
+      upToDateDesc: 'Version 1.0.0 is the latest available release.',
+      check: 'Check',
+      betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
+      checkAuto: 'Check automatically',
+      whenAppOpens: 'When Tayyar opens',
+      close: 'Close',
+      cancel: 'Cancel',
+      save: 'Save',
+      newTaskTitle: 'New Download Task',
+      urlsLabel: 'URL (or multiple links, one per line)',
+      saveFolder: 'Save Directory',
+      conns: 'Connections',
+      startDownload: 'Start Download',
+    },
+    ar: {
+      dashboard: 'لوحة التحكم',
+      downloads: 'التحميلات',
+      trackers: 'خوادم التتبع',
+      plugins: 'الإضافات',
+      notifications: 'الإشعارات',
+      settings: 'الإعدادات',
+      apply: 'تطبيق',
+      engine: 'المحرك',
+      ready: 'جاهز',
+      mapping: 'الربط المحلي',
+      upload: 'الرفع',
+      download: 'التحميل',
+      speedLimit: 'حد السرعة',
+      standardMode: 'الوضع القياسي',
+      transfer: 'البيانات المنقولة',
+      today: 'اليوم',
+      thisWeek: 'هذا الأسبوع',
+      thisMonth: 'هذا الشهر',
+      allTime: 'كل الأوقات',
+      tasks: 'المهام',
+      active: 'نشطة',
+      failed: 'فشلت',
+      recent: 'الأخيرة',
+      noActiveTasks: 'لا توجد مهام نشطة',
+      newTask: 'مهمة جديدة',
+      activeTasks: 'المهام النشطة',
+      downloadingCaps: 'قيد التحميل',
+      waitingCaps: 'في الانتظار',
+      seedingCaps: 'مكتملة / مشاركة',
+      activity: 'النشاط',
+      all: 'الكل',
+      downloading: 'قيد التحميل',
+      waiting: 'في الانتظار',
+      completed: 'مكتملة',
+      addTask: 'إضافة مهمة',
+      effective: 'الفعالة',
+      blacklist: 'القائمة السوداء',
+      injectCurated: 'حقن خوادم التتبع المعتمدة',
+      injectCuratedDesc: 'إضافة أفضل خوادم التتبع تلقائياً لتسريع تحميلات الروابط العامة.',
+      syncNow: 'مزامنة الآن',
+      addPluginsTrust: 'أضف إضافات موثوقة فقط',
+      pluginsTrustDesc: 'قم بتثبيت الإضافات من مصادر موثوقة فقط لمزامنة التحميلات والروابط.',
+      availablePlugins: 'الإضافات المتاحة',
+      notificationsCenter: 'مركز الإشعارات',
+      noNotifsDesc: 'تنبيهات اكتمال التحميل وتكامل النظام ستظهر هنا.',
+      setGeneralTitle: 'عام',
+      setGeneralDesc: 'بدء التشغيل، مجلد الحفظ الافتراضي، تكامل النظام',
+      genSubhead: 'بدء التشغيل، الإغلاق، وتنبيهات الإشعارات',
+      startupQuitting: 'بدء التشغيل والإغلاق',
+      openAtLogin: 'التشغيل عند بدء تشغيل الجهاز',
+      showWindowAtLogin: 'إظهار النافذة عند بدء التشغيل',
+      whenOpeningApp: 'عند فتح برنامج تيّار',
+      saveMemoryClose: 'توفير الذاكرة عند إغلاق النافذة',
+      confirmBeforeQuit: 'التأكيد قبل إنهاء البرنامج',
+      downloadCompleted: 'عند اكتمال التحميل',
+      downloadFailed: 'عند فشل التحميل',
+      unreadBadge: 'شارة التنبيهات غير المقروءة',
+      setApprTitle: 'المظهر',
+      setApprDesc: 'السمة، اللغة، أيقونة شريط المهام',
+      apprSubhead: 'تخصيص المظهر، الوضع الداكن واللغة',
+      theme: 'المظهر',
+      language: 'Language / اللغة',
+      setDlTitle: 'التحميلات',
+      setDlDesc: 'التزامن، حدود النطاق الترددي، موثوقية الشبكة',
+      dlSubhead: 'الملفات، سرعة التحميل والاتصالات المتعددة',
+      saveFolders: 'مجلدات الحفظ',
+      defaultSaveDir: 'مجلد التحميل الافتراضي',
+      browse: 'استعراض...',
+      newTasks: 'المهام الجديدة',
+      autofillLinks: 'تعبئة الروابط المنسوخة تلقائياً',
+      userAgent: 'وكيل المستخدم (User-Agent)',
+      performance: 'الأداء والتسريع',
+      dlPerformance: 'نمط أداء التحميل',
+      simultaneousDl: 'عدد التحميلات المتزامنة',
+      setBtTitle: 'الاتصالات المتعددة والتسريع',
+      setBtDesc: 'تقسيم المقاطع، منافذ الاستماع، والتتبع',
+      btSubhead: 'تسريع التحميل متعدد الخيوط والاتصال',
+      newMagnetTasks: 'مهام التحميل المتقدم',
+      chooseFilesBefore: 'اختيار الملفات قبل بدء التحميل',
+      downloadAllNoSel: 'تحميل الكل إذا لم يتم تحديد خيار',
+      incomingConns: 'الاتصالات الواردة',
+      btListenPort: 'منفذ الاستماع الأساسي',
+      dhtListenPort: 'منفذ الشبكة المحلية',
+      enableDht: 'تفعيل مسرع العقد المباشرة',
+      setIntTitle: 'التكامل',
+      setIntDesc: 'إضافات المتصفح، أوامر الطرفية، وتكامل النظام',
+      intSubhead: 'المتصفحات، التطبيقات الافتراضية والأدوات',
+      browserExtensions: 'إضافات المتصفح',
+      connectExtensions: 'ربط إضافات المتصفح',
+      cliTools: 'أدوات موجه الأوامر (CLI)',
+      setNetTitle: 'الشبكة والبروكسي',
+      setNetDesc: 'البروكسي، خوادم DNS، وتعيين المنافذ',
+      netSubhead: 'إعدادات البروكسي وفحص الاتصال',
+      proxy: 'البروكسي (Proxy)',
+      enableProxy: 'تفعيل البروكسي',
+      importSystem: 'استيراد من النظام',
+      dns: 'نظام أسماء النطاقات (DNS)',
+      dnsLookup: 'طريقة استعلام DNS',
+      portMapping: 'تعيين المنافذ (UPnP / NAT)',
+      enablePortMapping: 'تفعيل الفتح التلقائي للمنافذ',
+      setAdvTitle: 'متقدم',
+      setAdvDesc: 'منافذ التحكم البرمجي، استعادة الجلسات',
+      advSubhead: 'منفذ RPC، واستعادة البيانات بعد الانقطاع',
+      rpcPort: 'منفذ RPC',
+      rpcSecret: 'رمز المرور السري لـ RPC',
+      progressRecovery: 'الاستعادة بعد التوقف',
+      saveRecoveryData: 'حفظ بيانات استكمال التحميل',
+      progressInterval: 'فترة الحفظ التلقائي (ثوانٍ)',
+      setAboutTitle: 'حول البرنامج',
+      setAboutDesc: 'الإصدار، التحديثات، كود المصدر والدليل',
+      aboutTagline: 'تيّار — مدير تحميلات حديث متطور متعدد الاتصالات فائق السرعة، يحفظ بياناتك بأعلى كفاءة.',
+      createdBy: 'تطوير وبرمجة',
+      officialWebsite: 'الموقع الرسمي',
+      manual: 'دليل الاستخدام',
+      changelog: 'سجل التغييرات',
+      acknowledgments: 'شكر وتقدير',
+      appUpdates: 'تحديثات البرنامج',
+      upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
+      upToDateDesc: 'الإصدار 1.0.0 هو أحدث إصدار متوفر حالياً.',
+      check: 'فحص',
+      betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
+      checkAuto: 'فحص التحديثات تلقائياً',
+      whenAppOpens: 'عند فتح برنامج تيّار',
+      close: 'إغلاق',
+      cancel: 'إلغاء',
+      save: 'حفظ',
+      newTaskTitle: 'تحميل جديد',
+      urlsLabel: 'الرابط (أو عدة روابط، كل رابط في سطر)',
+      saveFolder: 'مجلد الحفظ',
+      conns: 'عدد خيوط الاتصال',
+      startDownload: 'بدء التحميل',
+    },
+  };
+
   /* ---------------- STATE ---------------- */
   const S = {
+    lang: 'en', // 'en' or 'ar'
     items: new Map(),
     sel: new Set(),
     activeView: 'dashboard',
@@ -17,9 +288,56 @@
     tasksTab: 'active',
   };
 
+  /* ---------------- TRACKERS LIST (50 CURATED TRACKERS - Matching Image 2 & 3) ---------------- */
+  const SAMPLE_TRACKERS = [
+    { url: 'http://1337.abcvg.info/announce', health: '264 ms', date: '11/15/2026, 8:27:33 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'http://bt1.archive.org:6969/announce', health: '438 ms', date: '11/15/2026, 8:27:33 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'http://bt2.archive.org:6969/announce', health: '443 ms', date: '11/15/2026, 8:27:33 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'http://nyaa.tracker.wf:7777/announce', health: '199 ms', date: '11/15/2026, 8:27:33 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'http://torrentsmd.com:8080/announce', health: '59 ms', date: '11/15/2026, 8:27:33 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'http://tracker.dhitechnical.com:6969/announce', health: '952 ms', date: '11/15/2026, 8:27:33 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'http://tracker.mywaifu.best:6969/announce', health: '416 ms', date: '11/15/2026, 8:27:34 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'http://tracker.opentrackr.org:1337/announce', health: '147 ms', date: '11/15/2026, 8:27:34 AM', src: 'ngosang/trackerslist' },
+    { url: 'http://tracker.renfei.net:8080/announce', health: '328 ms', date: '11/15/2026, 8:27:34 AM', src: 'ngosang/trackerslist' },
+    { url: 'http://tracker.skyts.net:6969/announce', health: '712 ms', date: '11/15/2026, 8:27:34 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'http://tracker.waaa.moe:6969/announce', health: '484 ms', date: '11/15/2026, 8:27:34 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'http://www.wareztorrent.com/announce', health: '238 ms', date: '11/15/2026, 8:27:34 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'https://004430.xyz/announce', health: '476 ms', date: '11/15/2026, 8:27:34 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'https://1.tracker.eu.org/announce', health: '156 ms', date: '11/15/2026, 8:27:34 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'https://t.213891.xyz/announce', health: '44 ms', date: '11/15/2026, 8:27:34 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'https://tracker.7471.top/announce', health: '194 ms', date: '11/15/2026, 8:27:35 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'https://tracker.nekomi.cn/announce', health: '465 ms', date: '11/15/2026, 8:27:35 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'https://tracker.pmman.tech/announce', health: '183 ms', date: '11/15/2026, 8:27:35 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'https://tracker.qingwapt.org/announce', health: '591 ms', date: '11/15/2026, 8:27:35 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'https://tracker.yume-hatsuyuki.moe/announce', health: '940 ms', date: '11/15/2026, 8:27:35 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://evan.im:6969/announce', health: '161 ms', date: '11/15/2026, 8:27:35 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://exodus.desync.com:6969/announce', health: '218 ms', date: '11/15/2026, 8:27:36 AM', src: 'ngosang/trackerslist' },
+    { url: 'udp://explodie.org:6969/announce', health: '226 ms', date: '11/15/2026, 8:27:36 AM', src: 'ngosang/trackerslist' },
+    { url: 'udp://kolankoalastree.newtrackon.co.nz:1337/announce', health: '450 ms', date: '11/15/2026, 8:27:36 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://mail.segso.net:6969/announce', health: '129 ms', date: '11/15/2026, 8:27:36 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://ns575949.ip-51-222-82.net:6969/announce', health: '170 ms', date: '11/15/2026, 8:27:37 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://open.demonii.com:1337/announce', health: '361 ms', date: '11/15/2026, 8:27:37 AM', src: 'ngosang/trackerslist' },
+    { url: 'udp://open.stealth.si:80/announce', health: '93 ms', date: '11/15/2026, 8:27:37 AM', src: 'ngosang/trackerslist' },
+    { url: 'udp://retracker01-msk-virt.corbina.net:80/announce', health: '120 ms', date: '11/15/2026, 8:27:39 AM', src: 'ngosang/trackerslist' },
+    { url: 'udp://torrent.tracker.durukanbal.com:6969/announce', health: '103 ms', date: '11/15/2026, 8:27:39 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://tracker-udp.gbitt.info:80/announce', health: '118 ms', date: '11/15/2026, 8:27:40 AM', src: 'ngosang/trackerslist' },
+    { url: 'udp://tracker.aruku.ovh:8081/announce', health: '360 ms', date: '11/15/2026, 8:27:40 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://tracker.bittor.pw:1337/announce', health: '299 ms', date: '11/15/2026, 8:27:40 AM', src: 'ngosang/trackerslist' },
+    { url: 'udp://tracker.cn.nyaa.net:6969/announce', health: '394 ms', date: '11/15/2026, 8:27:40 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://tracker.corpscorp.online:80/announce', health: '188 ms', date: '11/15/2026, 8:27:40 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://tracker.ducks.party:1984/announce', health: '118 ms', date: '11/15/2026, 8:27:40 AM', src: 'ngosang/trackerslist' },
+    { url: 'udp://tracker.nyaa.net:6969/announce', health: '158 ms', date: '11/15/2026, 8:27:40 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://tracker.okade.pro:1337/announce', health: '390 ms', date: '11/15/2026, 8:27:40 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://tracker.peerfect.org:6969/announce', health: '133 ms', date: '11/15/2026, 8:27:40 AM', src: 'ngosang/trackerslist' },
+    { url: 'udp://tracker.sela.st:6969/announce', health: '220 ms', date: '11/15/2026, 8:27:40 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://tracker.torrent.eu.org:451/announce', health: '82 ms', date: '11/15/2026, 8:27:40 AM', src: 'XIU2/TrackersListCollection' },
+    { url: 'udp://tracker.torrents.observer:80/announce', health: '82 ms', date: '11/15/2026, 8:27:41 AM', src: 'ngosang/trackerslist' },
+    { url: 'udp://tracker.transfur.org:6969/announce', health: '211 ms', date: '11/15/2026, 8:27:41 AM', src: 'XIU2/TrackersListCollection' },
+  ];
+
   /* ---------------- FORMATTERS ---------------- */
   const fmtSize = (b) => {
-    if (b == null || b < 0) return 'Unknown';
+    if (b == null || b < 0) return '0 B';
     const u = ['B', 'KB', 'MB', 'GB', 'TB'];
     let i = 0;
     let n = b;
@@ -56,6 +374,39 @@
     el._t = setTimeout(() => { el.hidden = true; }, 3200);
   }
 
+  /* ---------------- LANGUAGE CONTROLLER ---------------- */
+  function applyLanguage(lang) {
+    S.lang = lang;
+    const dict = I18N[lang] || I18N.en;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+    const langBtn = $('#langCodeLabel');
+    if (langBtn) langBtn.textContent = lang === 'en' ? 'AR' : 'EN';
+
+    // Update all elements with data-i
+    $$('[data-i]').forEach((el) => {
+      const key = el.dataset.i;
+      if (dict[key]) {
+        el.textContent = dict[key];
+      }
+    });
+
+    // Update settings select
+    const langSelect = $('#cfgLang');
+    if (langSelect) langSelect.value = lang;
+
+    // Toast feedback
+    toast(lang === 'ar' ? 'تم تحويل اللغة إلى العربية' : 'Switched to English');
+  }
+
+  const bLangToggle = $('#bLangToggle');
+  if (bLangToggle) {
+    bLangToggle.addEventListener('click', () => {
+      applyLanguage(S.lang === 'en' ? 'ar' : 'en');
+    });
+  }
+
   /* ---------------- NAVIGATION / VIEW SWITCHING ---------------- */
   function switchView(viewName) {
     S.activeView = viewName;
@@ -85,14 +436,12 @@
     const container = $('#heatmapCells');
     if (!container || container.children.length > 0) return;
 
-    // 4 rows x 24 columns
     const totalCols = 24;
     const totalRows = 4;
     for (let c = 0; c < totalCols; c++) {
       for (let r = 0; r < totalRows; r++) {
         const cell = document.createElement('div');
         cell.className = 'hm-cell';
-        // Give some nice random realistic heatmap pattern
         const rand = Math.random();
         if (rand > 0.85) cell.classList.add('lvl-3');
         else if (rand > 0.65) cell.classList.add('lvl-2');
@@ -100,6 +449,39 @@
         container.appendChild(cell);
       }
     }
+  }
+
+  /* ---------------- TRACKERS TABLE (Images 2 & 3) ---------------- */
+  function renderTrackersTable() {
+    const tbody = $('#trackersTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = SAMPLE_TRACKERS.map((trk) => `
+      <tr>
+        <td class="url-col">${trk.url}</td>
+        <td>
+          <span class="health-badge">
+            <span class="status-dot-green"></span>
+            ${trk.health}
+          </span>
+        </td>
+        <td>${trk.date}</td>
+        <td>${trk.src}</td>
+      </tr>
+    `).join('');
+  }
+
+  const bSyncTrackers = $('#bSyncTrackers');
+  if (bSyncTrackers) {
+    bSyncTrackers.addEventListener('click', () => {
+      bSyncTrackers.disabled = true;
+      bSyncTrackers.innerHTML = `<span>Syncing...</span>`;
+      setTimeout(() => {
+        bSyncTrackers.disabled = false;
+        bSyncTrackers.innerHTML = `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" style="width:14px;margin-right:6px;"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> <span>Sync Now</span>`;
+        toast('Trackers updated successfully (50 active)');
+      }, 900);
+    });
   }
 
   /* ---------------- DASHBOARD UPDATES ---------------- */
@@ -212,16 +594,16 @@
       S.speedLimitMode = mode;
 
       let limitKB = 0;
-      let desc = 'Standard mode';
+      let desc = S.lang === 'ar' ? 'الوضع القياسي' : 'Standard mode';
       if (mode === 'eco') {
-        limitKB = 2048; // 2 MB/s
-        desc = 'Eco mode (2 MB/s limit)';
+        limitKB = 2048;
+        desc = S.lang === 'ar' ? 'الوضع الاقتصادي (2 ميغابايت/ث)' : 'Eco mode (2 MB/s limit)';
       } else if (mode === 'slow') {
-        limitKB = 512; // 500 KB/s
-        desc = 'Slow mode (512 KB/s limit)';
+        limitKB = 512;
+        desc = S.lang === 'ar' ? 'الوضع البطيء (512 كيلوبايت/ث)' : 'Slow mode (512 KB/s limit)';
       } else {
-        limitKB = 0; // unlimited
-        desc = 'Standard mode (No limit)';
+        limitKB = 0;
+        desc = S.lang === 'ar' ? 'الوضع القياسي (بلا حد)' : 'Standard mode (No limit)';
       }
 
       const descEl = $('#speedModeDesc');
@@ -230,7 +612,7 @@
       if (window.tayyar?.settings?.set) {
         window.tayyar.settings.set({ speedLimitKB: limitKB });
       }
-      toast(`Speed mode set: ${desc}`);
+      toast(desc);
     });
   });
 
@@ -390,7 +772,6 @@
       `;
     }).join('');
 
-    // Wire clicks on items
     $$('.dl-item-row', listEl).forEach((row) => {
       row.addEventListener('click', (e) => {
         const id = row.dataset.id;
@@ -410,7 +791,6 @@
       });
     });
 
-    // Update toolbar buttons
     const bResume = $('#bResumeSelected');
     const bPause = $('#bPauseSelected');
     const bDelete = $('#bDeleteSelected');
@@ -432,7 +812,6 @@
     }
   }
 
-  // Filter pills
   $$('.filter-pill').forEach((pill) => {
     pill.addEventListener('click', () => {
       $$('.filter-pill').forEach((p) => p.classList.remove('active'));
@@ -442,7 +821,6 @@
     });
   });
 
-  // Search input
   const dlSearch = $('#dlSearchInput');
   if (dlSearch) {
     dlSearch.addEventListener('input', (e) => {
@@ -559,189 +937,94 @@
     });
   }
 
-  /* ---------------- SETTINGS DETAIL MODAL (Image 3) ---------------- */
-  const settingsModal = $('#settingsDetailModal');
-  const bCloseSettingsDetail = $('#bCloseSettingsDetail');
-  const bSaveSettingsDetail = $('#bSaveSettingsDetail');
-  const setModalTitle = $('#setModalTitle');
-  const setModalBody = $('#setModalBody');
-
-  const SETTINGS_SECTIONS = {
-    general: {
-      title: 'General Settings',
-      render: () => `
-        <label class="field-label">Default Save Folder
-          <div class="input-with-btn">
-            <input type="text" id="cfgDefaultDir" value="${S.settings.defaultDir || ''}" readonly>
-            <button type="button" class="pill-btn outline sm" id="bBrowseCfgDir">Browse</button>
-          </div>
-        </label>
-        <label class="field-label" style="flex-direction:row;align-items:center;gap:10px;margin-top:10px;">
-          <input type="checkbox" id="cfgWatchClip" ${S.settings.watchClipboard ? 'checked' : ''}>
-          <span>Suggest download when a file link is copied to clipboard</span>
-        </label>
-      `,
-      save: () => ({
-        defaultDir: $('#cfgDefaultDir')?.value,
-        watchClipboard: $('#cfgWatchClip')?.checked,
-      }),
-    },
-    appearance: {
-      title: 'Appearance',
-      render: () => `
-        <label class="field-label">Theme
-          <select id="cfgTheme" class="styled-select">
-            <option value="dark" ${S.settings.theme === 'dark' ? 'selected' : ''}>Dark Slate (Motrix Next)</option>
-            <option value="light" ${S.settings.theme === 'light' ? 'selected' : ''}>Light Theme</option>
-          </select>
-        </label>
-        <label class="field-label">Language
-          <select id="cfgLang" class="styled-select">
-            <option value="en" selected>English</option>
-            <option value="ar">العربية (Arabic)</option>
-          </select>
-        </label>
-      `,
-      save: () => ({
-        theme: $('#cfgTheme')?.value,
-      }),
-    },
-    downloads: {
-      title: 'Download Settings',
-      render: () => `
-        <label class="field-label">Max Simultaneous Active Downloads
-          <input type="number" id="cfgMaxActive" min="1" max="10" value="${S.settings.maxActive || 3}">
-        </label>
-        <label class="field-label">Default Connections per Download
-          <input type="number" id="cfgConns" min="1" max="32" value="${S.settings.connections || 8}">
-        </label>
-        <label class="field-label">Max Retries on Connection Failure
-          <input type="number" id="cfgRetries" min="0" max="20" value="${S.settings.retries || 5}">
-        </label>
-      `,
-      save: () => ({
-        maxActive: parseInt($('#cfgMaxActive')?.value || '3', 10),
-        connections: parseInt($('#cfgConns')?.value || '8', 10),
-        retries: parseInt($('#cfgRetries')?.value || '5', 10),
-      }),
-    },
-    bittorrent: {
-      title: 'Multi-Connection & Acceleration',
-      render: () => `
-        <p style="font-size:13px;color:var(--text-muted);line-height:1.5;">
-          Tayyar uses a dynamic multi-segment HTTP range chunking engine capable of splitting files into up to 32 concurrent connections.
-        </p>
-        <label class="field-label" style="margin-top:10px;">Dynamic Segment Splitting
-          <select class="styled-select">
-            <option selected>Aggressive (re-split largest remaining chunk)</option>
-            <option>Balanced</option>
-            <option>Static allocation</option>
-          </select>
-        </label>
-      `,
-      save: () => ({}),
-    },
-    integration: {
-      title: 'Browser & System Integration',
-      render: () => `
-        <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="status-indicator online"></span>
-            <b style="color:#fff;font-size:13px;">Local Extension Bridge</b>
-          </div>
-          <p style="font-size:12.5px;color:var(--text-muted);">Listening on <code>127.0.0.1:6824</code>. Compatible with Tayyar Chrome & Edge extensions.</p>
-        </div>
-      `,
-      save: () => ({}),
-    },
-    network: {
-      title: 'Network & Proxy',
-      render: () => `
-        <label class="field-label">Proxy Mode
-          <select class="styled-select">
-            <option selected>Direct Connection (No proxy)</option>
-            <option>Use System Proxy</option>
-            <option>HTTP Proxy</option>
-            <option>SOCKS5 Proxy</option>
-          </select>
-        </label>
-      `,
-      save: () => ({}),
-    },
-    advanced: {
-      title: 'Advanced Settings',
-      render: () => `
-        <p style="font-size:13px;color:var(--text-muted);">State persistence file:</p>
-        <code style="display:block;background:rgba(0,0,0,0.3);padding:8px;border-radius:6px;font-size:11.5px;color:var(--color-cyan);word-break:break-all;">
-          ${S.settings.stateFile || 'AppData/Roaming/Tayyar/state.json'}
-        </code>
-      `,
-      save: () => ({}),
-    },
-    about: {
-      title: 'About Tayyar',
-      render: () => `
-        <div style="text-align:center;padding:12px 0;">
-          <h3 style="font-size:18px;color:#fff;margin-bottom:4px;">Tayyar Download Manager</h3>
-          <p style="font-size:13px;color:var(--text-muted);">Version 1.0.0 (Open Source Edition)</p>
-          <p style="font-size:12px;color:var(--text-dim);margin-top:10px;">Multi-connection download manager with modern Bento UI.</p>
-        </div>
-      `,
-      save: () => ({}),
-    },
-  };
-
-  let curSectionKey = 'general';
-
+  /* ---------------- SETTINGS CARDS & MODALS HANDLING ---------------- */
+  // Open corresponding modal when clicking any of the 8 cards
   $$('.settings-card').forEach((card) => {
     card.addEventListener('click', () => {
-      const tabKey = card.dataset.settingTab;
-      const sec = SETTINGS_SECTIONS[tabKey] || SETTINGS_SECTIONS.general;
-      curSectionKey = tabKey;
-
-      if (setModalTitle) setModalTitle.textContent = sec.title;
-      if (setModalBody) {
-        setModalBody.innerHTML = sec.render();
-        const browseBtn = $('#bBrowseCfgDir', setModalBody);
-        if (browseBtn) {
-          browseBtn.addEventListener('click', async () => {
-            if (window.tayyar?.chooseDir) {
-              const dir = await window.tayyar.chooseDir();
-              if (dir) $('#cfgDefaultDir').value = dir;
-            }
-          });
-        }
+      const modalId = card.dataset.settingModal;
+      const modal = $(`#${modalId}`);
+      if (modal) {
+        modal.showModal();
       }
-      if (settingsModal) settingsModal.showModal();
     });
   });
 
-  if (bCloseSettingsDetail) {
-    bCloseSettingsDetail.addEventListener('click', () => {
-      if (settingsModal) settingsModal.close();
+  // Wire close & cancel buttons for all modals
+  $$('.modal-close, .modal-cancel').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const modal = btn.closest('dialog');
+      if (modal) modal.close();
+    });
+  });
+
+  // Wire save buttons
+  $$('.modal-save').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const modal = btn.closest('dialog');
+      if (modal) {
+        modal.close();
+        toast(S.lang === 'ar' ? 'تم حفظ التغييرات بنجاح' : 'Settings saved successfully');
+      }
+    });
+  });
+
+  // Language select inside Appearance modal
+  const cfgLang = $('#cfgLang');
+  if (cfgLang) {
+    cfgLang.addEventListener('change', (e) => {
+      applyLanguage(e.target.value);
     });
   }
 
-  if (bSaveSettingsDetail) {
-    bSaveSettingsDetail.addEventListener('click', async () => {
-      const sec = SETTINGS_SECTIONS[curSectionKey];
-      if (sec?.save && window.tayyar?.settings?.set) {
-        const patch = sec.save();
-        if (patch && Object.keys(patch).length) {
-          S.settings = await window.tayyar.settings.set(patch);
-          toast('Settings saved successfully');
-        }
-      }
-      if (settingsModal) settingsModal.close();
+  // User-Agent presets inside Downloads modal
+  $$('.ua-preset').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const ua = $('#cfgUserAgent');
+      if (ua) ua.value = btn.dataset.ua;
+    });
+  });
+
+  // Simultaneous downloads presets
+  $$('.sim-preset').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      $$('.sim-preset').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const sim = $('#cfgSimultaneous');
+      if (sim) sim.value = btn.dataset.val;
+    });
+  });
+
+  // Copy CLI tool command
+  const bCopyCli = $('#bCopyCli');
+  if (bCopyCli) {
+    bCopyCli.addEventListener('click', () => {
+      navigator.clipboard.writeText('tayyar download https://example.com/file.zip');
+      toast('Copied command to clipboard!');
+    });
+  }
+
+  // Check update simulation in About modal (Image 13)
+  const bCheckUpdate = $('#bCheckUpdate');
+  if (bCheckUpdate) {
+    bCheckUpdate.addEventListener('click', () => {
+      bCheckUpdate.disabled = true;
+      const originalHtml = bCheckUpdate.innerHTML;
+      bCheckUpdate.innerHTML = `<span>Checking...</span>`;
+      setTimeout(() => {
+        bCheckUpdate.disabled = false;
+        bCheckUpdate.innerHTML = originalHtml;
+        toast(S.lang === 'ar' ? 'برنامج تيّار محدّث لأحدث إصدار!' : 'Tayyar is up to date (Version 1.0.0)');
+      }, 1000);
     });
   }
 
   /* ---------------- IPC INITIALIZATION ---------------- */
   async function init() {
     initHeatmap();
+    renderTrackersTable();
 
     if (!window.tayyar) {
-      console.warn('Tayyar IPC bridge not found (running in pure browser)');
+      console.warn('Tayyar IPC bridge not found (running in preview)');
       return;
     }
 

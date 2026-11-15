@@ -2,6 +2,7 @@
   "name": "tayyar-download-manager",
   "productName": "Tayyar",
   "version": "1.0.0",
+  "author": "Mohammed Mahbuobeh (Jone)",
   "description": "تيّار — مدير تحميلات حديث متعدد الاتصالات",
   "main": "src/main.js",
   "scripts": {
