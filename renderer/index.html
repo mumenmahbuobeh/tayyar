@@ -1,28 +1,34 @@
 <!doctype html>
 <html lang="en" dir="ltr" data-theme="dark">
+
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tayyar — Next Gen Download Manager</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body class="dark-theme">
-<div id="app" class="app-layout">
-  <!-- ================= SIDEBAR ================= -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-top">
-      <div class="brand-dropdown" id="brandDropdownBtn">
-        <span class="brand-logo">
-          <svg viewBox="0 0 40 18" fill="none" class="brand-svg">
-            <rect x="1" y="2" width="14" height="14" rx="3" stroke="currentColor" stroke-width="2.2"/>
-            <path d="M5 11V7l3 3 3-3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="20" cy="9" r="1.8" fill="currentColor"/>
-            <rect x="25" y="2" width="14" height="14" rx="3" stroke="currentColor" stroke-width="2.2"/>
+  <div id="app" class="app-layout">
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="brand-dropdown" id="brandDropdownBtn">
+          <span class="brand-logo">
+            <svg viewBox="0 0 40 18" fill="none" class="brand-svg">
+              <rect x="1" y="2" width="14" height="14" rx="3" stroke="currentColor" stroke-width="2.2" />
+              <path d="M5 11V7l3 3 3-3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <circle cx="20" cy="9" r="1.8" fill="currentColor" />
+              <rect x="25" y="2" width="14" height="14" rx="3" stroke="currentColor" stroke-width="2.2" />
+            </svg>
+          </span>
+          <svg class="chevron-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M6 9l6 6 6-6" />
           </svg>
-        </span>
-        <svg class="chevron-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
+        </div>
 
       <div class="sidebar-top-actions">
         <!-- Language Switcher Pill -->
@@ -42,1317 +48,1474 @@
     <!-- Navigation links -->
     <nav class="sidebar-nav">
       <ul class="nav-list">
-        <li>
-          <button class="nav-item active" data-view="dashboard">
-            <span class="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-                <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-                <rect x="14" y="14" width="7" height="7" rx="1.5"/>
-                <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-              </svg>
-            </span>
-            <span class="nav-label" data-i="dashboard">Dashboard</span>
-          </button>
-        </li>
-        <li>
-          <button class="nav-item" data-view="downloads">
-            <span class="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 3v13m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
-              </svg>
-            </span>
-            <span class="nav-label" data-i="downloads">Downloads</span>
-            <span class="nav-badge" id="navBadge" hidden>0</span>
-          </button>
-        </li>
-        <li>
-          <button class="nav-item" data-view="trackers">
-            <span class="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4.93 4.93a10 10 0 0114.14 0M7.76 7.76a6 6 0 018.48 0M12 12m-2 0a2 2 0 104 0 2 2 0 10-4 0M12 14v7"/>
-              </svg>
-            </span>
-            <span class="nav-label" data-i="trackers">Trackers</span>
-          </button>
-        </li>
-        <li>
-          <button class="nav-item" data-view="plugins">
-            <span class="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="16" rx="3"/>
-                <path d="M3 10h18M10 4v16"/>
-              </svg>
-            </span>
-            <span class="nav-label" data-i="plugins">Plugins</span>
-          </button>
-        </li>
-      </ul>
-    </nav>
-
-    <!-- Sidebar Bottom -->
-    <div class="sidebar-bottom">
-      <ul class="nav-list">
-        <li>
-          <button class="nav-item" data-view="notifications">
-            <span class="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
-              </svg>
-            </span>
-            <span class="nav-label" data-i="notifications">Notifications</span>
-          </button>
-        </li>
-        <li>
-          <button class="nav-item" data-view="settings">
-            <span class="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-              </svg>
-            </span>
-            <span class="nav-label" data-i="settings">Settings</span>
-          </button>
-        </li>
-      </ul>
-    </div>
-  </aside>
-
-  <!-- ================= MAIN CONTENT ================= -->
-  <main class="main-content" id="mainContent">
-
-    <!-- ========== VIEW: DASHBOARD (Image 1 & 2) ========== -->
-    <section class="view-panel active" id="viewDashboard">
-      <header class="view-header">
-        <h1 class="view-title" data-i="dashboard">Dashboard</h1>
-        
-        <!-- Customize Mode Toolbar (Image 2) -->
-        <div class="customize-bar" id="customizeBar" hidden>
-          <button class="icon-btn-round" id="bCloseCustom" title="Close"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
-          <button class="icon-btn-round" id="bResetCustom" title="Reset"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
-          <button class="pill-btn primary" id="bApplyCustom"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none" style="width:14px;margin-right:4px;"><path d="M20 6L9 17l-5-5"/></svg> <span data-i="apply">Apply</span></button>
-          <div class="custom-dropdown-wrap">
-            <button class="pill-btn outline" id="bPresetMenu">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;margin-right:6px;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-              <span id="curPresetLabel">Compact</span>
-              <svg class="chevron-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;margin-left:4px;"><path d="M6 9l6 6 6-6"/></svg>
+          <li>
+            <button class="nav-item active" data-view="dashboard">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                  <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                  <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                  <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                </svg>
+              </span>
+              <span class="nav-label" data-i="dashboard">Dashboard</span>
             </button>
-            <div class="dropdown-popover" id="presetPopover" hidden>
-              <div class="dropdown-item" data-preset="balanced">Balanced</div>
-              <div class="dropdown-item" data-preset="task">Task Focus</div>
-              <div class="dropdown-item" data-preset="speed">Speed Focus</div>
-              <div class="dropdown-item active" data-preset="compact">Compact <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="check-ic"><path d="M20 6L9 17l-5-5"/></svg></div>
+          </li>
+          <li>
+            <button class="nav-item" data-view="downloads">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3v13m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+                </svg>
+              </span>
+              <span class="nav-label" data-i="downloads">Downloads</span>
+              <span class="nav-badge" id="navBadge" hidden>0</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" data-view="trackers">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M4.93 4.93a10 10 0 0114.14 0M7.76 7.76a6 6 0 018.48 0M12 12m-2 0a2 2 0 104 0 2 2 0 10-4 0M12 14v7" />
+                </svg>
+              </span>
+              <span class="nav-label" data-i="trackers">Trackers</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" data-view="plugins">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="16" rx="3" />
+                  <path d="M3 10h18M10 4v16" />
+                </svg>
+              </span>
+              <span class="nav-label" data-i="plugins">Plugins</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Sidebar Bottom -->
+      <div class="sidebar-bottom">
+        <ul class="nav-list">
+          <li>
+            <button class="nav-item" data-view="notifications">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+                </svg>
+              </span>
+              <span class="nav-label" data-i="notifications">Notifications</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item" data-view="settings">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3" />
+                  <path
+                    d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+                </svg>
+              </span>
+              <span class="nav-label" data-i="settings">Settings</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content" id="mainContent">
+
+      <!-- ========== VIEW: DASHBOARD (Image 1 & 2) ========== -->
+      <section class="view-panel active" id="viewDashboard">
+        <header class="view-header">
+          <h1 class="view-title" data-i="dashboard">Dashboard</h1>
+
+          <!-- Customize Mode Toolbar (Image 2) -->
+          <div class="customize-bar" id="customizeBar" hidden>
+            <button class="icon-btn-round" id="bCloseCustom" title="Close"><svg viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2.5" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg></button>
+            <button class="icon-btn-round" id="bResetCustom" title="Reset"><svg viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2" fill="none">
+                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+              </svg></button>
+            <button class="pill-btn primary" id="bApplyCustom"><svg viewBox="0 0 24 24" stroke="currentColor"
+                stroke-width="3" fill="none" style="width:14px;margin-right:4px;">
+                <path d="M20 6L9 17l-5-5" />
+              </svg> <span data-i="apply">Apply</span></button>
+            <div class="custom-dropdown-wrap">
+              <button class="pill-btn outline" id="bPresetMenu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  style="width:15px;margin-right:6px;">
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+                <span id="curPresetLabel">Compact</span>
+                <svg class="chevron-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  style="width:12px;margin-left:4px;">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              <div class="dropdown-popover" id="presetPopover" hidden>
+                <div class="dropdown-item" data-preset="balanced">Balanced</div>
+                <div class="dropdown-item" data-preset="task">Task Focus</div>
+                <div class="dropdown-item" data-preset="speed">Speed Focus</div>
+                <div class="dropdown-item active" data-preset="compact">Compact <svg viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" class="check-ic">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg></div>
+              </div>
+            </div>
+            <button class="icon-btn-round" id="bAddWidget" title="Add Card"><svg viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2.5" fill="none">
+                <path d="M12 5v14M5 12h14" />
+              </svg></button>
+          </div>
+
+          <div class="header-actions" id="standardDashActions">
+            <button class="icon-btn-ghost" id="bToggleCustomize" title="Customize Layout">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Bento Grid (9 Cards from Image 1) -->
+        <div class="bento-grid layout-compact" id="bentoGrid">
+
+          <!-- CARD 1: ENGINE -->
+          <div class="bento-card card-engine" data-widget="engine">
+            <div class="card-header">
+              <span class="card-label" data-i="engine">ENGINE</span>
+              <span class="card-header-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="4" width="16" height="16" rx="3" />
+                  <path d="M9 9h6M9 13h6M9 17h6M1 9h3M1 15h3M20 9h3M20 15h3M9 1v3M15 1v3M9 20v3M15 20v3" />
+                </svg>
+              </span>
+            </div>
+            <div class="card-main-val" id="engineStatusVal" data-i="ready">Ready</div>
+            <div class="card-footer">
+              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.0</span>
+              <span class="status-indicator online" id="engineStatusDot"></span>
             </div>
           </div>
-          <button class="icon-btn-round" id="bAddWidget" title="Add Card"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 5v14M5 12h14"/></svg></button>
-        </div>
 
-        <div class="header-actions" id="standardDashActions">
-          <button class="icon-btn-ghost" id="bToggleCustomize" title="Customize Layout">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>
-            </svg>
-          </button>
-        </div>
-      </header>
-
-      <!-- Bento Grid (9 Cards from Image 1) -->
-      <div class="bento-grid layout-compact" id="bentoGrid">
-
-        <!-- CARD 1: ENGINE -->
-        <div class="bento-card card-engine" data-widget="engine">
-          <div class="card-header">
-            <span class="card-label" data-i="engine">ENGINE</span>
-            <span class="card-header-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="4" y="4" width="16" height="16" rx="3"/>
-                <path d="M9 9h6M9 13h6M9 17h6M1 9h3M1 15h3M20 9h3M20 15h3M9 1v3M15 1v3M9 20v3M15 20v3"/>
-              </svg>
-            </span>
-          </div>
-          <div class="card-main-val" id="engineStatusVal" data-i="ready">Ready</div>
-          <div class="card-footer">
-            <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.0</span>
-            <span class="status-indicator online" id="engineStatusDot"></span>
-          </div>
-        </div>
-
-        <!-- CARD 2: NAT -->
-        <div class="bento-card card-nat" data-widget="nat">
-          <div class="card-header">
-            <span class="card-label">NAT</span>
-            <span class="card-header-icon dots-ic">•••</span>
-          </div>
-          <div class="card-main-val" data-i="mapping">Mapping</div>
-          <div class="card-footer">
-            <span class="footer-txt" id="natStatusTxt">Bridge (127.0.0.1:6824)</span>
-            <span class="status-indicator online"></span>
-          </div>
-        </div>
-
-        <!-- CARD 3: UPLOAD -->
-        <div class="bento-card card-speed card-upload" data-widget="upload">
-          <div class="card-header">
-            <span class="card-label" data-i="upload">UPLOAD</span>
-          </div>
-          <div class="card-main-val" id="uploadSpeedVal">0 <span class="unit">B/s</span></div>
-          <div class="card-speed-bar purple">
-            <div class="bar-glow-line" id="uploadGlowLine" style="width: 15%;"></div>
-          </div>
-        </div>
-
-        <!-- CARD 4: DOWNLOAD -->
-        <div class="bento-card card-speed card-download" data-widget="download">
-          <div class="card-header">
-            <span class="card-label" data-i="download">DOWNLOAD</span>
-          </div>
-          <div class="card-main-val" id="downloadSpeedVal">0 <span class="unit">B/s</span></div>
-          <div class="card-speed-bar cyan">
-            <div class="bar-glow-line" id="downloadGlowLine" style="width: 25%;"></div>
-          </div>
-        </div>
-
-        <!-- CARD 5: SPEED LIMIT -->
-        <div class="bento-card card-speed-limit" data-widget="speedLimit">
-          <div class="card-header">
-            <span class="card-label" data-i="speedLimit">SPEED LIMIT</span>
-            <span class="card-header-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-              </svg>
-            </span>
-          </div>
-          <div class="speed-modes">
-            <button class="mode-pill active" data-mode="unlimited" title="Unlimited Speed">
-              <span class="mode-emoji">🐇</span>
-            </button>
-            <button class="mode-pill" data-mode="eco" title="Eco Mode (2 MB/s)">
-              <span class="mode-emoji">🐢</span>
-            </button>
-            <button class="mode-pill" data-mode="slow" title="Slow Mode (500 KB/s)">
-              <span class="mode-emoji">🐿️</span>
-            </button>
-          </div>
-          <div class="card-footer">
-            <span class="footer-txt" id="speedModeDesc" data-i="standardMode">Standard mode</span>
-          </div>
-        </div>
-
-        <!-- CARD 6: TRANSFER -->
-        <div class="bento-card card-transfer" data-widget="transfer">
-          <div class="card-header">
-            <span class="card-label" data-i="transfer">TRANSFER</span>
-          </div>
-          <div class="card-main-val" id="transferTotalVal">0 <span class="unit">B</span></div>
-          <div class="card-footer">
-            <div class="select-pill-wrap">
-              <select id="transferPeriodSelect" class="select-pill">
-                <option value="today" data-i="today">Today</option>
-                <option value="week" data-i="thisWeek">This Week</option>
-                <option value="month" data-i="thisMonth">This Month</option>
-                <option value="all" data-i="allTime">All Time</option>
-              </select>
-              <svg class="chevron-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          <!-- CARD 2: NAT -->
+          <div class="bento-card card-nat" data-widget="nat">
+            <div class="card-header">
+              <span class="card-label">NAT</span>
+              <span class="card-header-icon dots-ic">•••</span>
+            </div>
+            <div class="card-main-val" data-i="mapping">Mapping</div>
+            <div class="card-footer">
+              <span class="footer-txt" id="natStatusTxt">Bridge (127.0.0.1:6824)</span>
+              <span class="status-indicator online"></span>
             </div>
           </div>
-        </div>
 
-        <!-- CARD 7: TASKS -->
-        <div class="bento-card card-tasks" data-widget="tasks">
-          <div class="card-header">
-            <span class="card-label" data-i="tasks">TASKS</span>
+          <!-- CARD 3: UPLOAD -->
+          <div class="bento-card card-speed card-upload" data-widget="upload">
+            <div class="card-header">
+              <span class="card-label" data-i="upload">UPLOAD</span>
+            </div>
+            <div class="card-main-val" id="uploadSpeedVal">0 <span class="unit">B/s</span></div>
+            <div class="card-speed-bar purple">
+              <div class="bar-glow-line" id="uploadGlowLine" style="width: 15%;"></div>
+            </div>
+          </div>
+
+          <!-- CARD 4: DOWNLOAD -->
+          <div class="bento-card card-speed card-download" data-widget="download">
+            <div class="card-header">
+              <span class="card-label" data-i="download">DOWNLOAD</span>
+            </div>
+            <div class="card-main-val" id="downloadSpeedVal">0 <span class="unit">B/s</span></div>
+            <div class="card-speed-bar cyan">
+              <div class="bar-glow-line" id="downloadGlowLine" style="width: 25%;"></div>
+            </div>
+          </div>
+
+          <!-- CARD 5: SPEED LIMIT -->
+          <div class="bento-card card-speed-limit" data-widget="speedLimit">
+            <div class="card-header">
+              <span class="card-label" data-i="speedLimit">SPEED LIMIT</span>
+              <span class="card-header-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3" />
+                  <path
+                    d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+                </svg>
+              </span>
+            </div>
+            <div class="speed-modes">
+              <button class="mode-pill active" data-mode="unlimited" title="Unlimited Speed">
+                <span class="mode-emoji">🐇</span>
+              </button>
+              <button class="mode-pill" data-mode="eco" title="Eco Mode (2 MB/s)">
+                <span class="mode-emoji">🐢</span>
+              </button>
+              <button class="mode-pill" data-mode="slow" title="Slow Mode (500 KB/s)">
+                <span class="mode-emoji">🐿️</span>
+              </button>
+            </div>
+            <div class="card-footer">
+              <span class="footer-txt" id="speedModeDesc" data-i="standardMode">Standard mode</span>
+            </div>
+          </div>
+
+          <!-- CARD 6: TRANSFER -->
+          <div class="bento-card card-transfer" data-widget="transfer">
+            <div class="card-header">
+              <span class="card-label" data-i="transfer">TRANSFER</span>
+            </div>
+            <div class="card-main-val" id="transferTotalVal">0 <span class="unit">B</span></div>
+            <div class="card-footer">
+              <div class="select-pill-wrap">
+                <select id="transferPeriodSelect" class="select-pill">
+                  <option value="today" data-i="today">Today</option>
+                  <option value="week" data-i="thisWeek">This Week</option>
+                  <option value="month" data-i="thisMonth">This Month</option>
+                  <option value="all" data-i="allTime">All Time</option>
+                </select>
+                <svg class="chevron-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 7: TASKS -->
+          <div class="bento-card card-tasks" data-widget="tasks">
+            <div class="card-header">
+              <span class="card-label" data-i="tasks">TASKS</span>
+              <div class="tab-pills">
+                <button class="tab-pill active" data-tab="active" data-i="active">Active</button>
+                <button class="tab-pill" data-tab="failed" data-i="failed">Failed</button>
+                <button class="tab-pill" data-tab="recent" data-i="recent">Recent</button>
+              </div>
+            </div>
+            <div class="tasks-body" id="tasksBodyContent">
+              <div class="empty-tasks-state" id="emptyTasksState">
+                <span class="empty-txt" data-i="noActiveTasks">No active tasks</span>
+                <button class="pill-btn light" id="bNewTaskFromCard" data-i="newTask">New task</button>
+              </div>
+              <div class="mini-tasks-list" id="miniTasksList" hidden></div>
+            </div>
+          </div>
+
+          <!-- CARD 8: ACTIVE TASKS -->
+          <div class="bento-card card-active-tasks" data-widget="activeTasks">
+            <div class="card-header">
+              <span class="card-label" data-i="activeTasks">ACTIVE TASKS</span>
+              <span class="status-indicator" id="activeTasksIndicator"></span>
+            </div>
+            <div class="card-main-val big-num" id="activeTasksCount">0</div>
+            <div class="active-tasks-subcols">
+              <div class="subcol">
+                <span class="subcol-num" id="subDownloadingCount">0</span>
+                <span class="subcol-lbl" data-i="downloadingCaps">DOWNLOADING</span>
+              </div>
+              <div class="subcol">
+                <span class="subcol-num" id="subWaitingCount">0</span>
+                <span class="subcol-lbl" data-i="waitingCaps">WAITING</span>
+              </div>
+              <div class="subcol">
+                <span class="subcol-num" id="subSeedingCount">0</span>
+                <span class="subcol-lbl" data-i="seedingCaps">SEEDING</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 9: ACTIVITY (HEATMAP) -->
+          <div class="bento-card card-activity" data-widget="activity">
+            <div class="card-header">
+              <span class="card-label" data-i="activity">ACTIVITY</span>
+            </div>
+            <div class="heatmap-wrap">
+              <div class="heatmap-months">
+                <span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span>
+              </div>
+              <div class="heatmap-grid-container">
+                <div class="heatmap-days">
+                  <span>Mon</span><span>Wed</span><span>Fri</span>
+                </div>
+                <div class="heatmap-cells" id="heatmapCells">
+                  <!-- Generated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========== VIEW: DOWNLOADS ========== -->
+      <section class="view-panel" id="viewDownloads">
+        <header class="view-header">
+          <div class="downloads-header-left">
+            <h1 class="view-title" data-i="downloads">Downloads</h1>
+            <div class="dl-filter-pills">
+              <button class="filter-pill active" data-dl-filter="all"><span data-i="all">All</span> <span class="cnt"
+                  id="cntAll">0</span></button>
+              <button class="filter-pill" data-dl-filter="active"><span data-i="downloading">Downloading</span> <span
+                  class="cnt" id="cntActive">0</span></button>
+              <button class="filter-pill" data-dl-filter="waiting"><span data-i="waiting">Waiting</span> <span
+                  class="cnt" id="cntWaiting">0</span></button>
+              <button class="filter-pill" data-dl-filter="done"><span data-i="completed">Completed</span> <span
+                  class="cnt" id="cntDone">0</span></button>
+              <button class="filter-pill" data-dl-filter="failed"><span data-i="failed">Failed</span> <span class="cnt"
+                  id="cntFailed">0</span></button>
+            </div>
+          </div>
+          <div class="downloads-header-right">
+            <div class="search-input-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="6" />
+                <path d="M20 20l-4.5-4.5" />
+              </svg>
+              <input type="search" id="dlSearchInput" placeholder="Search tasks...">
+            </div>
+            <button class="pill-btn primary" id="bAddDownload"><svg width="14" height="14" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 5v14M5 12h14" />
+              </svg> <span data-i="addTask">Add Task</span></button>
+            <button class="icon-btn-ghost" id="bResumeSelected" title="Resume" disabled><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5l11 7-11 7z" />
+              </svg></button>
+            <button class="icon-btn-ghost" id="bPauseSelected" title="Pause" disabled><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5h3v14H8zM13 5h3v14h-3z" />
+              </svg></button>
+            <button class="icon-btn-ghost danger" id="bDeleteSelected" title="Delete" disabled><svg width="14"
+                height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+              </svg></button>
+          </div>
+        </header>
+
+        <div class="downloads-container">
+          <div class="downloads-list" id="downloadsList">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Detail Drawer -->
+          <aside class="downloads-detail" id="downloadsDetail" hidden>
+            <div class="detail-header">
+              <h3 id="detTitle">Task Details</h3>
+              <button class="icon-btn-ghost" id="bCloseDetail">✕</button>
+            </div>
+            <div class="detail-body" id="detBody"></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ========== VIEW: TRACKERS (Images 2 & 3) ========== -->
+      <section class="view-panel" id="viewTrackers">
+        <header class="view-header">
+          <h1 class="view-title" data-i="trackers">Trackers</h1>
+          <div class="header-actions">
+            <button class="icon-btn-ghost" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="11" cy="11" r="6" />
+                <path d="M20 20l-4.5-4.5" />
+              </svg></button>
+          </div>
+        </header>
+
+        <!-- Trackers Content Card -->
+        <div class="trackers-card-wrap">
+          <div class="trackers-top-bar">
             <div class="tab-pills">
-              <button class="tab-pill active" data-tab="active" data-i="active">Active</button>
-              <button class="tab-pill" data-tab="failed" data-i="failed">Failed</button>
-              <button class="tab-pill" data-tab="recent" data-i="recent">Recent</button>
+              <button class="tab-pill active" id="tabTrackersEffective" data-i="effective">Effective</button>
+              <button class="tab-pill" id="tabTrackersBlacklist" data-i="blacklist">Blacklist</button>
             </div>
           </div>
-          <div class="tasks-body" id="tasksBodyContent">
-            <div class="empty-tasks-state" id="emptyTasksState">
-              <span class="empty-txt" data-i="noActiveTasks">No active tasks</span>
-              <button class="pill-btn light" id="bNewTaskFromCard" data-i="newTask">New task</button>
+
+          <div class="trackers-toggle-row">
+            <div class="toggle-info">
+              <h4 data-i="injectCurated">Inject curated trackers</h4>
+              <p data-i="injectCuratedDesc">Add curated trackers to new public multi-source acceleration tasks.</p>
             </div>
-            <div class="mini-tasks-list" id="miniTasksList" hidden></div>
+            <label class="switch-toggle">
+              <input type="checkbox" id="chkInjectTrackers" checked>
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <!-- Trackers Source Tags -->
+          <div class="trackers-tags-row">
+            <span class="tracker-tag">ngosang/trackerslist (best) <button class="tag-close">×</button></span>
+            <span class="tracker-tag">XIU2/TrackersListCollection (best) <button class="tag-close">×</button></span>
+          </div>
+
+          <!-- Trackers Data Table -->
+          <div class="trackers-table-wrap">
+            <table class="trackers-table">
+              <thead>
+                <tr>
+                  <th>URL</th>
+                  <th>HEALTH</th>
+                  <th>LAST PROBED</th>
+                  <th>SOURCE</th>
+                </tr>
+              </thead>
+              <tbody id="trackersTableBody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Trackers Footer -->
+          <div class="trackers-footer">
+            <span class="footer-stat" id="trackersStatTxt">50 trackers · Last successful update: 11/15/2026, 8:27:33
+              AM</span>
+            <button class="pill-btn light" id="bSyncTrackers"><svg viewBox="0 0 24 24" stroke="currentColor"
+                stroke-width="2" fill="none" style="width:14px;margin-right:6px;">
+                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+              </svg> <span data-i="syncNow">Sync Now</span></button>
           </div>
         </div>
+      </section>
 
-        <!-- CARD 8: ACTIVE TASKS -->
-        <div class="bento-card card-active-tasks" data-widget="activeTasks">
-          <div class="card-header">
-            <span class="card-label" data-i="activeTasks">ACTIVE TASKS</span>
-            <span class="status-indicator" id="activeTasksIndicator"></span>
+      <!-- ========== VIEW: PLUGINS (Image 1) ========== -->
+      <section class="view-panel" id="viewPlugins">
+        <header class="view-header">
+          <h1 class="view-title" data-i="plugins">Plugins</h1>
+          <div class="header-actions">
+            <button class="icon-btn-ghost" title="Add plugin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5">
+                <path d="M12 5v14M5 12h14" />
+              </svg></button>
+            <button class="icon-btn-ghost" title="Link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path
+                  d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+              </svg></button>
+            <button class="icon-btn-ghost" title="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+              </svg></button>
+            <button class="icon-btn-ghost" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="11" cy="11" r="6" />
+                <path d="M20 20l-4.5-4.5" />
+              </svg></button>
           </div>
-          <div class="card-main-val big-num" id="activeTasksCount">0</div>
-          <div class="active-tasks-subcols">
-            <div class="subcol">
-              <span class="subcol-num" id="subDownloadingCount">0</span>
-              <span class="subcol-lbl" data-i="downloadingCaps">DOWNLOADING</span>
-            </div>
-            <div class="subcol">
-              <span class="subcol-num" id="subWaitingCount">0</span>
-              <span class="subcol-lbl" data-i="waitingCaps">WAITING</span>
-            </div>
-            <div class="subcol">
-              <span class="subcol-num" id="subSeedingCount">0</span>
-              <span class="subcol-lbl" data-i="seedingCaps">SEEDING</span>
-            </div>
-          </div>
+        </header>
+
+        <!-- Trust notice banner -->
+        <div class="plugins-banner">
+          <div class="banner-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg> <span data-i="addPluginsTrust">Add plugins you trust</span></div>
+          <p data-i="pluginsTrustDesc">Install from a source you trust, review the requested access, then enable the
+            plugin. Grant website access only for sites you expect the plugin to handle.</p>
         </div>
 
-        <!-- CARD 9: ACTIVITY (HEATMAP) -->
-        <div class="bento-card card-activity" data-widget="activity">
-          <div class="card-header">
-            <span class="card-label" data-i="activity">ACTIVITY</span>
-          </div>
-          <div class="heatmap-wrap">
-            <div class="heatmap-months">
-              <span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span>
-            </div>
-            <div class="heatmap-grid-container">
-              <div class="heatmap-days">
-                <span>Mon</span><span>Wed</span><span>Fri</span>
+        <!-- Installed Plugins Grid -->
+        <div class="plugins-grid">
+          <div class="plugin-card">
+            <div class="plugin-card-top">
+              <span class="plugin-avatar avatar-blue">MF</span>
+              <div class="plugin-meta">
+                <div class="plugin-title">Tayyar Filename Template <span class="status-dot-blue"></span></div>
+                <div class="plugin-ver">v1.1.1 · tayyar.filename-template</div>
               </div>
-              <div class="heatmap-cells" id="heatmapCells">
-                <!-- Generated by JS -->
+              <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
+            </div>
+            <p class="plugin-desc">Renames downloads with safe, composable templates while preserving their extensions.
+            </p>
+            <div class="plugin-card-foot">
+              <button class="pill-btn light sm">Open</button>
+              <span class="badge-safe">Looks safe</span>
+            </div>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-card-top">
+              <span class="plugin-avatar avatar-green">MU</span>
+              <div class="plugin-meta">
+                <div class="plugin-title">Tayyar URL Resolver <span class="status-dot-blue"></span></div>
+                <div class="plugin-ver">v1.0.0 · tayyar.url-resolver</div>
               </div>
+              <label class="switch-toggle"><input type="checkbox"><span class="switch-slider"></span></label>
+            </div>
+            <p class="plugin-desc">URL-resolver framework for Tayyar multi-source stream handling.</p>
+            <div class="plugin-card-foot">
+              <button class="pill-btn light sm">Open</button>
+              <span class="badge-safe">Looks safe</span>
             </div>
           </div>
         </div>
 
+        <!-- Available Plugins Section -->
+        <h3 class="section-subtitle" style="margin:24px 0 14px;" data-i="availablePlugins">Available plugins</h3>
+        <div class="plugins-grid">
+          <div class="plugin-card">
+            <div class="plugin-card-top">
+              <span class="plugin-avatar avatar-blue">FC</span>
+              <div class="plugin-meta">
+                <div class="plugin-title">Folder Categories</div>
+                <div class="plugin-ver">by Ashkan4472 · v1.0.0</div>
+              </div>
+            </div>
+            <p class="plugin-desc">Sorts finished downloads into category folders (Compressed, Documents, Music,
+              Programs, Video).</p>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-card-top">
+              <span class="plugin-avatar avatar-green">AR</span>
+              <div class="plugin-meta">
+                <div class="plugin-title">AllDebrid Resolver</div>
+                <div class="plugin-ver">by DonTarken · v1.2.0</div>
+              </div>
+            </div>
+            <p class="plugin-desc">Automatically unlocks and debrids supported download links using your premium
+              account.</p>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-card-top">
+              <span class="plugin-avatar avatar-blue">MS</span>
+              <div class="plugin-meta">
+                <div class="plugin-title">Tayyar Smart Link</div>
+                <div class="plugin-ver">by griciaisl12 · v1.0.5</div>
+              </div>
+            </div>
+            <p class="plugin-desc">Resolves GitHub repository release, file links, Google Drive/Docs into real
+              downloads.</p>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-card-top">
+              <span class="plugin-avatar avatar-blue">MM</span>
+              <div class="plugin-meta">
+                <div class="plugin-title">Tayyar Media Merge</div>
+                <div class="plugin-ver">by Tayyar Team · v0.1.0</div>
+              </div>
+            </div>
+            <p class="plugin-desc">Combine separate video and audio files into one MP4 or MKV without re-encoding.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== VIEW: NOTIFICATIONS ========== -->
+      <section class="view-panel" id="viewNotifications">
+        <header class="view-header">
+          <h1 class="view-title" data-i="notifications">Notifications</h1>
+        </header>
+        <div class="subview-placeholder">
+          <div class="placeholder-card">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              class="placeholder-icon">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <h3 data-i="notificationsCenter">Notification Center</h3>
+            <p data-i="noNotifsDesc">Completed downloads and system integration alerts will be listed here.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== VIEW: SETTINGS (Matching Image 3) ========== -->
+      <section class="view-panel" id="viewSettings">
+        <header class="view-header">
+          <h1 class="view-title" data-i="settings">Settings</h1>
+        </header>
+
+        <!-- 8 Settings Cards Grid -->
+        <div class="settings-cards-grid">
+
+          <!-- Card 1: General (Pink 3D House) -->
+          <div class="settings-card" data-setting-modal="generalModal">
+            <div class="setting-card-icon-wrap icon-pink">
+              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+                <path d="M16 4L3 14h4v13a1 1 0 001 1h6v-8h4v8h6a1 1 0 001-1V14h4L16 4z" fill="#f43f5e" />
+                <path d="M16 4L3 14h4v13h4v-7h10v7h4V14h4L16 4z" fill="url(#gradHouse)" opacity="0.8" />
+                <defs>
+                  <linearGradient id="gradHouse" x1="3" y1="4" x2="29" y2="28">
+                    <stop stop-color="#fda4af" />
+                    <stop offset="1" stop-color="#f43f5e" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div class="setting-card-info">
+              <h3 class="setting-card-title" data-i="setGeneralTitle">General</h3>
+              <p class="setting-card-desc" data-i="setGeneralDesc">Startup, default save folder, system integration</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Appearance (Colorful Logo) -->
+          <div class="settings-card" data-setting-modal="appearanceModal">
+            <div class="setting-card-icon-wrap icon-multi">
+              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+                <circle cx="16" cy="16" r="14" fill="#0f172a" />
+                <circle cx="16" cy="16" r="13" stroke="url(#gradAppr)" stroke-width="2.5" />
+                <path d="M11 11v10M11 16l5-5 5 5M21 11v10" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" />
+                <defs>
+                  <linearGradient id="gradAppr" x1="0" y1="0" x2="32" y2="32">
+                    <stop stop-color="#38bdf8" />
+                    <stop offset="0.5" stop-color="#a855f7" />
+                    <stop offset="1" stop-color="#f43f5e" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div class="setting-card-info">
+              <h3 class="setting-card-title" data-i="setApprTitle">Appearance</h3>
+              <p class="setting-card-desc" data-i="setApprDesc">Theme, language, tray icon</p>
+            </div>
+          </div>
+
+          <!-- Card 3: Downloads (Cyan Tray) -->
+          <div class="settings-card" data-setting-modal="downloadsModal">
+            <div class="setting-card-icon-wrap icon-cyan">
+              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+                <path d="M16 6v14m0 0l-5-5m5 5l5-5" stroke="#06b6d4" stroke-width="3" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <path d="M6 20v6a2 2 0 002 2h16a2 2 0 002-2v-6" stroke="#22d3ee" stroke-width="2.5"
+                  stroke-linecap="round" />
+              </svg>
+            </div>
+            <div class="setting-card-info">
+              <h3 class="setting-card-title" data-i="setDlTitle">Downloads</h3>
+              <p class="setting-card-desc" data-i="setDlDesc">Concurrency, bandwidth limits, network reliability</p>
+            </div>
+          </div>
+
+          <!-- Card 4: BitTorrent (Purple/Blue Arrows) -->
+          <div class="settings-card" data-setting-modal="bittorrentModal">
+            <div class="setting-card-icon-wrap icon-purple">
+              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+                <path d="M11 26V8m0 0l-4 4m4-4l4 4" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <path d="M21 6v18m0 0l-4-4m4 4l4-4" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="setting-card-info">
+              <h3 class="setting-card-title" data-i="setBtTitle">BitTorrent</h3>
+              <p class="setting-card-desc" data-i="setBtDesc">DHT, listen ports, trackers, peer geo</p>
+            </div>
+          </div>
+
+          <!-- Card 5: Integration (Orange Puzzle) -->
+          <div class="settings-card" data-setting-modal="integrationModal">
+            <div class="setting-card-icon-wrap icon-orange">
+              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+                <path
+                  d="M13 5a3 3 0 016 0h5a2 2 0 012 2v5a3 3 0 010 6v5a2 2 0 01-2 2h-5a3 3 0 01-6 0H8a2 2 0 01-2-2v-5a3 3 0 000-6V7a2 2 0 012-2h5z"
+                  fill="#f97316" opacity="0.9" />
+              </svg>
+            </div>
+            <div class="setting-card-info">
+              <h3 class="setting-card-title" data-i="setIntTitle">Integration</h3>
+              <p class="setting-card-desc" data-i="setIntDesc">Browser extensions, CLI, system integrations</p>
+            </div>
+          </div>
+
+          <!-- Card 6: Network (Green Globe) -->
+          <div class="settings-card" data-setting-modal="networkModal">
+            <div class="setting-card-icon-wrap icon-green">
+              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+                <circle cx="16" cy="16" r="12" stroke="#10b981" stroke-width="2.5" />
+                <path d="M4 16h24M16 4a19 19 0 000 24 19 19 0 000-24" stroke="#34d399" stroke-width="2" />
+              </svg>
+            </div>
+            <div class="setting-card-info">
+              <h3 class="setting-card-title" data-i="setNetTitle">Network</h3>
+              <p class="setting-card-desc" data-i="setNetDesc">Proxy, DNS, and NAT/UPnP</p>
+            </div>
+          </div>
+
+          <!-- Card 7: Advanced (Blue Cog) -->
+          <div class="settings-card" data-setting-modal="advancedModal">
+            <div class="setting-card-icon-wrap icon-blue">
+              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+                <circle cx="16" cy="16" r="4" fill="#3b82f6" />
+                <path
+                  d="M26 16a10 10 0 00-.2-2l2.3-1.8a1 1 0 00.2-1.3l-2.2-3.8a1 1 0 00-1.2-.5l-2.7 1.1a10 10 0 00-3.5-2l-.4-2.9A1 1 0 0017.3 2h-4.6a1 1 0 00-1 .9l-.4 2.9a10 10 0 00-3.5 2L5.1 6.7a1 1 0 00-1.2.5L1.7 11a1 1 0 00.2 1.3l2.3 1.8A10 10 0 004 16a10 10 0 00.2 2l-2.3 1.8a1 1 0 00-.2 1.3l2.2 3.8a1 1 0 001.2.5l2.7-1.1a10 10 0 003.5 2l.4 2.9a1 1 0 001 .9h4.6a1 1 0 001-.9l.4-2.9a10 10 0 003.5-2l2.7 1.1a10 10 0 001.2-.5l2.2-3.8a1 1 0 00-.2-1.3L25.8 18c.1-.7.2-1.3.2-2z"
+                  stroke="#60a5fa" stroke-width="2" />
+              </svg>
+            </div>
+            <div class="setting-card-info">
+              <h3 class="setting-card-title" data-i="setAdvTitle">Advanced</h3>
+              <p class="setting-card-desc" data-i="setAdvDesc">RPC, SQLite persistence</p>
+            </div>
+          </div>
+
+          <!-- Card 8: About (Yellow Notebook - Image 13) -->
+          <div class="settings-card" data-setting-modal="aboutModal">
+            <div class="setting-card-icon-wrap icon-yellow">
+              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+                <rect x="7" y="5" width="18" height="22" rx="3" fill="#eab308" />
+                <path d="M11 11h10M11 16h10M11 21h6" stroke="#713f12" stroke-width="2" stroke-linecap="round" />
+                <circle cx="21" cy="7" r="2" fill="#ca8a04" />
+              </svg>
+            </div>
+            <div class="setting-card-info">
+              <h3 class="setting-card-title" data-i="setAboutTitle">About</h3>
+              <p class="setting-card-desc" data-i="setAboutDesc">Version, updates, source code and manual</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= MODALS SECTION ================= -->
+
+  <!-- ADD TASK MODAL -->
+  <dialog id="addModal" class="sleek-modal">
+    <form method="dialog" id="addForm" class="modal-form">
+      <div class="modal-head">
+        <h2 data-i="newTaskTitle">New Download Task</h2>
+        <button type="button" class="icon-btn-ghost modal-close" id="bCloseAdd">✕</button>
       </div>
-    </section>
-
-    <!-- ========== VIEW: DOWNLOADS ========== -->
-    <section class="view-panel" id="viewDownloads">
-      <header class="view-header">
-        <div class="downloads-header-left">
-          <h1 class="view-title" data-i="downloads">Downloads</h1>
-          <div class="dl-filter-pills">
-            <button class="filter-pill active" data-dl-filter="all"><span data-i="all">All</span> <span class="cnt" id="cntAll">0</span></button>
-            <button class="filter-pill" data-dl-filter="active"><span data-i="downloading">Downloading</span> <span class="cnt" id="cntActive">0</span></button>
-            <button class="filter-pill" data-dl-filter="waiting"><span data-i="waiting">Waiting</span> <span class="cnt" id="cntWaiting">0</span></button>
-            <button class="filter-pill" data-dl-filter="done"><span data-i="completed">Completed</span> <span class="cnt" id="cntDone">0</span></button>
-            <button class="filter-pill" data-dl-filter="failed"><span data-i="failed">Failed</span> <span class="cnt" id="cntFailed">0</span></button>
+      <div class="modal-body">
+        <label class="field-label"><span data-i="urlsLabel">URL (or multiple links, one per line)</span>
+          <textarea id="taskUrlInput" rows="3" placeholder="https://example.com/file.zip" required></textarea>
+        </label>
+        <div class="probe-box" id="probeBox" hidden>
+          <div class="probe-row">
+            <input type="text" id="probeFileName" class="probe-input" placeholder="File name">
+            <span class="chip-badge" id="probeSizeBadge">Detecting...</span>
           </div>
         </div>
-        <div class="downloads-header-right">
-          <div class="search-input-wrap">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
-            <input type="search" id="dlSearchInput" placeholder="Search tasks...">
-          </div>
-          <button class="pill-btn primary" id="bAddDownload"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> <span data-i="addTask">Add Task</span></button>
-          <button class="icon-btn-ghost" id="bResumeSelected" title="Resume" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5l11 7-11 7z"/></svg></button>
-          <button class="icon-btn-ghost" id="bPauseSelected" title="Pause" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5h3v14H8zM13 5h3v14h-3z"/></svg></button>
-          <button class="icon-btn-ghost danger" id="bDeleteSelected" title="Delete" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
-        </div>
-      </header>
-
-      <div class="downloads-container">
-        <div class="downloads-list" id="downloadsList">
-          <!-- Rendered by JS -->
-        </div>
-
-        <!-- Detail Drawer -->
-        <aside class="downloads-detail" id="downloadsDetail" hidden>
-          <div class="detail-header">
-            <h3 id="detTitle">Task Details</h3>
-            <button class="icon-btn-ghost" id="bCloseDetail">✕</button>
-          </div>
-          <div class="detail-body" id="detBody"></div>
-        </aside>
-      </div>
-    </section>
-
-    <!-- ========== VIEW: TRACKERS (Images 2 & 3) ========== -->
-    <section class="view-panel" id="viewTrackers">
-      <header class="view-header">
-        <h1 class="view-title" data-i="trackers">Trackers</h1>
-        <div class="header-actions">
-          <button class="icon-btn-ghost" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></button>
-        </div>
-      </header>
-
-      <!-- Trackers Content Card -->
-      <div class="trackers-card-wrap">
-        <div class="trackers-top-bar">
-          <div class="tab-pills">
-            <button class="tab-pill active" id="tabTrackersEffective" data-i="effective">Effective</button>
-            <button class="tab-pill" id="tabTrackersBlacklist" data-i="blacklist">Blacklist</button>
-          </div>
-        </div>
-
-        <div class="trackers-toggle-row">
-          <div class="toggle-info">
-            <h4 data-i="injectCurated">Inject curated trackers</h4>
-            <p data-i="injectCuratedDesc">Add curated trackers to new public multi-source acceleration tasks.</p>
-          </div>
-          <label class="switch-toggle">
-            <input type="checkbox" id="chkInjectTrackers" checked>
-            <span class="switch-slider"></span>
+        <div class="fields-row">
+          <label class="field-label flex-1"><span data-i="saveFolder">Save Directory</span>
+            <div class="input-with-btn">
+              <input type="text" id="taskSaveDir" readonly>
+              <button type="button" class="pill-btn outline sm" id="bBrowseSaveDir" data-i="browse">Browse</button>
+            </div>
+          </label>
+          <label class="field-label w-120"><span data-i="conns">Connections</span>
+            <select id="taskConnsSelect" class="styled-select">
+              <option value="1">1 thread</option>
+              <option value="2">2 threads</option>
+              <option value="4">4 threads</option>
+              <option value="8" selected>8 threads</option>
+              <option value="16">16 threads</option>
+              <option value="32">32 threads</option>
+            </select>
           </label>
         </div>
+        <div class="err-msg" id="addErrMsg" hidden></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light" id="bCancelAdd" data-i="cancel">Cancel</button>
+        <button type="submit" class="pill-btn primary" id="bSubmitAdd" data-i="startDownload">Start Download</button>
+      </div>
+    </form>
+  </dialog>
 
-        <!-- Trackers Source Tags -->
-        <div class="trackers-tags-row">
-          <span class="tracker-tag">ngosang/trackerslist (best) <button class="tag-close">×</button></span>
-          <span class="tracker-tag">XIU2/TrackersListCollection (best) <button class="tag-close">×</button></span>
+  <!-- 1. GENERAL MODAL (Image 5) -->
+  <dialog id="generalModal" class="sleek-modal modal-large">
+    <div class="modal-form">
+      <div class="modal-head">
+        <div>
+          <h2 data-i="setGeneralTitle">General</h2>
+          <p class="modal-subhead" data-i="genSubhead">Startup, quitting and notifications</p>
+        </div>
+        <button type="button" class="icon-btn-ghost modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-group-title" data-i="startupQuitting">Startup and quitting</div>
+
+        <div class="setting-toggle-row">
+          <span data-i="openAtLogin">Open at login</span>
+          <label class="switch-toggle"><input type="checkbox" id="cfgOpenAtLogin"><span
+              class="switch-slider"></span></label>
+        </div>
+        <div class="setting-toggle-row">
+          <span data-i="showWindowAtLogin">Show window at login</span>
+          <label class="switch-toggle"><input type="checkbox" id="cfgShowWindowLogin"><span
+              class="switch-slider"></span></label>
+        </div>
+        <div class="setting-select-row">
+          <span data-i="whenOpeningApp">When opening Tayyar</span>
+          <select class="styled-select" id="cfgWhenOpening">
+            <option value="main" selected>Open Main Window</option>
+            <option value="tray">Minimize to Tray</option>
+          </select>
+        </div>
+        <div class="setting-toggle-row">
+          <div>
+            <span data-i="saveMemoryClose">Save memory when the window is closed</span>
+            <div class="row-hint">Downloads continue. Reopening is slower and unsaved input is cleared.</div>
+          </div>
+          <label class="switch-toggle"><input type="checkbox" id="cfgSaveMemory"><span
+              class="switch-slider"></span></label>
+        </div>
+        <div class="setting-toggle-row">
+          <div>
+            <span data-i="confirmBeforeQuit">Confirm before quitting</span>
+            <div class="row-hint">Ask before quitting if downloads are still running.</div>
+          </div>
+          <label class="switch-toggle"><input type="checkbox" id="cfgConfirmQuit" checked><span
+              class="switch-slider"></span></label>
         </div>
 
-        <!-- Trackers Data Table -->
-        <div class="trackers-table-wrap">
-          <table class="trackers-table">
-            <thead>
-              <tr>
-                <th>URL</th>
-                <th>HEALTH</th>
-                <th>LAST PROBED</th>
-                <th>SOURCE</th>
-              </tr>
-            </thead>
-            <tbody id="trackersTableBody">
-              <!-- Rendered by JS -->
-            </tbody>
-          </table>
-        </div>
+        <div class="settings-group-title" style="margin-top:20px;" data-i="notifications">Notifications</div>
+        <div class="row-hint" style="margin-bottom:10px;">App error alerts stay on.</div>
 
-        <!-- Trackers Footer -->
-        <div class="trackers-footer">
-          <span class="footer-stat" id="trackersStatTxt">50 trackers · Last successful update: 11/15/2026, 8:27:33 AM</span>
-          <button class="pill-btn light" id="bSyncTrackers"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" style="width:14px;margin-right:6px;"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> <span data-i="syncNow">Sync Now</span></button>
+        <div class="setting-select-row">
+          <span data-i="downloadCompleted">Download completed</span>
+          <select class="styled-select" id="cfgNotifCompleted">
+            <option value="both" selected>Both</option>
+            <option value="banner">Banner only</option>
+            <option value="sound">Sound only</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+        <div class="setting-select-row">
+          <span data-i="downloadFailed">Download failed</span>
+          <select class="styled-select" id="cfgNotifFailed">
+            <option value="both" selected>Both</option>
+            <option value="banner">Banner only</option>
+            <option value="sound">Sound only</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+        <div class="setting-select-row">
+          <div>
+            <span data-i="unreadBadge">Unread badge</span>
+            <div class="row-hint">Shown on the notification center icon.</div>
+          </div>
+          <select class="styled-select" id="cfgUnreadBadge">
+            <option value="count" selected>Count</option>
+            <option value="dot">Dot</option>
+            <option value="none">None</option>
+          </select>
         </div>
       </div>
-    </section>
-
-    <!-- ========== VIEW: PLUGINS (Image 1) ========== -->
-    <section class="view-panel" id="viewPlugins">
-      <header class="view-header">
-        <h1 class="view-title" data-i="plugins">Plugins</h1>
-        <div class="header-actions">
-          <button class="icon-btn-ghost" title="Add plugin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></button>
-          <button class="icon-btn-ghost" title="Link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></button>
-          <button class="icon-btn-ghost" title="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
-          <button class="icon-btn-ghost" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></button>
-        </div>
-      </header>
-
-      <!-- Trust notice banner -->
-      <div class="plugins-banner">
-        <div class="banner-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <span data-i="addPluginsTrust">Add plugins you trust</span></div>
-        <p data-i="pluginsTrustDesc">Install from a source you trust, review the requested access, then enable the plugin. Grant website access only for sites you expect the plugin to handle.</p>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
+        <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
       </div>
-
-      <!-- Installed Plugins Grid -->
-      <div class="plugins-grid">
-        <div class="plugin-card">
-          <div class="plugin-card-top">
-            <span class="plugin-avatar avatar-blue">MF</span>
-            <div class="plugin-meta">
-              <div class="plugin-title">Tayyar Filename Template <span class="status-dot-blue"></span></div>
-              <div class="plugin-ver">v1.1.1 · tayyar.filename-template</div>
-            </div>
-            <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
-          </div>
-          <p class="plugin-desc">Renames downloads with safe, composable templates while preserving their extensions.</p>
-          <div class="plugin-card-foot">
-            <button class="pill-btn light sm">Open</button>
-            <span class="badge-safe">Looks safe</span>
-          </div>
-        </div>
-
-        <div class="plugin-card">
-          <div class="plugin-card-top">
-            <span class="plugin-avatar avatar-green">MU</span>
-            <div class="plugin-meta">
-              <div class="plugin-title">Tayyar URL Resolver <span class="status-dot-blue"></span></div>
-              <div class="plugin-ver">v1.0.0 · tayyar.url-resolver</div>
-            </div>
-            <label class="switch-toggle"><input type="checkbox"><span class="switch-slider"></span></label>
-          </div>
-          <p class="plugin-desc">URL-resolver framework for Tayyar multi-source stream handling.</p>
-          <div class="plugin-card-foot">
-            <button class="pill-btn light sm">Open</button>
-            <span class="badge-safe">Looks safe</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Available Plugins Section -->
-      <h3 class="section-subtitle" style="margin:24px 0 14px;" data-i="availablePlugins">Available plugins</h3>
-      <div class="plugins-grid">
-        <div class="plugin-card">
-          <div class="plugin-card-top">
-            <span class="plugin-avatar avatar-blue">FC</span>
-            <div class="plugin-meta">
-              <div class="plugin-title">Folder Categories</div>
-              <div class="plugin-ver">by Ashkan4472 · v1.0.0</div>
-            </div>
-          </div>
-          <p class="plugin-desc">Sorts finished downloads into category folders (Compressed, Documents, Music, Programs, Video).</p>
-        </div>
-
-        <div class="plugin-card">
-          <div class="plugin-card-top">
-            <span class="plugin-avatar avatar-green">AR</span>
-            <div class="plugin-meta">
-              <div class="plugin-title">AllDebrid Resolver</div>
-              <div class="plugin-ver">by DonTarken · v1.2.0</div>
-            </div>
-          </div>
-          <p class="plugin-desc">Automatically unlocks and debrids supported download links using your premium account.</p>
-        </div>
-
-        <div class="plugin-card">
-          <div class="plugin-card-top">
-            <span class="plugin-avatar avatar-blue">MS</span>
-            <div class="plugin-meta">
-              <div class="plugin-title">Tayyar Smart Link</div>
-              <div class="plugin-ver">by griciaisl12 · v1.0.5</div>
-            </div>
-          </div>
-          <p class="plugin-desc">Resolves GitHub repository release, file links, Google Drive/Docs into real downloads.</p>
-        </div>
-
-        <div class="plugin-card">
-          <div class="plugin-card-top">
-            <span class="plugin-avatar avatar-blue">MM</span>
-            <div class="plugin-meta">
-              <div class="plugin-title">Tayyar Media Merge</div>
-              <div class="plugin-ver">by Tayyar Team · v0.1.0</div>
-            </div>
-          </div>
-          <p class="plugin-desc">Combine separate video and audio files into one MP4 or MKV without re-encoding.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== VIEW: NOTIFICATIONS ========== -->
-    <section class="view-panel" id="viewNotifications">
-      <header class="view-header">
-        <h1 class="view-title" data-i="notifications">Notifications</h1>
-      </header>
-      <div class="subview-placeholder">
-        <div class="placeholder-card">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="placeholder-icon">
-            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
-          </svg>
-          <h3 data-i="notificationsCenter">Notification Center</h3>
-          <p data-i="noNotifsDesc">Completed downloads and system integration alerts will be listed here.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== VIEW: SETTINGS (Matching Image 3) ========== -->
-    <section class="view-panel" id="viewSettings">
-      <header class="view-header">
-        <h1 class="view-title" data-i="settings">Settings</h1>
-      </header>
-
-      <!-- 8 Settings Cards Grid -->
-      <div class="settings-cards-grid">
-
-        <!-- Card 1: General (Pink 3D House) -->
-        <div class="settings-card" data-setting-modal="generalModal">
-          <div class="setting-card-icon-wrap icon-pink">
-            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-              <path d="M16 4L3 14h4v13a1 1 0 001 1h6v-8h4v8h6a1 1 0 001-1V14h4L16 4z" fill="#f43f5e"/>
-              <path d="M16 4L3 14h4v13h4v-7h10v7h4V14h4L16 4z" fill="url(#gradHouse)" opacity="0.8"/>
-              <defs><linearGradient id="gradHouse" x1="3" y1="4" x2="29" y2="28"><stop stop-color="#fda4af"/><stop offset="1" stop-color="#f43f5e"/></linearGradient></defs>
-            </svg>
-          </div>
-          <div class="setting-card-info">
-            <h3 class="setting-card-title" data-i="setGeneralTitle">General</h3>
-            <p class="setting-card-desc" data-i="setGeneralDesc">Startup, default save folder, system integration</p>
-          </div>
-        </div>
-
-        <!-- Card 2: Appearance (Colorful Logo) -->
-        <div class="settings-card" data-setting-modal="appearanceModal">
-          <div class="setting-card-icon-wrap icon-multi">
-            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-              <circle cx="16" cy="16" r="14" fill="#0f172a"/>
-              <circle cx="16" cy="16" r="13" stroke="url(#gradAppr)" stroke-width="2.5"/>
-              <path d="M11 11v10M11 16l5-5 5 5M21 11v10" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
-              <defs><linearGradient id="gradAppr" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#38bdf8"/><stop offset="0.5" stop-color="#a855f7"/><stop offset="1" stop-color="#f43f5e"/></linearGradient></defs>
-            </svg>
-          </div>
-          <div class="setting-card-info">
-            <h3 class="setting-card-title" data-i="setApprTitle">Appearance</h3>
-            <p class="setting-card-desc" data-i="setApprDesc">Theme, language, tray icon</p>
-          </div>
-        </div>
-
-        <!-- Card 3: Downloads (Cyan Tray) -->
-        <div class="settings-card" data-setting-modal="downloadsModal">
-          <div class="setting-card-icon-wrap icon-cyan">
-            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-              <path d="M16 6v14m0 0l-5-5m5 5l5-5" stroke="#06b6d4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M6 20v6a2 2 0 002 2h16a2 2 0 002-2v-6" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="setting-card-info">
-            <h3 class="setting-card-title" data-i="setDlTitle">Downloads</h3>
-            <p class="setting-card-desc" data-i="setDlDesc">Concurrency, bandwidth limits, network reliability</p>
-          </div>
-        </div>
-
-        <!-- Card 4: BitTorrent (Purple/Blue Arrows) -->
-        <div class="settings-card" data-setting-modal="bittorrentModal">
-          <div class="setting-card-icon-wrap icon-purple">
-            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-              <path d="M11 26V8m0 0l-4 4m4-4l4 4" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M21 6v18m0 0l-4-4m4 4l4-4" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="setting-card-info">
-            <h3 class="setting-card-title" data-i="setBtTitle">BitTorrent</h3>
-            <p class="setting-card-desc" data-i="setBtDesc">DHT, listen ports, trackers, peer geo</p>
-          </div>
-        </div>
-
-        <!-- Card 5: Integration (Orange Puzzle) -->
-        <div class="settings-card" data-setting-modal="integrationModal">
-          <div class="setting-card-icon-wrap icon-orange">
-            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-              <path d="M13 5a3 3 0 016 0h5a2 2 0 012 2v5a3 3 0 010 6v5a2 2 0 01-2 2h-5a3 3 0 01-6 0H8a2 2 0 01-2-2v-5a3 3 0 000-6V7a2 2 0 012-2h5z" fill="#f97316" opacity="0.9"/>
-            </svg>
-          </div>
-          <div class="setting-card-info">
-            <h3 class="setting-card-title" data-i="setIntTitle">Integration</h3>
-            <p class="setting-card-desc" data-i="setIntDesc">Browser extensions, CLI, system integrations</p>
-          </div>
-        </div>
-
-        <!-- Card 6: Network (Green Globe) -->
-        <div class="settings-card" data-setting-modal="networkModal">
-          <div class="setting-card-icon-wrap icon-green">
-            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-              <circle cx="16" cy="16" r="12" stroke="#10b981" stroke-width="2.5"/>
-              <path d="M4 16h24M16 4a19 19 0 000 24 19 19 0 000-24" stroke="#34d399" stroke-width="2"/>
-            </svg>
-          </div>
-          <div class="setting-card-info">
-            <h3 class="setting-card-title" data-i="setNetTitle">Network</h3>
-            <p class="setting-card-desc" data-i="setNetDesc">Proxy, DNS, and NAT/UPnP</p>
-          </div>
-        </div>
-
-        <!-- Card 7: Advanced (Blue Cog) -->
-        <div class="settings-card" data-setting-modal="advancedModal">
-          <div class="setting-card-icon-wrap icon-blue">
-            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-              <circle cx="16" cy="16" r="4" fill="#3b82f6"/>
-              <path d="M26 16a10 10 0 00-.2-2l2.3-1.8a1 1 0 00.2-1.3l-2.2-3.8a1 1 0 00-1.2-.5l-2.7 1.1a10 10 0 00-3.5-2l-.4-2.9A1 1 0 0017.3 2h-4.6a1 1 0 00-1 .9l-.4 2.9a10 10 0 00-3.5 2L5.1 6.7a1 1 0 00-1.2.5L1.7 11a1 1 0 00.2 1.3l2.3 1.8A10 10 0 004 16a10 10 0 00.2 2l-2.3 1.8a1 1 0 00-.2 1.3l2.2 3.8a1 1 0 001.2.5l2.7-1.1a10 10 0 003.5 2l.4 2.9a1 1 0 001 .9h4.6a1 1 0 001-.9l.4-2.9a10 10 0 003.5-2l2.7 1.1a10 10 0 001.2-.5l2.2-3.8a1 1 0 00-.2-1.3L25.8 18c.1-.7.2-1.3.2-2z" stroke="#60a5fa" stroke-width="2"/>
-            </svg>
-          </div>
-          <div class="setting-card-info">
-            <h3 class="setting-card-title" data-i="setAdvTitle">Advanced</h3>
-            <p class="setting-card-desc" data-i="setAdvDesc">RPC, SQLite persistence</p>
-          </div>
-        </div>
-
-        <!-- Card 8: About (Yellow Notebook - Image 13) -->
-        <div class="settings-card" data-setting-modal="aboutModal">
-          <div class="setting-card-icon-wrap icon-yellow">
-            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-              <rect x="7" y="5" width="18" height="22" rx="3" fill="#eab308"/>
-              <path d="M11 11h10M11 16h10M11 21h6" stroke="#713f12" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="21" cy="7" r="2" fill="#ca8a04"/>
-            </svg>
-          </div>
-          <div class="setting-card-info">
-            <h3 class="setting-card-title" data-i="setAboutTitle">About</h3>
-            <p class="setting-card-desc" data-i="setAboutDesc">Version, updates, source code and manual</p>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-  </main>
-</div>
-
-<!-- ================= MODALS SECTION ================= -->
-
-<!-- ADD TASK MODAL -->
-<dialog id="addModal" class="sleek-modal">
-  <form method="dialog" id="addForm" class="modal-form">
-    <div class="modal-head">
-      <h2 data-i="newTaskTitle">New Download Task</h2>
-      <button type="button" class="icon-btn-ghost modal-close" id="bCloseAdd">✕</button>
     </div>
-    <div class="modal-body">
-      <label class="field-label"><span data-i="urlsLabel">URL (or multiple links, one per line)</span>
-        <textarea id="taskUrlInput" rows="3" placeholder="https://example.com/file.zip" required></textarea>
-      </label>
-      <div class="probe-box" id="probeBox" hidden>
-        <div class="probe-row">
-          <input type="text" id="probeFileName" class="probe-input" placeholder="File name">
-          <span class="chip-badge" id="probeSizeBadge">Detecting...</span>
+  </dialog>
+
+  <!-- 2. APPEARANCE MODAL -->
+  <dialog id="appearanceModal" class="sleek-modal">
+    <div class="modal-form">
+      <div class="modal-head">
+        <div>
+          <h2 data-i="setApprTitle">Appearance</h2>
+          <p class="modal-subhead" data-i="apprSubhead">Theme, language, and tray preferences</p>
         </div>
+        <button type="button" class="icon-btn-ghost modal-close">✕</button>
       </div>
-      <div class="fields-row">
-        <label class="field-label flex-1"><span data-i="saveFolder">Save Directory</span>
-          <div class="input-with-btn">
-            <input type="text" id="taskSaveDir" readonly>
-            <button type="button" class="pill-btn outline sm" id="bBrowseSaveDir" data-i="browse">Browse</button>
-          </div>
+      <div class="modal-body">
+        <label class="field-label"><span data-i="theme">Theme</span>
+          <select id="cfgTheme" class="styled-select">
+            <option value="dark" selected>Dark Slate (Motrix Next)</option>
+            <option value="light">Light Theme</option>
+          </select>
         </label>
-        <label class="field-label w-120"><span data-i="conns">Connections</span>
-          <select id="taskConnsSelect" class="styled-select">
-            <option value="1">1 thread</option>
-            <option value="2">2 threads</option>
-            <option value="4">4 threads</option>
-            <option value="8" selected>8 threads</option>
-            <option value="16">16 threads</option>
-            <option value="32">32 threads</option>
+        <label class="field-label" style="margin-top:12px;"><span data-i="language">Language / اللغة</span>
+          <select id="cfgLang" class="styled-select">
+            <option value="en" selected>English (Primary)</option>
+            <option value="ar">العربية (Arabic RTL)</option>
           </select>
         </label>
       </div>
-      <div class="err-msg" id="addErrMsg" hidden></div>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
+        <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
+      </div>
     </div>
-    <div class="modal-foot">
-      <button type="button" class="pill-btn light" id="bCancelAdd" data-i="cancel">Cancel</button>
-      <button type="submit" class="pill-btn primary" id="bSubmitAdd" data-i="startDownload">Start Download</button>
-    </div>
-  </form>
-</dialog>
+  </dialog>
 
-<!-- 1. GENERAL MODAL (Image 5) -->
-<dialog id="generalModal" class="sleek-modal modal-large">
-  <div class="modal-form">
-    <div class="modal-head">
-      <div>
-        <h2 data-i="setGeneralTitle">General</h2>
-        <p class="modal-subhead" data-i="genSubhead">Startup, quitting and notifications</p>
-      </div>
-      <button type="button" class="icon-btn-ghost modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="settings-group-title" data-i="startupQuitting">Startup and quitting</div>
-      
-      <div class="setting-toggle-row">
-        <span data-i="openAtLogin">Open at login</span>
-        <label class="switch-toggle"><input type="checkbox" id="cfgOpenAtLogin"><span class="switch-slider"></span></label>
-      </div>
-      <div class="setting-toggle-row">
-        <span data-i="showWindowAtLogin">Show window at login</span>
-        <label class="switch-toggle"><input type="checkbox" id="cfgShowWindowLogin"><span class="switch-slider"></span></label>
-      </div>
-      <div class="setting-select-row">
-        <span data-i="whenOpeningApp">When opening Tayyar</span>
-        <select class="styled-select" id="cfgWhenOpening">
-          <option value="main" selected>Open Main Window</option>
-          <option value="tray">Minimize to Tray</option>
-        </select>
-      </div>
-      <div class="setting-toggle-row">
+  <!-- 3. DOWNLOADS MODAL (Images 6 & 7) -->
+  <dialog id="downloadsModal" class="sleek-modal modal-large">
+    <div class="modal-form">
+      <div class="modal-head">
         <div>
-          <span data-i="saveMemoryClose">Save memory when the window is closed</span>
-          <div class="row-hint">Downloads continue. Reopening is slower and unsaved input is cleared.</div>
+          <h2 data-i="setDlTitle">Downloads</h2>
+          <p class="modal-subhead" data-i="dlSubhead">Files, download speed and connections</p>
         </div>
-        <label class="switch-toggle"><input type="checkbox" id="cfgSaveMemory"><span class="switch-slider"></span></label>
+        <button type="button" class="icon-btn-ghost modal-close">✕</button>
       </div>
-      <div class="setting-toggle-row">
-        <div>
-          <span data-i="confirmBeforeQuit">Confirm before quitting</span>
-          <div class="row-hint">Ask before quitting if downloads are still running.</div>
-        </div>
-        <label class="switch-toggle"><input type="checkbox" id="cfgConfirmQuit" checked><span class="switch-slider"></span></label>
-      </div>
-
-      <div class="settings-group-title" style="margin-top:20px;" data-i="notifications">Notifications</div>
-      <div class="row-hint" style="margin-bottom:10px;">App error alerts stay on.</div>
-
-      <div class="setting-select-row">
-        <span data-i="downloadCompleted">Download completed</span>
-        <select class="styled-select" id="cfgNotifCompleted">
-          <option value="both" selected>Both</option>
-          <option value="banner">Banner only</option>
-          <option value="sound">Sound only</option>
-          <option value="none">None</option>
-        </select>
-      </div>
-      <div class="setting-select-row">
-        <span data-i="downloadFailed">Download failed</span>
-        <select class="styled-select" id="cfgNotifFailed">
-          <option value="both" selected>Both</option>
-          <option value="banner">Banner only</option>
-          <option value="sound">Sound only</option>
-          <option value="none">None</option>
-        </select>
-      </div>
-      <div class="setting-select-row">
-        <div>
-          <span data-i="unreadBadge">Unread badge</span>
-          <div class="row-hint">Shown on the notification center icon.</div>
-        </div>
-        <select class="styled-select" id="cfgUnreadBadge">
-          <option value="count" selected>Count</option>
-          <option value="dot">Dot</option>
-          <option value="none">None</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
-      <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
-    </div>
-  </div>
-</dialog>
-
-<!-- 2. APPEARANCE MODAL -->
-<dialog id="appearanceModal" class="sleek-modal">
-  <div class="modal-form">
-    <div class="modal-head">
-      <div>
-        <h2 data-i="setApprTitle">Appearance</h2>
-        <p class="modal-subhead" data-i="apprSubhead">Theme, language, and tray preferences</p>
-      </div>
-      <button type="button" class="icon-btn-ghost modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <label class="field-label"><span data-i="theme">Theme</span>
-        <select id="cfgTheme" class="styled-select">
-          <option value="dark" selected>Dark Slate (Motrix Next)</option>
-          <option value="light">Light Theme</option>
-        </select>
-      </label>
-      <label class="field-label" style="margin-top:12px;"><span data-i="language">Language / اللغة</span>
-        <select id="cfgLang" class="styled-select">
-          <option value="en" selected>English (Primary)</option>
-          <option value="ar">العربية (Arabic RTL)</option>
-        </select>
-      </label>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
-      <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
-    </div>
-  </div>
-</dialog>
-
-<!-- 3. DOWNLOADS MODAL (Images 6 & 7) -->
-<dialog id="downloadsModal" class="sleek-modal modal-large">
-  <div class="modal-form">
-    <div class="modal-head">
-      <div>
-        <h2 data-i="setDlTitle">Downloads</h2>
-        <p class="modal-subhead" data-i="dlSubhead">Files, download speed and connections</p>
-      </div>
-      <button type="button" class="icon-btn-ghost modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="settings-group-title" data-i="saveFolders">Save folders</div>
-      <label class="field-label"><span data-i="defaultSaveDir">Default download folder</span>
-        <div class="input-with-btn">
-          <input type="text" id="cfgDefaultSaveDir" value="C:\Users\jone_\Downloads" readonly>
-          <button type="button" class="pill-btn outline sm" id="bBrowseCfgSaveDir" data-i="browse">Browse...</button>
-        </div>
-        <div class="row-hint">Removing a folder from this list won't delete it or its files.</div>
-      </label>
-
-      <div class="settings-group-title" style="margin-top:20px;" data-i="newTasks">New tasks</div>
-      <div class="setting-toggle-row">
-        <div>
-          <span data-i="autofillLinks">Autofill links from clipboard</span>
-          <div class="row-hint">Paste copied links when opening a new task.</div>
-        </div>
-        <label class="switch-toggle"><input type="checkbox" id="cfgAutofillClip" checked><span class="switch-slider"></span></label>
-      </div>
-      <label class="field-label" style="margin-top:10px;"><span data-i="userAgent">User-Agent</span>
-        <input type="text" id="cfgUserAgent" value="Tayyar/2.0 (Compatible; Windows NT 10.0; Win64; x64)">
-        <div class="pills-row" style="margin-top:6px;">
-          <button type="button" class="pill-btn light sm ua-preset" data-ua="Tayyar/2.0">Tayyar</button>
-          <button type="button" class="pill-btn light sm ua-preset" data-ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/130.0">Chrome</button>
-          <button type="button" class="pill-btn light sm ua-preset" data-ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Firefox/132.0">Firefox</button>
-          <button type="button" class="pill-btn light sm ua-preset" data-ua="Transmission/3.00">Transmission</button>
-        </div>
-      </label>
-
-      <div class="settings-group-title" style="margin-top:20px;" data-i="performance">Performance</div>
-      <div class="setting-select-row">
-        <div>
-          <span data-i="dlPerformance">Download performance</span>
-          <div class="row-hint">Balance download speed and resource use.</div>
-        </div>
-        <select class="styled-select" id="cfgPerformance">
-          <option value="auto" selected>Automatic</option>
-          <option value="high">Maximum Throughput</option>
-          <option value="low">Low CPU & Memory</option>
-        </select>
-      </div>
-
-      <div class="perf-chips-grid">
-        <div class="perf-chip">
-          <span class="chip-num">16</span>
-          <span class="chip-lbl">Max connections</span>
-        </div>
-        <div class="perf-chip">
-          <span class="chip-num">64</span>
-          <span class="chip-lbl">Per-server cap</span>
-        </div>
-        <div class="perf-chip">
-          <span class="chip-num">4 MiB</span>
-          <span class="chip-lbl">Min segment</span>
-        </div>
-        <div class="perf-chip">
-          <span class="chip-num">32 MiB</span>
-          <span class="chip-lbl">Disk cache</span>
-        </div>
-      </div>
-
-      <div class="setting-num-row" style="margin-top:14px;">
-        <div>
-          <span data-i="simultaneousDl">Simultaneous downloads</span>
-          <div class="row-hint">Additional tasks wait in the queue. Range: 1–200.</div>
-        </div>
-        <input type="number" id="cfgSimultaneous" class="styled-input-num" min="1" max="200" value="10">
-      </div>
-      <div class="pills-row" style="margin-top:8px;">
-        <button type="button" class="pill-btn light sm sim-preset" data-val="1">1</button>
-        <button type="button" class="pill-btn light sm sim-preset" data-val="3">3</button>
-        <button type="button" class="pill-btn light sm sim-preset" data-val="5">5</button>
-        <button type="button" class="pill-btn light sm sim-preset active" data-val="10">10</button>
-        <button type="button" class="pill-btn light sm sim-preset" data-val="20">20</button>
-        <button type="button" class="pill-btn light sm sim-preset" data-val="30">30</button>
-      </div>
-
-      <div class="settings-group-title" style="margin-top:20px;" data-i="fileTypesTitle">Supported File Types (200+ Formats)</div>
-      <label class="field-label">
-        <span data-i="fileTypesDesc">Universal format auto-capture list</span>
-        <textarea id="cfgFileTypes" class="styled-textarea" rows="4" readonly style="font-family:monospace;font-size:11px;line-height:1.6;resize:none;color:var(--color-cyan);background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;width:100%;margin-top:4px;">00* 3DM 3DS 3GP 3MF 7Z AAB AAC ABC ACE AFDESIGN AFPHOTO AI AIF AIFF APE APK APKM APKS APPIMAGE APPX APPXBUNDLE ARJ ARROW ARW ASF AU AVI AVRO AZW AZW3 BAK BAM BIN BLEND BZ BZ2 C4D CAB CAF CBR CBZ CCD CHD CKPT CPIO CR2 CR3 CRAM CSO DAE DAT DCM DDS DEB DFF DIVX DJVU DMG DNG DOC DOCX DSF DWG DXF EPS EPUB EXE EXR F3D F4V FASTA FASTQ FB2 FBX FEATHER FIG FITS FLAC FLATPAK FQ GCODE GCZ GEM GGML GGUF GLB GLTF GPKG GRIB GRIB2 GZ GZIP H5 HDF5 HDR IGES IGS IMG INDD IPA ISO ISZ JAR JOBLIB JSONL KERAS KRA LAS LAZ LLAMAFILE LWO LZ LZ4 LZH LZMA M2T M2TS M2V M4A M4B M4V MA MAT MAX MB MBTILES MDF MDS MID MIDI MKA MKV MLMODEL MOBI MOV MP3 MP4 MPA MPE MPEG MPG MSI MSIX MSIXBUNDLE MSP MSU MTS MXF NC NDJSON NEF NEMO NII NPY NPZ NRG NSP NSZ NUPKG OBJ ODP ODS ODT OGG OGM OGV ONNX OPUS ORC ORF OTF OVA OVF PAK PARQUET PB PBF PDF PICKLE PK3 PK4 PKG PKL PLJ PLY POTX PPS PPSX PPT PPTX PSB PSD PT PTH QCOW QCOW2 QT R0* R1* R2* R3* R4* R5* R6* R7* R8* R9* RA RAF RAR RDS RM RMVB RPM RTF RUN RVZ RW2 SAFETENSORS SEA SF2 SFZ SHP SIT SITX SKETCH SKP SLDASM SLDPRT SNAP SQLITE SQLITE3 STEP STL STP TAR TBZ TBZ2 TFLITE TGA TGZ TIF TIFF TLZ TORRENT TTA TTC TTF TXZ TZST UNITYPACKAGE USD USDA USDC USDZ VDB VDI VHD VHDX VMDK VOB VPK VSIX WAV WBFS WEBM WHL WIM WMA WMV WRL WTV WUA WV X3D XAPK XCF XCI XLS XLSB XLSM XLSX XZ Z Z0* ZIP ZIPX ZPR ZST ZTL</textarea>
-        <div class="row-hint" style="margin-top:4px;" data-i="fileTypesHint">Downloads automatically sorted into organized folders (Video, Music, Compressed, Documents, Programs, 3D-Models, AI-Datasets, Images, Games-ROMs).</div>
-      </label>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
-      <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
-    </div>
-  </div>
-</dialog>
-
-<!-- 4. BITTORRENT / MULTI-CONNECTION MODAL (Images 8 & 9) -->
-<dialog id="bittorrentModal" class="sleek-modal modal-large">
-  <div class="modal-form">
-    <div class="modal-head">
-      <div>
-        <h2 data-i="setBtTitle">BitTorrent & Acceleration</h2>
-        <p class="modal-subhead" data-i="btSubhead">Magnets, seeding and trackers</p>
-      </div>
-      <button type="button" class="icon-btn-ghost modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="settings-group-title" data-i="newMagnetTasks">New magnet tasks</div>
-      <div class="setting-toggle-row">
-        <div>
-          <span data-i="chooseFilesBefore">Choose files before downloading</span>
-          <div class="row-hint">Show file selection after a magnet link loads.</div>
-        </div>
-        <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
-      </div>
-      <div class="setting-toggle-row">
-        <div>
-          <span data-i="downloadAllNoSel">Download all if no selection is made</span>
-          <div class="row-hint">Starts after timeout, even if the app window is closed.</div>
-        </div>
-        <label class="switch-toggle"><input type="checkbox"><span class="switch-slider"></span></label>
-      </div>
-
-      <div class="settings-group-title" style="margin-top:20px;" data-i="incomingConns">Incoming connections</div>
-      <div class="setting-num-row">
-        <span data-i="btListenPort">BT listen port</span>
-        <input type="number" class="styled-input-num" value="6881">
-      </div>
-      <div class="setting-num-row">
-        <span data-i="dhtListenPort">DHT listen port</span>
-        <input type="number" class="styled-input-num" value="6881">
-      </div>
-      <div class="setting-toggle-row">
-        <div>
-          <span data-i="enableDht">Enable DHT</span>
-          <div class="row-hint">Find peers through DHT without relying on a tracker.</div>
-        </div>
-        <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
-      <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
-    </div>
-  </div>
-</dialog>
-
-<!-- 5. INTEGRATION MODAL (Images 10 & 11) -->
-<dialog id="integrationModal" class="sleek-modal modal-large">
-  <div class="modal-form">
-    <div class="modal-head">
-      <div>
-        <h2 data-i="setIntTitle">Integration</h2>
-        <p class="modal-subhead" data-i="intSubhead">Browsers, default apps and tools</p>
-      </div>
-      <button type="button" class="icon-btn-ghost modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="settings-group-title" data-i="browserExtensions">Browser extensions</div>
-      <div class="setting-toggle-row">
-        <div>
-          <span data-i="connectExtensions">Connect browser extensions</span>
-          <div class="row-hint">Send webpage downloads to Tayyar with the browser extension.</div>
-        </div>
-        <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
-      </div>
-
-      <!-- Browser Cards with Authentic Vector Logos -->
-      <div class="browser-cards-grid">
-        <!-- 1. Google Chrome -->
-        <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
-            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 2.98.97 4.29L7.4 9.38C8.35 6.78 10.84 5 13.73 5H21.5C19.31 3.16 16.29 2 12 2z" fill="#EA4335"/>
-            <path d="M21.5 5H13.73c1.64.95 2.84 2.54 3.18 4.45l4.89 8.47c1.37-1.72 2.2-3.72 2.2-5.92 0-2.61-1.02-4.99-2.5-6.83L21.5 5z" fill="#FBBC05"/>
-            <path d="M12 22c4.42 0 8.16-2.87 9.5-6.83L16.61 6.7c-1.39 1.77-3.56 2.9-6.01 2.9-.62 0-1.22-.07-1.79-.22L3.92 18.06C5.97 20.48 9.01 22 12 22z" fill="#34A853"/>
-            <circle cx="12" cy="12" r="5" fill="#FFFFFF"/>
-            <circle cx="12" cy="12" r="3.8" fill="#1A73E8"/>
-          </svg>
-          <span class="browser-name">Chrome</span>
-          <button class="pill-btn outline sm bInstallBrowser" data-browser="chrome" data-i="install">Install</button>
-        </div>
-
-        <!-- 2. Microsoft Edge -->
-        <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
-            <defs>
-              <linearGradient id="edgeGradA" x1="12" y1="2" x2="22" y2="20" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#0078D7"/>
-                <stop offset="100%" stop-color="#002050"/>
-              </linearGradient>
-              <linearGradient id="edgeGradB" x1="2" y1="12" x2="16" y2="22" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#00BCF2"/>
-                <stop offset="100%" stop-color="#0078D7"/>
-              </linearGradient>
-              <linearGradient id="edgeGradC" x1="2" y1="4" x2="20" y2="14" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#00C853"/>
-                <stop offset="50%" stop-color="#00B0FF"/>
-                <stop offset="100%" stop-color="#0078D7"/>
-              </linearGradient>
-            </defs>
-            <path d="M21.8 16.5c-.3 3.4-3.1 6.1-6.7 6.1-3.8 0-6.9-3.1-6.9-6.9 0-.5.1-1 .2-1.5l4.6 1.7c-.1.3-.1.6-.1 1 0 1.9 1.5 3.4 3.4 3.4 1.7 0 3.1-1.2 3.4-2.9h2.1z" fill="url(#edgeGradA)"/>
-            <path d="M3.1 12.7C4 8.6 7.6 5.5 12 5.5c3.2 0 6 1.7 7.6 4.2l-4.3 2.5c-.8-1.2-2.1-2-3.5-2-2.2 0-4 1.7-4.2 3.8l-4.5-1.3z" fill="url(#edgeGradB)"/>
-            <path d="M11.5 10.2c2.2 0 4 1.7 4.2 3.8H10.4l-4.9-1.8c.8-2.6 3.4-4.6 6.5-4.6z" fill="url(#edgeGradC)"/>
-          </svg>
-          <span class="browser-name">Edge</span>
-          <button class="pill-btn outline sm bInstallBrowser" data-browser="edge" data-i="install">Install</button>
-        </div>
-
-        <!-- 3. Mozilla Firefox -->
-        <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
-            <defs>
-              <radialGradient id="ffGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#6B3BA7"/>
-                <stop offset="70%" stop-color="#2B1A6D"/>
-                <stop offset="100%" stop-color="#181347"/>
-              </radialGradient>
-              <linearGradient id="ffFire" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#FFDD00"/>
-                <stop offset="35%" stop-color="#FF6B00"/>
-                <stop offset="75%" stop-color="#FF1A40"/>
-                <stop offset="100%" stop-color="#9400D3"/>
-              </linearGradient>
-            </defs>
-            <circle cx="12" cy="12" r="8.2" fill="url(#ffGlow)"/>
-            <ellipse cx="14" cy="13" rx="5" ry="4" fill="#3E2A82" opacity="0.8"/>
-            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.8.48 3.5 1.32 4.96.38-.45.83-.84 1.34-1.14-.1-.58-.16-1.18-.16-1.82 0-3.87 3.13-7 7-7 .42 0 .83.04 1.23.11-.82.68-1.48 1.54-1.92 2.53-.29.66-.44 1.39-.44 2.16 0 2.76 2.24 5 5 5 .77 0 1.5-.15 2.16-.44.99-.44 1.85-1.1 2.53-1.92.07.4.11.81.11 1.23 0 3.87-3.13 7-7 7-1.12 0-2.18-.26-3.12-.73 1.52 1.38 3.52 2.23 5.72 2.23 4.97 0 9-4.03 9-9 0-2.31-.87-4.42-2.31-6.02.21.72.31 1.49.31 2.27 0 3.31-2.69 6-6 6-.77 0-1.5-.15-2.16-.44.82-1.28 2.25-2.16 3.86-2.25 2.21-.12 4-1.91 4-4.13 0-1.26-.59-2.39-1.5-3.14.99 1.15 1.5 2.64 1.5 4.24 0 .42-.04.83-.11 1.23-1.28-2.52-3.88-4.23-6.89-4.23-.42 0-.83.04-1.23.11C12.82 2.48 12.42 2 12 2z" fill="url(#ffFire)"/>
-          </svg>
-          <span class="browser-name">Firefox</span>
-          <button class="pill-btn outline sm bInstallBrowser" data-browser="firefox" data-i="install">Install</button>
-        </div>
-
-        <!-- 4. Apple Safari -->
-        <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
-            <defs>
-              <linearGradient id="safGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#29B6F6"/>
-                <stop offset="100%" stop-color="#0277BD"/>
-              </linearGradient>
-            </defs>
-            <circle cx="12" cy="12" r="10" fill="url(#safGrad)"/>
-            <circle cx="12" cy="12" r="8.2" stroke="rgba(255,255,255,0.3)" stroke-width="0.8" stroke-dasharray="1.2 1.2"/>
-            <circle cx="12" cy="12" r="7.2" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
-            <g transform="rotate(45 12 12)">
-              <polygon points="12,3.5 14,12 10,12" fill="#FF3B30"/>
-              <polygon points="12,20.5 14,12 10,12" fill="#FFFFFF"/>
-              <circle cx="12" cy="12" r="1.5" fill="#FFFFFF"/>
-              <circle cx="12" cy="12" r="0.8" fill="#0277BD"/>
-            </g>
-          </svg>
-          <span class="browser-name">Safari</span>
-          <button class="pill-btn outline sm bInstallBrowser" data-browser="safari" data-i="install">Install</button>
-        </div>
-
-        <!-- 5. Brave Browser -->
-        <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
-            <defs>
-              <linearGradient id="braveGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#FF5A00"/>
-                <stop offset="100%" stop-color="#E51937"/>
-              </linearGradient>
-            </defs>
-            <path d="M19.2 5.5l-2.4-3.5H7.2L4.8 5.5 2 8.5l1.8 7.5 8.2 5.5 8.2-5.5 1.8-7.5-2.8-3z" fill="url(#braveGrad)"/>
-            <path d="M12 19.5l-6.5-4.2-1.2-5.5 2.5-2.2 1.8 3 3.4.8 3.4-.8 1.8-3 2.5 2.2-1.2 5.5L12 19.5z" fill="#FF7D00"/>
-            <path d="M12 15l-2.5-2 .7-1.6 1.8.4 1.8-.4.7 1.6-2.5 2z" fill="#FFFFFF"/>
-          </svg>
-          <span class="browser-name">Brave</span>
-          <button class="pill-btn outline sm bInstallBrowser" data-browser="brave" data-i="install">Install</button>
-        </div>
-
-        <!-- 6. Opera -->
-        <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
-            <defs>
-              <linearGradient id="operaGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#FF3848"/>
-                <stop offset="100%" stop-color="#CC0012"/>
-              </linearGradient>
-            </defs>
-            <circle cx="12" cy="12" r="10" fill="url(#operaGrad)"/>
-            <ellipse cx="12" cy="12" rx="4.5" ry="7.2" fill="#172227"/>
-          </svg>
-          <span class="browser-name">Opera</span>
-          <button class="pill-btn outline sm bInstallBrowser" data-browser="opera" data-i="install">Install</button>
-        </div>
-      </div>
-
-      <div class="settings-group-title" style="margin-top:20px;" data-i="cliTools">Command-line tools</div>
-      <div class="cli-box">
-        <div class="cli-top">
-          <span>Tayyar CLI Tool</span>
-          <span class="chip-badge ready">Ready</span>
-        </div>
-        <div class="cli-code-row">
-          <code>tayyar download https://example.com/file.zip</code>
-          <button class="pill-btn light sm" id="bCopyCli">Copy</button>
-        </div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
-      <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
-    </div>
-  </div>
-</dialog>
-
-<!-- 6. NETWORK MODAL (Image 12) -->
-<dialog id="networkModal" class="sleek-modal modal-large">
-  <div class="modal-form">
-    <div class="modal-head">
-      <div>
-        <h2 data-i="setNetTitle">Network</h2>
-        <p class="modal-subhead" data-i="netSubhead">Proxy, DNS and connection checks</p>
-      </div>
-      <button type="button" class="icon-btn-ghost modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="settings-group-title" data-i="proxy">Proxy</div>
-      <div class="setting-toggle-row">
-        <span data-i="enableProxy">Enable proxy</span>
-        <button type="button" class="pill-btn outline sm" style="margin-right:auto;margin-left:14px;" data-i="importSystem">Import from system</button>
-        <label class="switch-toggle"><input type="checkbox" id="cfgEnableProxy"><span class="switch-slider"></span></label>
-      </div>
-
-      <div class="settings-group-title" style="margin-top:20px;" data-i="dns">DNS</div>
-      <div class="setting-select-row">
-        <div>
-          <span data-i="dnsLookup">DNS lookup</span>
-          <div class="row-hint">How downloads look up server addresses.</div>
-        </div>
-        <select class="styled-select" id="cfgDns">
-          <option value="auto" selected>Auto</option>
-          <option value="doh">DNS over HTTPS (Cloudflare/Google)</option>
-          <option value="custom">Custom DNS</option>
-        </select>
-      </div>
-
-      <div class="settings-group-title" style="margin-top:20px;" data-i="portMapping">Port mapping (NAT)</div>
-      <div class="setting-toggle-row">
-        <div>
-          <span data-i="enablePortMapping">Enable port mapping</span>
-          <div class="row-hint">Ask the router to open the ports set in network settings.</div>
-        </div>
-        <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
-      </div>
-
-      <div class="settings-group-title" style="margin-top:20px;" data-i="globalServersTitle">Global Server Compatibility</div>
-      <div class="setting-toggle-row">
-        <div>
-          <span data-i="globalServersBypass">Universal Regional Server Compatibility</span>
-          <div class="row-hint" data-i="globalServersDesc">Bypass regional CA restrictions (Russian domestic CAs, Chinese CDNs, Iranian national gateways) &amp; anti-hotlink blocks without SSL termination errors.</div>
-        </div>
-        <label class="switch-toggle"><input type="checkbox" id="cfgGlobalBypass" checked><span class="switch-slider"></span></label>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
-      <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
-    </div>
-  </div>
-</dialog>
-
-<!-- 7. ADVANCED MODAL (Image 4) -->
-<dialog id="advancedModal" class="sleek-modal modal-large">
-  <div class="modal-form">
-    <div class="modal-head">
-      <div>
-        <h2 data-i="setAdvTitle">Advanced</h2>
-        <p class="modal-subhead" data-i="advSubhead">RPC, progress and recovery</p>
-      </div>
-      <button type="button" class="icon-btn-ghost modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="settings-group-title">RPC</div>
-      <div class="setting-num-row">
-        <div>
-          <span data-i="rpcPort">RPC port</span>
-          <div class="row-hint">Restart required after changing this.</div>
-        </div>
-        <input type="number" class="styled-input-num" value="16800">
-      </div>
-      <label class="field-label" style="margin-top:10px;"><span data-i="rpcSecret">RPC secret</span>
-        <div class="input-with-btn">
-          <input type="password" id="cfgRpcSecret" value="••••••••••••••" readonly>
-          <button type="button" class="icon-btn-ghost" title="Show/Hide">👁</button>
-          <button type="button" class="icon-btn-ghost" title="Copy">📋</button>
-        </div>
-      </label>
-
-      <div class="settings-group-title" style="margin-top:20px;" data-i="progressRecovery">Progress and recovery</div>
-      <div class="setting-toggle-row">
-        <div>
-          <span data-i="saveRecoveryData">Save recovery data</span>
-          <div class="row-hint">Keep data used to resume downloads after restarting.</div>
-        </div>
-        <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
-      </div>
-      <div class="setting-num-row" style="margin-top:10px;">
-        <div>
-          <span data-i="progressInterval">Progress save interval (s)</span>
-          <div class="row-hint">Save more often to reduce progress lost after a crash.</div>
-        </div>
-        <input type="number" class="styled-input-num" value="15">
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
-      <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
-    </div>
-  </div>
-</dialog>
-
-<!-- 8. ABOUT MODAL (IMAGE 13 - Customized with User Name & Credits!) -->
-<dialog id="aboutModal" class="sleek-modal modal-about">
-  <div class="modal-form">
-    <div class="modal-body" style="padding: 28px 24px 20px;">
-      <!-- About Card Top -->
-      <div class="about-card-hero">
-        <div class="about-app-badge">
-          <svg viewBox="0 0 40 40" class="about-app-svg" fill="none">
-            <rect width="40" height="40" rx="10" fill="url(#gradAbout)"/>
-            <rect x="7" y="7" width="26" height="26" rx="5" fill="#182328" stroke="rgba(255,255,255,0.15)"/>
-            <path d="M14 17l6 6 6-6M20 11v12" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="12" y="27" width="16" height="2" rx="1" fill="#38bdf8"/>
-            <defs><linearGradient id="gradAbout" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#38bdf8"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#f43f5e"/></linearGradient></defs>
-          </svg>
-        </div>
-        <div class="about-hero-details">
-          <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.0</span></h2>
-          <p class="about-tagline" data-i="aboutTagline">Before content collapses, preserve what truly matters, let beauty enter your orbit of preservation.</p>
-          <div class="about-dev-by">
-            <span data-i="createdBy">Created & Developed by</span> <b class="dev-name" id="devNameText">Mu'men Mahbuobeh</b> · <a href="https://github.com/mumen-mahbuobeh/tayyar" target="_blank" class="about-link" id="repoLink"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>GitHub: mumen-mahbuobeh/tayyar</a> · <span>MIT Open Source</span>
+      <div class="modal-body">
+        <div class="settings-group-title" data-i="saveFolders">Save folders</div>
+        <label class="field-label"><span data-i="defaultSaveDir">Default download folder</span>
+          <div class="input-with-btn">
+            <input type="text" id="cfgDefaultSaveDir" value="C:\Users\jone_\Downloads" readonly>
+            <button type="button" class="pill-btn outline sm" id="bBrowseCfgSaveDir" data-i="browse">Browse...</button>
           </div>
-        </div>
-      </div>
+          <div class="row-hint">Removing a folder from this list won't delete it or its files.</div>
+        </label>
 
-      <!-- Links row -->
-      <div class="about-links-row">
-        <a href="https://github.com/mumen-mahbuobeh/tayyar" target="_blank" class="about-nav-link" data-i="officialWebsite">Official website</a>
-        <a href="https://github.com/mumen-mahbuobeh/tayyar#readme" target="_blank" class="about-nav-link" data-i="manual">Manual</a>
-        <a href="https://github.com/mumen-mahbuobeh/tayyar" target="_blank" class="about-nav-link" data-i="sourceCode">Source Code</a>
-        <a href="https://github.com/mumen-mahbuobeh/tayyar/releases" target="_blank" class="about-nav-link" data-i="changelog">Changelog</a>
-        <a href="https://github.com/mumen-mahbuobeh/tayyar/blob/main/LICENSE" target="_blank" class="about-nav-link" data-i="acknowledgments">License (MIT)</a>
-      </div>
-
-      <!-- Updates Section -->
-      <div class="about-updates-section">
-        <div class="section-micro-lbl" data-i="appUpdates">App updates</div>
-        <div class="updates-status-row">
+        <div class="settings-group-title" style="margin-top:20px;" data-i="newTasks">New tasks</div>
+        <div class="setting-toggle-row">
           <div>
-            <h4 class="update-title" id="updateTitleText" data-i="upToDate">Tayyar is up to date</h4>
-            <div class="update-desc" data-i="upToDateDesc">Version 1.0.0 is the latest available release.</div>
+            <span data-i="autofillLinks">Autofill links from clipboard</span>
+            <div class="row-hint">Paste copied links when opening a new task.</div>
           </div>
-          <div class="update-actions">
-            <button class="pill-btn light sm" id="bCheckUpdate">
-              <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" style="width:13px;margin-right:4px;"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-              <span data-i="check">Check</span>
-            </button>
-            <select class="styled-select sm" id="cfgChannel">
-              <option value="stable">Stable</option>
-              <option value="beta" selected>Beta ▾</option>
-            </select>
+          <label class="switch-toggle"><input type="checkbox" id="cfgAutofillClip" checked><span
+              class="switch-slider"></span></label>
+        </div>
+        <label class="field-label" style="margin-top:10px;"><span data-i="userAgent">User-Agent</span>
+          <input type="text" id="cfgUserAgent" value="Tayyar/2.0 (Compatible; Windows NT 10.0; Win64; x64)">
+          <div class="pills-row" style="margin-top:6px;">
+            <button type="button" class="pill-btn light sm ua-preset" data-ua="Tayyar/2.0">Tayyar</button>
+            <button type="button" class="pill-btn light sm ua-preset"
+              data-ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/130.0">Chrome</button>
+            <button type="button" class="pill-btn light sm ua-preset"
+              data-ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Firefox/132.0">Firefox</button>
+            <button type="button" class="pill-btn light sm ua-preset" data-ua="Transmission/3.00">Transmission</button>
           </div>
-        </div>
+        </label>
 
-        <!-- Warning box -->
-        <div class="about-warning-box">
-          <span data-i="betaWarning">Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.</span>
-        </div>
-
-        <!-- Toggle -->
-        <div class="setting-toggle-row" style="margin-top:14px;">
+        <div class="settings-group-title" style="margin-top:20px;" data-i="performance">Performance</div>
+        <div class="setting-select-row">
           <div>
-            <span data-i="checkAuto">Check automatically</span>
-            <div class="row-hint" data-i="whenAppOpens">When Tayyar opens</div>
+            <span data-i="dlPerformance">Download performance</span>
+            <div class="row-hint">Balance download speed and resource use.</div>
           </div>
-          <label class="switch-toggle"><input type="checkbox" id="cfgAutoCheckUpdate" checked><span class="switch-slider"></span></label>
+          <select class="styled-select" id="cfgPerformance">
+            <option value="auto" selected>Automatic</option>
+            <option value="high">Maximum Throughput</option>
+            <option value="low">Low CPU & Memory</option>
+          </select>
         </div>
+
+        <div class="perf-chips-grid">
+          <div class="perf-chip">
+            <span class="chip-num">16</span>
+            <span class="chip-lbl">Max connections</span>
+          </div>
+          <div class="perf-chip">
+            <span class="chip-num">64</span>
+            <span class="chip-lbl">Per-server cap</span>
+          </div>
+          <div class="perf-chip">
+            <span class="chip-num">4 MiB</span>
+            <span class="chip-lbl">Min segment</span>
+          </div>
+          <div class="perf-chip">
+            <span class="chip-num">32 MiB</span>
+            <span class="chip-lbl">Disk cache</span>
+          </div>
+        </div>
+
+        <div class="setting-num-row" style="margin-top:14px;">
+          <div>
+            <span data-i="simultaneousDl">Simultaneous downloads</span>
+            <div class="row-hint">Additional tasks wait in the queue. Range: 1–200.</div>
+          </div>
+          <input type="number" id="cfgSimultaneous" class="styled-input-num" min="1" max="200" value="10">
+        </div>
+        <div class="pills-row" style="margin-top:8px;">
+          <button type="button" class="pill-btn light sm sim-preset" data-val="1">1</button>
+          <button type="button" class="pill-btn light sm sim-preset" data-val="3">3</button>
+          <button type="button" class="pill-btn light sm sim-preset" data-val="5">5</button>
+          <button type="button" class="pill-btn light sm sim-preset active" data-val="10">10</button>
+          <button type="button" class="pill-btn light sm sim-preset" data-val="20">20</button>
+          <button type="button" class="pill-btn light sm sim-preset" data-val="30">30</button>
+        </div>
+
+        <div class="settings-group-title" style="margin-top:20px;" data-i="fileTypesTitle">Supported File Types (200+
+          Formats)</div>
+        <label class="field-label">
+          <span data-i="fileTypesDesc">Universal format auto-capture list</span>
+          <textarea id="cfgFileTypes" class="styled-textarea" rows="4" readonly
+            style="font-family:monospace;font-size:11px;line-height:1.6;resize:none;color:var(--color-cyan);background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;width:100%;margin-top:4px;">00* 3DM 3DS 3GP 3MF 7Z AAB AAC ABC ACE AFDESIGN AFPHOTO AI AIF AIFF APE APK APKM APKS APPIMAGE APPX APPXBUNDLE ARJ ARROW ARW ASF AU AVI AVRO AZW AZW3 BAK BAM BIN BLEND BZ BZ2 C4D CAB CAF CBR CBZ CCD CHD CKPT CPIO CR2 CR3 CRAM CSO DAE DAT DCM DDS DEB DFF DIVX DJVU DMG DNG DOC DOCX DSF DWG DXF EPS EPUB EXE EXR F3D F4V FASTA FASTQ FB2 FBX FEATHER FIG FITS FLAC FLATPAK FQ GCODE GCZ GEM GGML GGUF GLB GLTF GPKG GRIB GRIB2 GZ GZIP H5 HDF5 HDR IGES IGS IMG INDD IPA ISO ISZ JAR JOBLIB JSONL KERAS KRA LAS LAZ LLAMAFILE LWO LZ LZ4 LZH LZMA M2T M2TS M2V M4A M4B M4V MA MAT MAX MB MBTILES MDF MDS MID MIDI MKA MKV MLMODEL MOBI MOV MP3 MP4 MPA MPE MPEG MPG MSI MSIX MSIXBUNDLE MSP MSU MTS MXF NC NDJSON NEF NEMO NII NPY NPZ NRG NSP NSZ NUPKG OBJ ODP ODS ODT OGG OGM OGV ONNX OPUS ORC ORF OTF OVA OVF PAK PARQUET PB PBF PDF PICKLE PK3 PK4 PKG PKL PLJ PLY POTX PPS PPSX PPT PPTX PSB PSD PT PTH QCOW QCOW2 QT R0* R1* R2* R3* R4* R5* R6* R7* R8* R9* RA RAF RAR RDS RM RMVB RPM RTF RUN RVZ RW2 SAFETENSORS SEA SF2 SFZ SHP SIT SITX SKETCH SKP SLDASM SLDPRT SNAP SQLITE SQLITE3 STEP STL STP TAR TBZ TBZ2 TFLITE TGA TGZ TIF TIFF TLZ TORRENT TTA TTC TTF TXZ TZST UNITYPACKAGE USD USDA USDC USDZ VDB VDI VHD VHDX VMDK VOB VPK VSIX WAV WBFS WEBM WHL WIM WMA WMV WRL WTV WUA WV X3D XAPK XCF XCI XLS XLSB XLSM XLSX XZ Z Z0* ZIP ZIPX ZPR ZST ZTL</textarea>
+          <div class="row-hint" style="margin-top:4px;" data-i="fileTypesHint">Downloads automatically sorted into
+            organized folders (Video, Music, Compressed, Documents, Programs, 3D-Models, AI-Datasets, Images,
+            Games-ROMs).</div>
+        </label>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
+        <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
       </div>
     </div>
-    <div class="modal-foot">
-      <button type="button" class="pill-btn light modal-close" data-i="close">Close</button>
-    </div>
-  </div>
-</dialog>
+  </dialog>
 
-<!-- EXTENSION INSTALL MODAL -->
-<dialog id="extInstallModal" class="sleek-modal modal-large">
-  <div class="modal-form">
-    <div class="modal-head">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div id="extModalLogo" style="display:flex;align-items:center;"></div>
+  <!-- 4. BITTORRENT / MULTI-CONNECTION MODAL (Images 8 & 9) -->
+  <dialog id="bittorrentModal" class="sleek-modal modal-large">
+    <div class="modal-form">
+      <div class="modal-head">
         <div>
-          <h2 id="extModalTitle">Install Browser Extension</h2>
-          <p class="modal-subhead" id="extModalSubhead">Tayyar download manager integration</p>
+          <h2 data-i="setBtTitle">BitTorrent & Acceleration</h2>
+          <p class="modal-subhead" data-i="btSubhead">Magnets, seeding and trackers</p>
+        </div>
+        <button type="button" class="icon-btn-ghost modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-group-title" data-i="newMagnetTasks">New magnet tasks</div>
+        <div class="setting-toggle-row">
+          <div>
+            <span data-i="chooseFilesBefore">Choose files before downloading</span>
+            <div class="row-hint">Show file selection after a magnet link loads.</div>
+          </div>
+          <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
+        </div>
+        <div class="setting-toggle-row">
+          <div>
+            <span data-i="downloadAllNoSel">Download all if no selection is made</span>
+            <div class="row-hint">Starts after timeout, even if the app window is closed.</div>
+          </div>
+          <label class="switch-toggle"><input type="checkbox"><span class="switch-slider"></span></label>
+        </div>
+
+        <div class="settings-group-title" style="margin-top:20px;" data-i="incomingConns">Incoming connections</div>
+        <div class="setting-num-row">
+          <span data-i="btListenPort">BT listen port</span>
+          <input type="number" class="styled-input-num" value="6881">
+        </div>
+        <div class="setting-num-row">
+          <span data-i="dhtListenPort">DHT listen port</span>
+          <input type="number" class="styled-input-num" value="6881">
+        </div>
+        <div class="setting-toggle-row">
+          <div>
+            <span data-i="enableDht">Enable DHT</span>
+            <div class="row-hint">Find peers through DHT without relying on a tracker.</div>
+          </div>
+          <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
         </div>
       </div>
-      <button type="button" class="icon-btn-ghost modal-close">✕</button>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
+        <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
+      </div>
     </div>
-    <div class="modal-body" id="extModalBody">
-      <!-- Steps generated by JS -->
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="pill-btn outline" id="bOpenExtFolder">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M3 7h6l2 2h10v10H3z"/></svg>
-        <span data-i="openFolder">Open Extension Folder</span>
-      </button>
-      <button type="button" class="pill-btn primary modal-close" data-i="done">Done</button>
-    </div>
-  </div>
-</dialog>
+  </dialog>
 
-<!-- TOAST -->
-<div class="toast-popup" id="toastPopup" hidden></div>
+  <!-- 5. INTEGRATION MODAL (Images 10 & 11) -->
+  <dialog id="integrationModal" class="sleek-modal modal-large">
+    <div class="modal-form">
+      <div class="modal-head">
+        <div>
+          <h2 data-i="setIntTitle">Integration</h2>
+          <p class="modal-subhead" data-i="intSubhead">Browsers, default apps and tools</p>
+        </div>
+        <button type="button" class="icon-btn-ghost modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-group-title" data-i="browserExtensions">Browser extensions</div>
+        <div class="setting-toggle-row">
+          <div>
+            <span data-i="connectExtensions">Connect browser extensions</span>
+            <div class="row-hint">Send webpage downloads to Tayyar with the browser extension.</div>
+          </div>
+          <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
+        </div>
 
-<script src="app.js"></script>
+        <!-- Browser Cards with Authentic Vector Logos -->
+        <div class="browser-cards-grid">
+          <!-- 1. Google Chrome -->
+          <div class="browser-box">
+            <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 2.98.97 4.29L7.4 9.38C8.35 6.78 10.84 5 13.73 5H21.5C19.31 3.16 16.29 2 12 2z"
+                fill="#EA4335" />
+              <path
+                d="M21.5 5H13.73c1.64.95 2.84 2.54 3.18 4.45l4.89 8.47c1.37-1.72 2.2-3.72 2.2-5.92 0-2.61-1.02-4.99-2.5-6.83L21.5 5z"
+                fill="#FBBC05" />
+              <path
+                d="M12 22c4.42 0 8.16-2.87 9.5-6.83L16.61 6.7c-1.39 1.77-3.56 2.9-6.01 2.9-.62 0-1.22-.07-1.79-.22L3.92 18.06C5.97 20.48 9.01 22 12 22z"
+                fill="#34A853" />
+              <circle cx="12" cy="12" r="5" fill="#FFFFFF" />
+              <circle cx="12" cy="12" r="3.8" fill="#1A73E8" />
+            </svg>
+            <span class="browser-name">Chrome</span>
+            <button class="pill-btn outline sm bInstallBrowser" data-browser="chrome" data-i="install">Install</button>
+          </div>
+
+          <!-- 2. Microsoft Edge -->
+          <div class="browser-box">
+            <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+              <defs>
+                <linearGradient id="edgeGradA" x1="12" y1="2" x2="22" y2="20" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#0078D7" />
+                  <stop offset="100%" stop-color="#002050" />
+                </linearGradient>
+                <linearGradient id="edgeGradB" x1="2" y1="12" x2="16" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#00BCF2" />
+                  <stop offset="100%" stop-color="#0078D7" />
+                </linearGradient>
+                <linearGradient id="edgeGradC" x1="2" y1="4" x2="20" y2="14" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#00C853" />
+                  <stop offset="50%" stop-color="#00B0FF" />
+                  <stop offset="100%" stop-color="#0078D7" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M21.8 16.5c-.3 3.4-3.1 6.1-6.7 6.1-3.8 0-6.9-3.1-6.9-6.9 0-.5.1-1 .2-1.5l4.6 1.7c-.1.3-.1.6-.1 1 0 1.9 1.5 3.4 3.4 3.4 1.7 0 3.1-1.2 3.4-2.9h2.1z"
+                fill="url(#edgeGradA)" />
+              <path
+                d="M3.1 12.7C4 8.6 7.6 5.5 12 5.5c3.2 0 6 1.7 7.6 4.2l-4.3 2.5c-.8-1.2-2.1-2-3.5-2-2.2 0-4 1.7-4.2 3.8l-4.5-1.3z"
+                fill="url(#edgeGradB)" />
+              <path d="M11.5 10.2c2.2 0 4 1.7 4.2 3.8H10.4l-4.9-1.8c.8-2.6 3.4-4.6 6.5-4.6z" fill="url(#edgeGradC)" />
+            </svg>
+            <span class="browser-name">Edge</span>
+            <button class="pill-btn outline sm bInstallBrowser" data-browser="edge" data-i="install">Install</button>
+          </div>
+
+          <!-- 3. Mozilla Firefox -->
+          <div class="browser-box">
+            <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+              <defs>
+                <radialGradient id="ffGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#6B3BA7" />
+                  <stop offset="70%" stop-color="#2B1A6D" />
+                  <stop offset="100%" stop-color="#181347" />
+                </radialGradient>
+                <linearGradient id="ffFire" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#FFDD00" />
+                  <stop offset="35%" stop-color="#FF6B00" />
+                  <stop offset="75%" stop-color="#FF1A40" />
+                  <stop offset="100%" stop-color="#9400D3" />
+                </linearGradient>
+              </defs>
+              <circle cx="12" cy="12" r="8.2" fill="url(#ffGlow)" />
+              <ellipse cx="14" cy="13" rx="5" ry="4" fill="#3E2A82" opacity="0.8" />
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12c0 1.8.48 3.5 1.32 4.96.38-.45.83-.84 1.34-1.14-.1-.58-.16-1.18-.16-1.82 0-3.87 3.13-7 7-7 .42 0 .83.04 1.23.11-.82.68-1.48 1.54-1.92 2.53-.29.66-.44 1.39-.44 2.16 0 2.76 2.24 5 5 5 .77 0 1.5-.15 2.16-.44.99-.44 1.85-1.1 2.53-1.92.07.4.11.81.11 1.23 0 3.87-3.13 7-7 7-1.12 0-2.18-.26-3.12-.73 1.52 1.38 3.52 2.23 5.72 2.23 4.97 0 9-4.03 9-9 0-2.31-.87-4.42-2.31-6.02.21.72.31 1.49.31 2.27 0 3.31-2.69 6-6 6-.77 0-1.5-.15-2.16-.44.82-1.28 2.25-2.16 3.86-2.25 2.21-.12 4-1.91 4-4.13 0-1.26-.59-2.39-1.5-3.14.99 1.15 1.5 2.64 1.5 4.24 0 .42-.04.83-.11 1.23-1.28-2.52-3.88-4.23-6.89-4.23-.42 0-.83.04-1.23.11C12.82 2.48 12.42 2 12 2z"
+                fill="url(#ffFire)" />
+            </svg>
+            <span class="browser-name">Firefox</span>
+            <button class="pill-btn outline sm bInstallBrowser" data-browser="firefox" data-i="install">Install</button>
+          </div>
+
+          <!-- 4. Apple Safari -->
+          <div class="browser-box">
+            <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+              <defs>
+                <linearGradient id="safGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#29B6F6" />
+                  <stop offset="100%" stop-color="#0277BD" />
+                </linearGradient>
+              </defs>
+              <circle cx="12" cy="12" r="10" fill="url(#safGrad)" />
+              <circle cx="12" cy="12" r="8.2" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"
+                stroke-dasharray="1.2 1.2" />
+              <circle cx="12" cy="12" r="7.2" stroke="rgba(255,255,255,0.4)" stroke-width="0.6" />
+              <g transform="rotate(45 12 12)">
+                <polygon points="12,3.5 14,12 10,12" fill="#FF3B30" />
+                <polygon points="12,20.5 14,12 10,12" fill="#FFFFFF" />
+                <circle cx="12" cy="12" r="1.5" fill="#FFFFFF" />
+                <circle cx="12" cy="12" r="0.8" fill="#0277BD" />
+              </g>
+            </svg>
+            <span class="browser-name">Safari</span>
+            <button class="pill-btn outline sm bInstallBrowser" data-browser="safari" data-i="install">Install</button>
+          </div>
+
+          <!-- 5. Brave Browser -->
+          <div class="browser-box">
+            <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+              <defs>
+                <linearGradient id="braveGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#FF5A00" />
+                  <stop offset="100%" stop-color="#E51937" />
+                </linearGradient>
+              </defs>
+              <path d="M19.2 5.5l-2.4-3.5H7.2L4.8 5.5 2 8.5l1.8 7.5 8.2 5.5 8.2-5.5 1.8-7.5-2.8-3z"
+                fill="url(#braveGrad)" />
+              <path d="M12 19.5l-6.5-4.2-1.2-5.5 2.5-2.2 1.8 3 3.4.8 3.4-.8 1.8-3 2.5 2.2-1.2 5.5L12 19.5z"
+                fill="#FF7D00" />
+              <path d="M12 15l-2.5-2 .7-1.6 1.8.4 1.8-.4.7 1.6-2.5 2z" fill="#FFFFFF" />
+            </svg>
+            <span class="browser-name">Brave</span>
+            <button class="pill-btn outline sm bInstallBrowser" data-browser="brave" data-i="install">Install</button>
+          </div>
+
+          <!-- 6. Opera -->
+          <div class="browser-box">
+            <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+              <defs>
+                <linearGradient id="operaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#FF3848" />
+                  <stop offset="100%" stop-color="#CC0012" />
+                </linearGradient>
+              </defs>
+              <circle cx="12" cy="12" r="10" fill="url(#operaGrad)" />
+              <ellipse cx="12" cy="12" rx="4.5" ry="7.2" fill="#172227" />
+            </svg>
+            <span class="browser-name">Opera</span>
+            <button class="pill-btn outline sm bInstallBrowser" data-browser="opera" data-i="install">Install</button>
+          </div>
+        </div>
+
+        <div class="settings-group-title" style="margin-top:20px;" data-i="cliTools">Command-line tools</div>
+        <div class="cli-box">
+          <div class="cli-top">
+            <span>Tayyar CLI Tool</span>
+            <span class="chip-badge ready">Ready</span>
+          </div>
+          <div class="cli-code-row">
+            <code>tayyar download https://example.com/file.zip</code>
+            <button class="pill-btn light sm" id="bCopyCli">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
+        <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 6. NETWORK MODAL (Image 12) -->
+  <dialog id="networkModal" class="sleek-modal modal-large">
+    <div class="modal-form">
+      <div class="modal-head">
+        <div>
+          <h2 data-i="setNetTitle">Network</h2>
+          <p class="modal-subhead" data-i="netSubhead">Proxy, DNS and connection checks</p>
+        </div>
+        <button type="button" class="icon-btn-ghost modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-group-title" data-i="proxy">Proxy</div>
+        <div class="setting-toggle-row">
+          <span data-i="enableProxy">Enable proxy</span>
+          <button type="button" class="pill-btn outline sm" style="margin-right:auto;margin-left:14px;"
+            data-i="importSystem">Import from system</button>
+          <label class="switch-toggle"><input type="checkbox" id="cfgEnableProxy"><span
+              class="switch-slider"></span></label>
+        </div>
+
+        <div class="settings-group-title" style="margin-top:20px;" data-i="dns">DNS</div>
+        <div class="setting-select-row">
+          <div>
+            <span data-i="dnsLookup">DNS lookup</span>
+            <div class="row-hint">How downloads look up server addresses.</div>
+          </div>
+          <select class="styled-select" id="cfgDns">
+            <option value="auto" selected>Auto</option>
+            <option value="doh">DNS over HTTPS (Cloudflare/Google)</option>
+            <option value="custom">Custom DNS</option>
+          </select>
+        </div>
+
+        <div class="settings-group-title" style="margin-top:20px;" data-i="portMapping">Port mapping (NAT)</div>
+        <div class="setting-toggle-row">
+          <div>
+            <span data-i="enablePortMapping">Enable port mapping</span>
+            <div class="row-hint">Ask the router to open the ports set in network settings.</div>
+          </div>
+          <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
+        </div>
+
+        <div class="settings-group-title" style="margin-top:20px;" data-i="globalServersTitle">Global Server
+          Compatibility</div>
+        <div class="setting-toggle-row">
+          <div>
+            <span data-i="globalServersBypass">Universal Regional Server Compatibility</span>
+            <div class="row-hint" data-i="globalServersDesc">Bypass regional CA restrictions (Russian domestic CAs,
+              Chinese CDNs, Iranian national gateways) &amp; anti-hotlink blocks without SSL termination errors.</div>
+          </div>
+          <label class="switch-toggle"><input type="checkbox" id="cfgGlobalBypass" checked><span
+              class="switch-slider"></span></label>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
+        <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 7. ADVANCED MODAL (Image 4) -->
+  <dialog id="advancedModal" class="sleek-modal modal-large">
+    <div class="modal-form">
+      <div class="modal-head">
+        <div>
+          <h2 data-i="setAdvTitle">Advanced</h2>
+          <p class="modal-subhead" data-i="advSubhead">RPC, progress and recovery</p>
+        </div>
+        <button type="button" class="icon-btn-ghost modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-group-title">RPC</div>
+        <div class="setting-num-row">
+          <div>
+            <span data-i="rpcPort">RPC port</span>
+            <div class="row-hint">Restart required after changing this.</div>
+          </div>
+          <input type="number" class="styled-input-num" value="16800">
+        </div>
+        <label class="field-label" style="margin-top:10px;"><span data-i="rpcSecret">RPC secret</span>
+          <div class="input-with-btn">
+            <input type="password" id="cfgRpcSecret" value="••••••••••••••" readonly>
+            <button type="button" class="icon-btn-ghost" title="Show/Hide">👁</button>
+            <button type="button" class="icon-btn-ghost" title="Copy">📋</button>
+          </div>
+        </label>
+
+        <div class="settings-group-title" style="margin-top:20px;" data-i="progressRecovery">Progress and recovery</div>
+        <div class="setting-toggle-row">
+          <div>
+            <span data-i="saveRecoveryData">Save recovery data</span>
+            <div class="row-hint">Keep data used to resume downloads after restarting.</div>
+          </div>
+          <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
+        </div>
+        <div class="setting-num-row" style="margin-top:10px;">
+          <div>
+            <span data-i="progressInterval">Progress save interval (s)</span>
+            <div class="row-hint">Save more often to reduce progress lost after a crash.</div>
+          </div>
+          <input type="number" class="styled-input-num" value="15">
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
+        <button type="button" class="pill-btn primary modal-save" data-i="save">Save</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 8. ABOUT MODAL (IMAGE 13 - Customized with User Name & Credits!) -->
+  <dialog id="aboutModal" class="sleek-modal modal-about">
+    <div class="modal-form">
+      <div class="modal-body" style="padding: 28px 24px 20px;">
+        <!-- About Card Top -->
+        <div class="about-card-hero">
+          <div class="about-app-badge">
+            <svg viewBox="0 0 40 40" class="about-app-svg" fill="none">
+              <rect width="40" height="40" rx="10" fill="url(#gradAbout)" />
+              <rect x="7" y="7" width="26" height="26" rx="5" fill="#182328" stroke="rgba(255,255,255,0.15)" />
+              <path d="M14 17l6 6 6-6M20 11v12" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <rect x="12" y="27" width="16" height="2" rx="1" fill="#38bdf8" />
+              <defs>
+                <linearGradient id="gradAbout" x1="0" y1="0" x2="40" y2="40">
+                  <stop stop-color="#38bdf8" />
+                  <stop offset="0.5" stop-color="#818cf8" />
+                  <stop offset="1" stop-color="#f43f5e" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="about-hero-details">
+            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.0</span></h2>
+            <p class="about-tagline" data-i="aboutTagline">Before content collapses, preserve what truly matters, let
+              beauty enter your orbit of preservation.</p>
+            <div class="about-dev-by">
+              <span data-i="createdBy">Created & Developed by</span> <b class="dev-name" id="devNameText">Mu'men
+                Mahbuobeh</b> · <a href="https://github.com/mumen-mahbuobeh/tayyar" target="_blank" class="about-link"
+                id="repoLink"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"
+                  style="vertical-align:-2px;margin-right:4px;">
+                  <path
+                    d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                </svg>GitHub: mumen-mahbuobeh/tayyar</a> · <span>MIT Open Source</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Links row -->
+        <div class="about-links-row">
+          <a href="https://github.com/mumen-mahbuobeh/tayyar" target="_blank" class="about-nav-link"
+            data-i="officialWebsite">Official website</a>
+          <a href="https://github.com/mumen-mahbuobeh/tayyar#readme" target="_blank" class="about-nav-link"
+            data-i="manual">Manual</a>
+          <a href="https://github.com/mumen-mahbuobeh/tayyar" target="_blank" class="about-nav-link"
+            data-i="sourceCode">Source Code</a>
+          <a href="https://github.com/mumen-mahbuobeh/tayyar/releases" target="_blank" class="about-nav-link"
+            data-i="changelog">Changelog</a>
+          <a href="https://github.com/mumen-mahbuobeh/tayyar/blob/main/LICENSE" target="_blank" class="about-nav-link"
+            data-i="acknowledgments">License (MIT)</a>
+        </div>
+
+        <!-- Updates Section -->
+        <div class="about-updates-section">
+          <div class="section-micro-lbl" data-i="appUpdates">App updates</div>
+          <div class="updates-status-row">
+            <div>
+              <h4 class="update-title" id="updateTitleText" data-i="upToDate">Tayyar is up to date</h4>
+              <div class="update-desc" data-i="upToDateDesc">Version 1.0.0 is the latest available release.</div>
+            </div>
+            <div class="update-actions">
+              <button class="pill-btn light sm" id="bCheckUpdate">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                  style="width:13px;margin-right:4px;">
+                  <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                </svg>
+                <span data-i="check">Check</span>
+              </button>
+              <select class="styled-select sm" id="cfgChannel">
+                <option value="stable">Stable</option>
+                <option value="beta" selected>Beta ▾</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Warning box -->
+          <div class="about-warning-box">
+            <span data-i="betaWarning">Beta may be less stable. You'll also receive newer stable releases. Switching
+              back stops beta updates without downgrading.</span>
+          </div>
+
+          <!-- Toggle -->
+          <div class="setting-toggle-row" style="margin-top:14px;">
+            <div>
+              <span data-i="checkAuto">Check automatically</span>
+              <div class="row-hint" data-i="whenAppOpens">When Tayyar opens</div>
+            </div>
+            <label class="switch-toggle"><input type="checkbox" id="cfgAutoCheckUpdate" checked><span
+                class="switch-slider"></span></label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light modal-close" data-i="close">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- EXTENSION INSTALL MODAL -->
+  <dialog id="extInstallModal" class="sleek-modal modal-large">
+    <div class="modal-form">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div id="extModalLogo" style="display:flex;align-items:center;"></div>
+          <div>
+            <h2 id="extModalTitle">Install Browser Extension</h2>
+            <p class="modal-subhead" id="extModalSubhead">Tayyar download manager integration</p>
+          </div>
+        </div>
+        <button type="button" class="icon-btn-ghost modal-close">✕</button>
+      </div>
+      <div class="modal-body" id="extModalBody">
+        <!-- Steps generated by JS -->
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn outline" id="bOpenExtFolder">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            style="margin-right:6px;">
+            <path d="M3 7h6l2 2h10v10H3z" />
+          </svg>
+          <span data-i="openFolder">Open Extension Folder</span>
+        </button>
+        <button type="button" class="pill-btn primary modal-close" data-i="done">Done</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- TOAST -->
+  <div class="toast-popup" id="toastPopup" hidden></div>
+
+  <script src="app.js"></script>
 </body>
+
 </html>

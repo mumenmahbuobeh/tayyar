@@ -982,7 +982,7 @@
               if (probeFileName) probeFileName.value = info.filename || '';
               if (probeSizeBadge) probeSizeBadge.textContent = fmtSize(info.size);
             }
-          } catch (_) {}
+          } catch (_) { }
         }, 500);
       }
     });
