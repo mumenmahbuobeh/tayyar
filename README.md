@@ -1,63 +1,156 @@
-<<<<<<< HEAD
-# تيّار — Tayyar Download Manager
-**برنامج تنزيل ملفات حديث فائق السرعة مفتوح المصدر لسطح المكتب (ويندوز، لينكس، ماك)**  
-**Modern, High-Speed, Open-Source Multi-Connection Desktop Download Manager**
+# Tayyar (تيّار) — Next-Gen Multi-Connection Download Manager
 
-**تطوير وبرمجة / Developed by:** **Mu'men Mahbuobeh (مؤمن محبوبة)**  
-**مستودع المشروع / GitHub Repository:** [https://github.com/mumenmahbuobeh/tayyar](https://github.com/mumenmahbuobeh/tayyar)  
-**الترخيص / License:** MIT Open Source License  
+<p align="center">
+  <img src="renderer/assets/icon.png" alt="Tayyar Logo" width="96" height="96" onerror="this.style.display='none'"/>
+</p>
 
----
+<p align="center">
+  <strong>High-Speed, Resilient, Open-Source Universal Download Manager for Desktop & Mobile</strong><br>
+  <em>Designed and Developed by <strong>Mu'men Mahbuobeh</strong></em>
+</p>
 
-## الميزات الأساسية / Key Features
-
-- ⚡ **تحميل متعدد الاتصالات فائق السرعة (Dynamic Multi-Segment):** حتى 64 اتصالاً للملف الواحد مع إعادة تقسيم ديناميكية عند انتهاء أي مسار.
-- 📂 **دعم شامل لأكثر من 200 صيغة ملف (Universal 200+ Formats):**
-  - دعم كامل لملفات: `00* 3DM 3DS 3GP 3MF 7Z AAB AAC ABC ACE AFDESIGN AFPHOTO AI AIF AIFF APE APK APKM APKS APPIMAGE APPX APPXBUNDLE ARJ ARROW ARW ASF AU AVI AVRO AZW AZW3 BAK BAM BIN BLEND BZ BZ2 C4D CAB CAF CBR CBZ CCD CHD CKPT CPIO CR2 CR3 CRAM CSO DAE DAT DCM DDS DEB DFF DIVX DJVU DMG DNG DOC DOCX DSF DWG DXF EPS EPUB EXE EXR F3D F4V FASTA FASTQ FB2 FBX FEATHER FIG FITS FLAC FLATPAK FQ GCODE GCZ GEM GGML GGUF GLB GLTF GPKG GRIB GRIB2 GZ GZIP H5 HDF5 HDR IGES IGS IMG INDD IPA ISO ISZ JAR JOBLIB JSONL KERAS KRA LAS LAZ LLAMAFILE LWO LZ LZ4 LZH LZMA M2T M2TS M2V M4A M4B M4V MA MAT MAX MB MBTILES MDF MDS MID MIDI MKA MKV MLMODEL MOBI MOV MP3 MP4 MPA MPE MPEG MPG MSI MSIX MSIXBUNDLE MSP MSU MTS MXF NC NDJSON NEF NEMO NII NPY NPZ NRG NSP NSZ NUPKG OBJ ODP ODS ODT OGG OGM OGV ONNX OPUS ORC ORF OTF OVA OVF PAK PARQUET PB PBF PDF PICKLE PK3 PK4 PKG PKL PLJ PLY POTX PPS PPSX PPT PPTX PSB PSD PT PTH QCOW QCOW2 QT R0*–R9* RA RAF RAR RDS RM RMVB RPM RTF RUN RVZ RW2 SAFETENSORS SEA SF2 SFZ SHP SIT SITX SKETCH SKP SLDASM SLDPRT SNAP SQLITE SQLITE3 STEP STL STP TAR TBZ TBZ2 TFLITE TGA TGZ TIF TIFF TLZ TORRENT TTA TTC TTF TXZ TZST UNITYPACKAGE USD USDA USDC USDZ VDB VDI VHD VHDX VMDK VOB VPK VSIX WAV WBFS WEBM WHL WIM WMA WMV WRL WTV WUA WV X3D XAPK XCF XCI XLS XLSB XLSM XLSX XZ Z Z0* ZIP ZIPX ZPR ZST ZTL`.
-  - فرز وتصنيف آلي في مجلدات مرتبة (`Video`, `Music`, `Compressed`, `Documents`, `Programs`, `3D-Models`, `AI-Datasets`, `Images`, `Games-ROMs`).
-- 🌐 **توافق كامل مع كافة السيرفرات العالمية (Russian, Chinese, Iranian & CDN Servers):**
-  - تجاوز قيود الشهادات الإقليمية (Russian domestic GOST/MinTsifry CAs، الإيرانية الوطنية، والصينية ذاتية التوقيع).
-  - محاكاة ترويسات متصفح Chrome 131 وتجاوز قيود منع السرقة (Anti-Hotlink Referer Spoofing).
-  - معالجة ترميز الأسماء المتعددة للغات الروسية والصينية والفارسية والعربية بدقة.
-- 🧩 **إضافات لكافة المتصفحات (Browser Extensions):**
-  - دعم Google Chrome, Microsoft Edge, Mozilla Firefox, Apple Safari, Brave, Opera.
-  - شارة تحميل عائمة لمقاطع الفيديو والصوتيات في صفحات الويب (IDM-style video sniffer badge).
-  - اعتراض التنزيلات تلقائياً وقوائم كليك يمين.
-- 📋 **مراقبة الحافظة الذكية (Smart Clipboard Listener):** التقاط الروابط المنسوخة وعرض التحميل السريع فوراً.
-- 🎨 **واجهة Bento Grid عصرية ثنائية اللغة:**
-  - دعم أصيل للغة العربية (RTL) والإنجليزية (LTR).
-  - نمط مظلم أنيق مستوحى من Motrix Next مع رسوم بيانية ومراقبة سرعة في الوقت الفعلي.
+<p align="center">
+  <a href="https://github.com/mumenmahbuobeh/tayyar/releases"><img src="https://img.shields.io/github/v/release/mumenmahbuobeh/tayyar?color=06b6d4&style=flat-square" alt="Latest Release"/></a>
+  <a href="https://github.com/mumenmahbuobeh/tayyar/actions"><img src="https://img.shields.io/github/actions/workflow/status/mumenmahbuobeh/tayyar/build.yml?branch=main&style=flat-square" alt="Build Status"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"/></a>
+  <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS%20%7C%20Android-38bdf8?style=flat-square" alt="Supported Platforms"/>
+  <img src="https://img.shields.io/badge/language-English%20%7C%20Arabic%20(RTL)-10b981?style=flat-square" alt="Languages"/>
+</p>
 
 ---
 
-## التشغيل والتثبيت / Run & Build
+## 📥 Downloads & Binary Releases
 
+Download the ready-to-run packages for your operating system directly from [GitHub Releases](https://github.com/mumenmahbuobeh/tayyar/releases/latest):
+
+| Platform | Format | Direct Download / Package | Status |
+| :--- | :--- | :--- | :--- |
+| **Windows** | `.exe` (Installer) | [Download Tayyar-Setup-1.0.0.exe](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
+| **Windows** | `.exe` (Portable) | [Download Tayyar-1.0.0-Portable.exe](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
+| **Android** | `.apk` (Mobile) | [Download Tayyar-Android-v1.0.0.apk](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
+| **Linux** | `.AppImage` | [Download Tayyar-1.0.0.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
+| **Linux** | `.deb` (Debian/Ubuntu) | [Download tayyar_1.0.0_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
+| **macOS** | `.dmg` (Universal) | [Download Tayyar-1.0.0.dmg](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
+
+---
+
+## ⚡ Highlights & Key Features
+
+### 1. Dynamic Multi-Threaded Chunking (Turbo Engine)
+* **Up to 64 Concurrent Connections:** Downloads files in dynamically calculated chunks using HTTP Range requests.
+* **Smart End-Game Acceleration:** Automatically sub-divides remaining slow segments across faster idle threads to prevent hanging downloads.
+* **Resumable Transfers:** Full session persistence across network dropouts, app restarts, or crashes.
+
+### 2. Universal Support for 200+ File Formats
+Tayyar natively identifies, captures, and categorizes over 200 file formats into dedicated directories:
+* **Archives & Compressed:** `7Z`, `ZIP`, `RAR`, `TAR`, `GZ`, `BZ2`, `XZ`, `ZST`, `ISO`, `DMG`, `CAB`, `ARJ`, `CPIO`, `00*`, `R0*–R9*`
+* **Video & Streams:** `MP4`, `MKV`, `AVI`, `WEBM`, `MOV`, `FLV`, `TS`, `M2TS`, `VOB`, `WMV`, `3GP`, `MPEG`, `MXF`
+* **Audio & Lossless:** `MP3`, `FLAC`, `WAV`, `AAC`, `OGG`, `M4A`, `OPUS`, `AIFF`, `APE`, `TTA`, `WV`
+* **Documents & E-Books:** `PDF`, `DOCX`, `XLSX`, `PPTX`, `EPUB`, `MOBI`, `AZW3`, `DJVU`, `FB2`, `RTF`, `CSV`, `JSONL`
+* **AI & Machine Learning Models:** `GGUF`, `GGML`, `SAFETENSORS`, `CKPT`, `ONNX`, `PT`, `PTH`, `BIN`, `TFLITE`, `PARQUET`, `ARROW`
+* **Applications & Installers:** `EXE`, `MSI`, `APK`, `APKM`, `APKS`, `AAB`, `DEB`, `RPM`, `APPIMAGE`, `SNAP`, `FLATPAK`, `PKG`, `DMG`
+* **3D, CAD & Graphics:** `BLEND`, `OBJ`, `FBX`, `GLTF`, `GLB`, `STL`, `STEP`, `STP`, `DWG`, `DXF`, `USDZ`, `C4D`, `MAX`, `MA`
+
+### 3. Worldwide Server Resilience (Russian, Chinese, Iranian & Restricted CDNs)
+* **Regional CA Resilience:** Transparent handling of servers using sovereign or self-signed TLS certificates (e.g. Russian MinTsifry/GOST, Iranian national infrastructure, Chinese academic/corporate CDNs).
+* **Anti-Hotlinking Spoofing:** Dynamic `User-Agent` and `Referer` spoofing for services that restrict downloads to active browser sessions (e.g., Yandex Disk, Baidu Wangpan, 1fichier, Rapidgator, Aparat).
+* **Cross-Encoding Resilient Filename Parser:** Seamlessly handles filenames in UTF-8, RFC 5987, Windows-1256 (Arabic), Windows-1251 (Cyrillic), and GBK/GB2312 (Chinese).
+
+### 4. Browser Integration & Extensions
+Ready-to-use extension integration for all major web browsers:
+* **Supported Browsers:** Google Chrome, Microsoft Edge, Mozilla Firefox, Apple Safari, Brave, Opera, Vivaldi, Arc.
+* **Features:**
+  * One-click download interception.
+  * Floating media sniffer button (IDM-style) on HTML5 video & audio elements.
+  * Context menu integration (`Download with Tayyar`).
+
+### 5. Modern Bilingual Bento Grid UI
+* **Bilingual Experience:** Native toggle between English (`LTR`) and Arabic (`RTL`) with layout realignment.
+* **Collapsible Sidebar:** Toggle between full-width drawer and compact 68px icon dock.
+* **Customizable Dashboard:** Real-time speed charts, NAT status, activity heatmap, transfer metrics, and speed limiter presets (Unlimited 🐇, Eco 🐢, Slow 🐌).
+* **Built-in Tracker & Plugin Management:** Real-time BitTorrent / acceleration tracker probing with health latency status.
+
+---
+
+## 🛠️ Technology Stack
+
+* **Core Desktop Runtime:** [Electron 33](https://www.electronjs.org/) + Node.js 20
+* **Mobile Runtime (Android & iOS):** [Capacitor 7](https://capacitorjs.com/)
+* **Engine:** Pure Node.js high-performance asynchronous multi-threaded streams (`http`, `https`, `net`, `crypto`, `fs`)
+* **Styling & UI:** Pure Vanilla CSS3 with GPU-accelerated Glassmorphism (zero heavy framework overhead)
+* **Packaging:** `electron-builder` + Gradle / Android Studio toolchain
+
+---
+
+## 🚀 Development & Build Instructions
+
+### Prerequisites
+* [Node.js](https://nodejs.org/) v20+
+* [npm](https://www.npmjs.com/) v10+
+* (For Android APK builds) Java JDK 17 & Android Studio / Android SDK
+
+### 1. Clone & Install
 ```bash
-# تثبيت الاعتماديات
+git clone https://github.com/mumenmahbuobeh/tayyar.git
+cd tayyar
 npm install
+```
 
-# تشغيل التطبيق في وضع التطوير
+### 2. Run in Development Mode
+```bash
 npm start
+```
 
-# تشغيل فحص واختبار محرك التحميل
+### 3. Run Self-Test Suite
+```bash
 npm test
+```
 
-# تجميع وتصدير البرنامج لنظام ويندوز (.exe)
+### 4. Build Desktop Packages
+```bash
+# Windows (.exe installer & portable binary)
 npm run dist:win
 
-# تجميع وتصدير البرنامج لأنظمة لينكس (.AppImage, .deb)
+# Linux (.AppImage & .deb packages)
 npm run dist:linux
 
-# تجميع وتصدير البرنامج لأنظمة ماك (.dmg)
+# macOS (.dmg disk image)
 npm run dist:mac
+```
+
+### 5. Build Android APK
+```bash
+# Sync web renderer with Android project
+npm run build:android
+
+# Build debug APK with Gradle
+cd android
+./gradlew assembleDebug
+
+# Output APK path:
+# android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ---
 
-## ترخيص المشروع / License
-هذا المشروع مفتوح المصدر ومتاح بموجب ترخيص [MIT License](LICENSE).  
-Copyright (c) 2026 **Mu'men Mahbuobeh**.
-=======
-# tayyar
-tayyar 
->>>>>>> f2bb87a23141228f1fb9b6ab1c40d7e70edc195c
+## 📱 Mobile Architecture (Android)
+
+Tayyar's responsive UI adapts smoothly to mobile screens via Capacitor. To open and inspect the native Android project in Android Studio:
+```bash
+npm run open:android
+```
+
+---
+
+## 👨‍💻 Author & Attribution
+
+* **Author & Lead Developer:** **Mu'men Mahbuobeh**
+* **GitHub Profile:** [@mumenmahbuobeh](https://github.com/mumenmahbuobeh)
+* **Repository:** [https://github.com/mumenmahbuobeh/tayyar](https://github.com/mumenmahbuobeh/tayyar)
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — feel free to use, modify, distribute, and contribute.  
+See the [LICENSE](LICENSE) file for complete details.

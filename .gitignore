@@ -6,6 +6,16 @@ package-lock.json
 dist/
 build/
 out/
+build-apk/
+*.apk
+*.aab
+
+# Android & Gradle
+.gradle/
+android/.gradle/
+android/build/
+android/app/build/
+android/captures/
 
 # Logs
 *.log

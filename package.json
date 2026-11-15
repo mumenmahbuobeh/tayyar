@@ -3,7 +3,7 @@
   "productName": "Tayyar",
   "version": "1.0.0",
   "author": "Mu'men Mahbuobeh",
-  "description": "تيّار — مدير تحميلات حديث متعدد الاتصالات مفتوح المصدر | Modern Open Source Download Manager",
+  "description": "Tayyar — Next-Generation Open Source Multi-Connection Download Manager",
   "homepage": "https://github.com/mumenmahbuobeh/tayyar",
   "repository": {
     "type": "git",
@@ -16,9 +16,12 @@
     "dist": "electron-builder",
     "dist:win": "electron-builder --win",
     "dist:linux": "electron-builder --linux",
-    "dist:mac": "electron-builder --mac"
+    "dist:mac": "electron-builder --mac",
+    "build:android": "npx cap copy android && npx cap sync android",
+    "open:android": "npx cap open android"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.6.10",
     "electron": "^33.2.0",
     "electron-builder": "^25.1.8"
   },
@@ -55,5 +58,9 @@
       ],
       "category": "Network"
     }
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/core": "^8.6.2"
   }
 }

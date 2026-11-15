@@ -1,0 +1,8 @@
+{
+  "appId": "com.mahbuobeh.tayyar",
+  "appName": "Tayyar",
+  "webDir": "renderer",
+  "server": {
+    "androidScheme": "https"
+  }
+}
