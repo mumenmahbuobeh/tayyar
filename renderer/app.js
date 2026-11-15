@@ -582,14 +582,14 @@
 
     if (!filtered.length) {
       emptyState.hidden = false;
-      emptyState.style.display = 'flex';
+      emptyState.style.setProperty('display', 'flex', 'important');
       listEl.hidden = true;
-      listEl.style.display = 'none';
+      listEl.style.setProperty('display', 'none', 'important');
     } else {
       emptyState.hidden = true;
-      emptyState.style.display = 'none';
+      emptyState.style.setProperty('display', 'none', 'important');
       listEl.hidden = false;
-      listEl.style.display = 'flex';
+      listEl.style.setProperty('display', 'flex', 'important');
       listEl.innerHTML = filtered.slice(0, 3).map((d) => `
         <div class="mini-task-item">
           <div class="mini-task-info">
@@ -679,11 +679,11 @@
     bToggleCustomize.addEventListener('click', () => {
       if (customizeBar) {
         customizeBar.hidden = false;
-        customizeBar.style.display = 'flex';
+        customizeBar.style.setProperty('display', 'flex', 'important');
       }
       if (standardDashActions) {
         standardDashActions.hidden = true;
-        standardDashActions.style.display = 'none';
+        standardDashActions.style.setProperty('display', 'none', 'important');
       }
       if (bentoGrid) bentoGrid.classList.add('customizing');
     });
@@ -692,15 +692,15 @@
   const closeCustomize = () => {
     if (customizeBar) {
       customizeBar.hidden = true;
-      customizeBar.style.display = 'none';
+      customizeBar.style.setProperty('display', 'none', 'important');
     }
     if (standardDashActions) {
       standardDashActions.hidden = false;
-      standardDashActions.style.display = 'flex';
+      standardDashActions.style.setProperty('display', 'flex', 'important');
     }
     if (presetPopover) {
       presetPopover.hidden = true;
-      presetPopover.style.display = 'none';
+      presetPopover.style.setProperty('display', 'none', 'important');
     }
     if (bentoGrid) bentoGrid.classList.remove('customizing');
   };

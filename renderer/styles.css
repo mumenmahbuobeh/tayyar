@@ -74,22 +74,44 @@ svg:not([width]) {
   max-height: 36px;
 }
 
-.placeholder-icon {
-  width: 52px !important;
-  height: 52px !important;
-  max-width: 52px !important;
-  max-height: 52px !important;
-  min-width: 52px !important;
-  min-height: 52px !important;
+.placeholder-icon,
+.placeholder-icon-wrap {
+  width: 48px !important;
+  height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
   color: var(--color-cyan) !important;
-  opacity: 0.85;
+  opacity: 0.9;
   margin: 0 auto 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.placeholder-icon svg,
+.placeholder-icon-wrap svg {
+  width: 44px !important;
+  height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  display: block !important;
+  color: var(--color-cyan) !important;
 }
 
 .search-input-wrap svg {
   width: 14px !important;
   height: 14px !important;
+  min-width: 14px !important;
+  min-height: 14px !important;
+  max-width: 14px !important;
+  max-height: 14px !important;
   color: var(--text-dim) !important;
+  display: block !important;
+  flex-shrink: 0 !important;
 }
 
 .icon-btn-ghost svg {
@@ -954,73 +976,98 @@ html[dir="rtl"] .select-pill-wrap .chevron-ic {
 }
 
 /* ================= DOWNLOADS VIEW (SCREENSHOT 1 FIX) ================= */
+#viewDownloads .view-header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+}
+
 .downloads-header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
 }
 
 .dl-filter-pills {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 4px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-subtle);
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  padding: 4px !important;
+  border-radius: var(--radius-pill) !important;
+  border: 1px solid var(--border-subtle) !important;
 }
 
 .filter-pill {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 5px 12px;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-muted) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 5px 12px !important;
+  border-radius: var(--radius-pill) !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+  -webkit-appearance: none !important;
+}
+
+.filter-pill:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  color: #ffffff !important;
 }
 
 .filter-pill .cnt {
-  font-size: 11px;
-  opacity: 0.8;
-  background-color: rgba(255, 255, 255, 0.08);
-  padding: 1px 6px;
-  border-radius: var(--radius-pill);
+  font-size: 11px !important;
+  opacity: 0.8 !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  padding: 1px 6px !important;
+  border-radius: var(--radius-pill) !important;
 }
 
 .filter-pill.active {
-  background-color: #23343c;
-  color: #ffffff;
+  background-color: #23343c !important;
+  color: #ffffff !important;
 }
 
 .downloads-header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
 }
 
 .search-input-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-pill);
-  padding: 5px 14px;
-  height: 34px;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-pill) !important;
+  padding: 5px 14px !important;
+  height: 34px !important;
+  box-sizing: border-box !important;
 }
 
 .search-input-wrap input {
   background: transparent !important;
   border: none !important;
   outline: none !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  font-size: 12.5px !important;
+  width: 140px !important;
+  font-family: inherit !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  -webkit-appearance: none !important;
+}
   color: #ffffff !important;
   font-size: 12.5px;
   width: 140px;
@@ -1184,27 +1231,31 @@ html[dir="rtl"] .select-pill-wrap .chevron-ic {
 
 /* ================= PLACEHOLDER VIEWS (SCREENSHOT 2 FIX) ================= */
 .subview-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  padding: 30px;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 400px !important;
+  padding: 30px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .placeholder-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-card);
-  padding: 44px 56px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  max-width: 480px;
-  width: 100%;
-  margin: auto;
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-card) !important;
+  padding: 44px 56px !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  max-width: 480px !important;
+  width: 100% !important;
+  margin: auto !important;
+  box-sizing: border-box !important;
 }
 
 .placeholder-card h3 {
