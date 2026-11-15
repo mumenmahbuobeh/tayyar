@@ -2794,3 +2794,84 @@ html[dir="rtl"] .glass-island-player {
   }
 }
 
+@
+
+/* ================= EXACT APPLE LIQUID GLASS (MODALS) ================= */
+@media (max-width: 768px) {
+  /* Modals background overlay */
+  .sleek-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+  }
+
+  /* Modals bottom sheet style / Glassy popup */
+  .sleek-modal {
+    background: rgba(30, 30, 30, 0.6) !important; /* Dark Glass */
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 35px !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.2) !important;
+    width: 92vw !important;
+    max-width: 92vw !important;
+    margin: auto !important;
+    margin-bottom: 20px !important; /* Slight float above bottom */
+    padding: 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .modal-head {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 24px !important;
+    background: transparent !important;
+  }
+
+  .modal-head h2 {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.5px !important;
+    color: #ffffff !important;
+  }
+
+  .modal-body {
+    padding: 24px !important;
+    background: transparent !important;
+    max-height: 60vh !important;
+    overflow-y: auto !important;
+  }
+
+  .modal-foot {
+    background: rgba(0,0,0,0.2) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 20px 24px !important;
+  }
+
+  /* Inputs, Switchers & Selects inside modal */
+  .settings-row {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 20px !important;
+    padding: 16px !important;
+    margin-bottom: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  }
+
+  .settings-row-info h4 {
+    color: #ffffff !important;
+    font-size: 15px !important;
+  }
+
+  .settings-row-info p {
+    color: rgba(255,255,255,0.6) !important;
+  }
+
+  .input-base, .select-base {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+    border-radius: 14px !important;
+    padding: 12px 16px !important;
+  }
+}
+@
