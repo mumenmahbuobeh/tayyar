@@ -137,6 +137,9 @@
       saveFolder: 'Save Directory',
       conns: 'Connections',
       startDownload: 'Start Download',
+      install: 'Install',
+      openFolder: 'Open Extension Folder',
+      done: 'Done',
     },
     ar: {
       dashboard: 'لوحة التحكم',
@@ -270,6 +273,9 @@
       saveFolder: 'مجلد الحفظ',
       conns: 'عدد خيوط الاتصال',
       startDownload: 'بدء التحميل',
+      install: 'تثبيت',
+      openFolder: 'فتح مجلد الإضافة',
+      done: 'تم',
     },
   };
 
@@ -1021,6 +1027,151 @@
         bCheckUpdate.innerHTML = originalHtml;
         toast(S.lang === 'ar' ? 'برنامج تيّار محدّث لأحدث إصدار!' : 'Tayyar is up to date (Version 1.0.0)');
       }, 1000);
+    });
+  }
+
+  /* ---------------- BROWSER EXTENSION INSTALLATION MODAL ---------------- */
+  let currentExtBrowser = 'chrome';
+  const extInstallModal = $('#extInstallModal');
+  const extModalLogo = $('#extModalLogo');
+  const extModalTitle = $('#extModalTitle');
+  const extModalSubhead = $('#extModalSubhead');
+  const extModalBody = $('#extModalBody');
+  const bOpenExtFolder = $('#bOpenExtFolder');
+
+  const EXT_INSTRUCTIONS = {
+    chrome: {
+      name: 'Google Chrome',
+      stepsEn: [
+        'Open Google Chrome and navigate to <code>chrome://extensions</code> in the address bar.',
+        'Enable <b>Developer mode</b> using the toggle switch in the top-right corner.',
+        'Click the <b>Load unpacked</b> button in the top-left.',
+        'Select the <code>extension</code> folder inside your Tayyar directory.',
+      ],
+      stepsAr: [
+        'افتح متصفح Google Chrome واكتب <code>chrome://extensions</code> في شريط العناوين.',
+        'قم بتفعيل <b>وضع مطوّر البرامج (Developer mode)</b> من المفتاح في أعلى اليمين.',
+        'انقر على زر <b>تحميل حزمة غير مضغوطة (Load unpacked)</b> في أعلى اليسار.',
+        'اختر مجلد <code>extension</code> الموجود داخل مجلد برنامج تيّار.',
+      ],
+    },
+    edge: {
+      name: 'Microsoft Edge',
+      stepsEn: [
+        'Open Microsoft Edge and navigate to <code>edge://extensions</code>.',
+        'Turn on <b>Developer mode</b> from the left sidebar.',
+        'Click <b>Load unpacked</b> and choose the <code>extension</code> folder.',
+        'The Tayyar icon will appear in your Edge toolbar to capture downloads.',
+      ],
+      stepsAr: [
+        'افتح متصفح Microsoft Edge واذهب إلى <code>edge://extensions</code>.',
+        'قم بتشغيل <b>وضع المطور (Developer mode)</b> من القائمة الجانبية.',
+        'انقر على <b>تحميل حزمة غير مضغوطة (Load unpacked)</b> وحدد مجلد <code>extension</code>.',
+        'ستظهر أيقونة تيّار في شريط أدوات Edge لالتقاط التحميلات فوراً.',
+      ],
+    },
+    firefox: {
+      name: 'Mozilla Firefox',
+      stepsEn: [
+        'Open Firefox and go to <code>about:debugging#/runtime/this-firefox</code>.',
+        'Click <b>Load Temporary Add-on...</b>',
+        'Select the <code>manifest.json</code> file inside the <code>extension-firefox</code> folder.',
+        'Tayyar integration will be active and ready to catch all downloads.',
+      ],
+      stepsAr: [
+        'افتح متصفح فايرفوكس واذهب إلى <code>about:debugging#/runtime/this-firefox</code>.',
+        'انقر على زر <b>تحميل إضافة مؤقتة... (Load Temporary Add-on)</b>.',
+        'اختر ملف <code>manifest.json</code> داخل مجلد <code>extension-firefox</code>.',
+        'سيتم تفعيل تكامل تيّار وسيبدأ بالتقاط تحميلات فايرفوكس فوراً.',
+      ],
+    },
+    safari: {
+      name: 'Apple Safari',
+      stepsEn: [
+        'In Safari, open <b>Settings > Advanced</b> and check <i>Show features for web developers</i>.',
+        'Under the <b>Develop</b> menu, enable <i>Allow unsigned extensions</i>.',
+        'Load the Tayyar extension folder or convert using standard WebExtension converter.',
+      ],
+      stepsAr: [
+        'في متصفح Safari، افتح الإعدادات ثم المتقدمة وفعّل <i>إظهار ميزات مطوري الويب</i>.',
+        'من قائمة التطوير (Develop)، فعّل خيار <i>السماح بالإضافة غير الموقعة</i>.',
+        'قم بتحميل مجلد الإضافة وسيتصل ببرنامج تيّار مباشرة.',
+      ],
+    },
+    brave: {
+      name: 'Brave Browser',
+      stepsEn: [
+        'Open Brave and navigate to <code>brave://extensions</code>.',
+        'Enable <b>Developer mode</b> at the top-right.',
+        'Click <b>Load unpacked</b> and select the <code>extension</code> folder.',
+      ],
+      stepsAr: [
+        'افتح متصفح Brave واذهب إلى <code>brave://extensions</code>.',
+        'قم بتفعيل <b>وضع المطور (Developer mode)</b> في الأعلى.',
+        'انقر على <b>Load unpacked</b> واختر مجلد <code>extension</code>.',
+      ],
+    },
+    opera: {
+      name: 'Opera',
+      stepsEn: [
+        'Open Opera and navigate to <code>opera://extensions</code>.',
+        'Toggle <b>Developer mode</b> on in the top-right.',
+        'Click <b>Load unpacked</b> and select the <code>extension</code> folder.',
+      ],
+      stepsAr: [
+        'افتح متصفح Opera واذهب إلى <code>opera://extensions</code>.',
+        'قم بتفعيل <b>وضع المطور (Developer mode)</b>.',
+        'انقر على <b>Load unpacked</b> واختر مجلد <code>extension</code>.',
+      ],
+    },
+  };
+
+  $$('.bInstallBrowser').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const bKey = btn.dataset.browser;
+      const bInfo = EXT_INSTRUCTIONS[bKey] || EXT_INSTRUCTIONS.chrome;
+      currentExtBrowser = bKey;
+
+      const box = btn.closest('.browser-box');
+      const svgClone = box ? box.querySelector('.browser-svg')?.cloneNode(true) : null;
+      if (extModalLogo) {
+        extModalLogo.innerHTML = '';
+        if (svgClone) extModalLogo.appendChild(svgClone);
+      }
+
+      if (extModalTitle) {
+        extModalTitle.textContent = S.lang === 'ar' ? `تثبيت إضافة ${bInfo.name}` : `Install ${bInfo.name} Extension`;
+      }
+      if (extModalSubhead) {
+        extModalSubhead.textContent = S.lang === 'ar' ? 'ربط التحميلات التلقائية مع تطبيق تيّار' : 'Seamless multi-connection download capture';
+      }
+
+      const steps = S.lang === 'ar' ? bInfo.stepsAr : bInfo.stepsEn;
+      if (extModalBody) {
+        extModalBody.innerHTML = `
+          <div class="ext-steps-list">
+            ${steps.map((st, i) => `
+              <div class="ext-step-item">
+                <span class="ext-step-num">${i + 1}</span>
+                <span class="ext-step-txt">${st}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (extInstallModal) extInstallModal.showModal();
+    });
+  });
+
+  if (bOpenExtFolder) {
+    bOpenExtFolder.addEventListener('click', () => {
+      const targetFolder = currentExtBrowser === 'firefox' ? 'firefox' : 'chrome';
+      if (window.tayyar?.openExtensionFolder) {
+        window.tayyar.openExtensionFolder(targetFolder);
+        toast(S.lang === 'ar' ? 'تم فتح مجلد الإضافة في مستكشف الملفات' : 'Opened extension folder in Explorer');
+      }
     });
   }
 

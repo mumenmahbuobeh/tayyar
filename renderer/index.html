@@ -995,32 +995,125 @@
         <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
       </div>
 
-      <!-- Browser Cards -->
+      <!-- Browser Cards with Authentic Vector Logos -->
       <div class="browser-cards-grid">
+        <!-- 1. Google Chrome -->
         <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" fill="#3b82f6"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="#fff"/></svg>
+          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 2.98.97 4.29L7.4 9.38C8.35 6.78 10.84 5 13.73 5H21.5C19.31 3.16 16.29 2 12 2z" fill="#EA4335"/>
+            <path d="M21.5 5H13.73c1.64.95 2.84 2.54 3.18 4.45l4.89 8.47c1.37-1.72 2.2-3.72 2.2-5.92 0-2.61-1.02-4.99-2.5-6.83L21.5 5z" fill="#FBBC05"/>
+            <path d="M12 22c4.42 0 8.16-2.87 9.5-6.83L16.61 6.7c-1.39 1.77-3.56 2.9-6.01 2.9-.62 0-1.22-.07-1.79-.22L3.92 18.06C5.97 20.48 9.01 22 12 22z" fill="#34A853"/>
+            <circle cx="12" cy="12" r="5" fill="#FFFFFF"/>
+            <circle cx="12" cy="12" r="3.8" fill="#1A73E8"/>
+          </svg>
           <span class="browser-name">Chrome</span>
-          <button class="pill-btn outline sm">Install</button>
+          <button class="pill-btn outline sm bInstallBrowser" data-browser="chrome" data-i="install">Install</button>
         </div>
+
+        <!-- 2. Microsoft Edge -->
         <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" fill="#0284c7"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0110 10c0 5.52-4.48 10-10 10S2 17.52 2 12" stroke="#fff" stroke-width="2"/></svg>
-          <span class="browser-name">Microsoft Edge</span>
-          <button class="pill-btn outline sm">Install</button>
+          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+            <defs>
+              <linearGradient id="edgeGradA" x1="12" y1="2" x2="22" y2="20" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#0078D7"/>
+                <stop offset="100%" stop-color="#002050"/>
+              </linearGradient>
+              <linearGradient id="edgeGradB" x1="2" y1="12" x2="16" y2="22" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#00BCF2"/>
+                <stop offset="100%" stop-color="#0078D7"/>
+              </linearGradient>
+              <linearGradient id="edgeGradC" x1="2" y1="4" x2="20" y2="14" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#00C853"/>
+                <stop offset="50%" stop-color="#00B0FF"/>
+                <stop offset="100%" stop-color="#0078D7"/>
+              </linearGradient>
+            </defs>
+            <path d="M21.8 16.5c-.3 3.4-3.1 6.1-6.7 6.1-3.8 0-6.9-3.1-6.9-6.9 0-.5.1-1 .2-1.5l4.6 1.7c-.1.3-.1.6-.1 1 0 1.9 1.5 3.4 3.4 3.4 1.7 0 3.1-1.2 3.4-2.9h2.1z" fill="url(#edgeGradA)"/>
+            <path d="M3.1 12.7C4 8.6 7.6 5.5 12 5.5c3.2 0 6 1.7 7.6 4.2l-4.3 2.5c-.8-1.2-2.1-2-3.5-2-2.2 0-4 1.7-4.2 3.8l-4.5-1.3z" fill="url(#edgeGradB)"/>
+            <path d="M11.5 10.2c2.2 0 4 1.7 4.2 3.8H10.4l-4.9-1.8c.8-2.6 3.4-4.6 6.5-4.6z" fill="url(#edgeGradC)"/>
+          </svg>
+          <span class="browser-name">Edge</span>
+          <button class="pill-btn outline sm bInstallBrowser" data-browser="edge" data-i="install">Install</button>
         </div>
+
+        <!-- 3. Mozilla Firefox -->
         <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" fill="#f97316"><circle cx="12" cy="12" r="10"/></svg>
+          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+            <defs>
+              <radialGradient id="ffGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#6B3BA7"/>
+                <stop offset="70%" stop-color="#2B1A6D"/>
+                <stop offset="100%" stop-color="#181347"/>
+              </radialGradient>
+              <linearGradient id="ffFire" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FFDD00"/>
+                <stop offset="35%" stop-color="#FF6B00"/>
+                <stop offset="75%" stop-color="#FF1A40"/>
+                <stop offset="100%" stop-color="#9400D3"/>
+              </linearGradient>
+            </defs>
+            <circle cx="12" cy="12" r="8.2" fill="url(#ffGlow)"/>
+            <ellipse cx="14" cy="13" rx="5" ry="4" fill="#3E2A82" opacity="0.8"/>
+            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.8.48 3.5 1.32 4.96.38-.45.83-.84 1.34-1.14-.1-.58-.16-1.18-.16-1.82 0-3.87 3.13-7 7-7 .42 0 .83.04 1.23.11-.82.68-1.48 1.54-1.92 2.53-.29.66-.44 1.39-.44 2.16 0 2.76 2.24 5 5 5 .77 0 1.5-.15 2.16-.44.99-.44 1.85-1.1 2.53-1.92.07.4.11.81.11 1.23 0 3.87-3.13 7-7 7-1.12 0-2.18-.26-3.12-.73 1.52 1.38 3.52 2.23 5.72 2.23 4.97 0 9-4.03 9-9 0-2.31-.87-4.42-2.31-6.02.21.72.31 1.49.31 2.27 0 3.31-2.69 6-6 6-.77 0-1.5-.15-2.16-.44.82-1.28 2.25-2.16 3.86-2.25 2.21-.12 4-1.91 4-4.13 0-1.26-.59-2.39-1.5-3.14.99 1.15 1.5 2.64 1.5 4.24 0 .42-.04.83-.11 1.23-1.28-2.52-3.88-4.23-6.89-4.23-.42 0-.83.04-1.23.11C12.82 2.48 12.42 2 12 2z" fill="url(#ffFire)"/>
+          </svg>
           <span class="browser-name">Firefox</span>
-          <button class="pill-btn outline sm">Install</button>
+          <button class="pill-btn outline sm bInstallBrowser" data-browser="firefox" data-i="install">Install</button>
         </div>
+
+        <!-- 4. Apple Safari -->
         <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" fill="#38bdf8"><circle cx="12" cy="12" r="10"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2"/></svg>
+          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+            <defs>
+              <linearGradient id="safGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#29B6F6"/>
+                <stop offset="100%" stop-color="#0277BD"/>
+              </linearGradient>
+            </defs>
+            <circle cx="12" cy="12" r="10" fill="url(#safGrad)"/>
+            <circle cx="12" cy="12" r="8.2" stroke="rgba(255,255,255,0.3)" stroke-width="0.8" stroke-dasharray="1.2 1.2"/>
+            <circle cx="12" cy="12" r="7.2" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+            <g transform="rotate(45 12 12)">
+              <polygon points="12,3.5 14,12 10,12" fill="#FF3B30"/>
+              <polygon points="12,20.5 14,12 10,12" fill="#FFFFFF"/>
+              <circle cx="12" cy="12" r="1.5" fill="#FFFFFF"/>
+              <circle cx="12" cy="12" r="0.8" fill="#0277BD"/>
+            </g>
+          </svg>
           <span class="browser-name">Safari</span>
-          <button class="pill-btn outline sm">Install</button>
+          <button class="pill-btn outline sm bInstallBrowser" data-browser="safari" data-i="install">Install</button>
         </div>
+
+        <!-- 5. Brave Browser -->
         <div class="browser-box">
-          <svg viewBox="0 0 24 24" class="browser-svg" fill="#ffffff"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-          <span class="browser-name">GitHub</span>
-          <button class="pill-btn outline sm">Development</button>
+          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+            <defs>
+              <linearGradient id="braveGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FF5A00"/>
+                <stop offset="100%" stop-color="#E51937"/>
+              </linearGradient>
+            </defs>
+            <path d="M19.2 5.5l-2.4-3.5H7.2L4.8 5.5 2 8.5l1.8 7.5 8.2 5.5 8.2-5.5 1.8-7.5-2.8-3z" fill="url(#braveGrad)"/>
+            <path d="M12 19.5l-6.5-4.2-1.2-5.5 2.5-2.2 1.8 3 3.4.8 3.4-.8 1.8-3 2.5 2.2-1.2 5.5L12 19.5z" fill="#FF7D00"/>
+            <path d="M12 15l-2.5-2 .7-1.6 1.8.4 1.8-.4.7 1.6-2.5 2z" fill="#FFFFFF"/>
+          </svg>
+          <span class="browser-name">Brave</span>
+          <button class="pill-btn outline sm bInstallBrowser" data-browser="brave" data-i="install">Install</button>
+        </div>
+
+        <!-- 6. Opera -->
+        <div class="browser-box">
+          <svg viewBox="0 0 24 24" class="browser-svg" width="34" height="34" fill="none">
+            <defs>
+              <linearGradient id="operaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#FF3848"/>
+                <stop offset="100%" stop-color="#CC0012"/>
+              </linearGradient>
+            </defs>
+            <circle cx="12" cy="12" r="10" fill="url(#operaGrad)"/>
+            <ellipse cx="12" cy="12" rx="4.5" ry="7.2" fill="#172227"/>
+          </svg>
+          <span class="browser-name">Opera</span>
+          <button class="pill-btn outline sm bInstallBrowser" data-browser="opera" data-i="install">Install</button>
         </div>
       </div>
 
@@ -1210,6 +1303,32 @@
     </div>
     <div class="modal-foot">
       <button type="button" class="pill-btn light modal-close" data-i="close">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- EXTENSION INSTALL MODAL -->
+<dialog id="extInstallModal" class="sleek-modal modal-large">
+  <div class="modal-form">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div id="extModalLogo" style="display:flex;align-items:center;"></div>
+        <div>
+          <h2 id="extModalTitle">Install Browser Extension</h2>
+          <p class="modal-subhead" id="extModalSubhead">Tayyar download manager integration</p>
+        </div>
+      </div>
+      <button type="button" class="icon-btn-ghost modal-close">✕</button>
+    </div>
+    <div class="modal-body" id="extModalBody">
+      <!-- Steps generated by JS -->
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="pill-btn outline" id="bOpenExtFolder">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M3 7h6l2 2h10v10H3z"/></svg>
+        <span data-i="openFolder">Open Extension Folder</span>
+      </button>
+      <button type="button" class="pill-btn primary modal-close" data-i="done">Done</button>
     </div>
   </div>
 </dialog>

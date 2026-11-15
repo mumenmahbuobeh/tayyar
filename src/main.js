@@ -54,11 +54,18 @@ function createWindow() {
 function startBridge() {
   const srv = http.createServer((req, res) => {
     const origin = req.headers.origin || '';
-    const fromExtension = /^(chrome|moz)-extension:\/\//.test(origin);
-    res.setHeader('Access-Control-Allow-Origin', fromExtension ? origin : 'null');
+    const fromExtension = !origin || /^(chrome|moz|safari-web)-extension:\/\/|^http:\/\/127\.0\.0\.1/i.test(origin);
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Tayyar');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+
     if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
+
+    if (req.method === 'GET' && (req.url === '/ping' || req.url === '/status')) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: '1.0.0', bridge: true }));
+    }
+
     if (req.method !== 'POST' || req.url !== '/add' || !fromExtension || req.headers['x-tayyar'] !== '1') {
       res.writeHead(403); return res.end();
     }
@@ -69,7 +76,8 @@ function startBridge() {
         const { url, referer } = JSON.parse(body);
         if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); }
         send('ui:add-url', { url: String(url || ''), referer: String(referer || '') });
-        res.writeHead(200); res.end('ok');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
       } catch (_) { res.writeHead(400); res.end(); }
     });
   });
@@ -110,6 +118,15 @@ function wireIpc() {
   h('chooseDir', async () => {
     const r = await dialog.showOpenDialog(win, { properties: ['openDirectory', 'createDirectory'] });
     return r.canceled ? null : r.filePaths[0];
+  });
+  h('openExtensionFolder', (type) => {
+    const folder = type === 'firefox' ? 'extension-firefox' : 'extension';
+    const p = path.join(__dirname, '..', folder);
+    shell.openPath(p);
+    return { ok: true, path: p };
+  });
+  h('openUrl', (u) => {
+    if (/^https?:\/\//i.test(u)) shell.openExternal(u);
   });
 }
 

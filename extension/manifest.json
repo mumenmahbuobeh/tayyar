@@ -1,10 +1,44 @@
 {
   "manifest_version": 3,
-  "name": "Tayyar Integration — تيّار",
+  "name": "Tayyar Download Manager Integration — تيّار",
+  "short_name": "Tayyar",
   "version": "1.0.0",
-  "description": "Send downloads and links from the browser to the Tayyar desktop app.",
-  "permissions": ["contextMenus", "downloads", "storage"],
-  "host_permissions": ["http://127.0.0.1:6824/*"],
-  "background": { "service_worker": "background.js" },
-  "action": { "default_title": "Tayyar: capture browser downloads (click to toggle)" }
+  "description": "Send downloads, media files, and links directly to the Tayyar multi-connection desktop download manager.",
+  "permissions": [
+    "contextMenus",
+    "downloads",
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:6824/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Tayyar Download Manager",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
 }

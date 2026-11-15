@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tayyar Integration</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-wrap">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="brand-row">
+        <div class="brand-logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="6" fill="#06b6d4"/>
+            <path d="M12 5v10m0 0l-3.5-3.5m3.5 3.5l3.5-3.5M6 18h12" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="brand-title">Tayyar</span>
+        </div>
+        <button class="lang-pill" id="bLang">AR</button>
+      </div>
+      <p class="tagline" id="txtTagline">Next Gen Download Manager</p>
+    </header>
+
+    <!-- Connection Status Banner -->
+    <div class="status-banner" id="statusBanner">
+      <span class="status-dot" id="statusDot"></span>
+      <span class="status-txt" id="statusTxt">Checking connection...</span>
+    </div>
+
+    <!-- Quick Add Form -->
+    <div class="quick-add-box">
+      <label class="field-label" id="lblQuickAdd">Quick Download</label>
+      <div class="input-row">
+        <input type="url" id="quickUrlInput" placeholder="https://example.com/file.zip" autocomplete="off">
+        <button class="btn-primary" id="bSendDownload">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <div class="feedback-msg" id="feedbackMsg" hidden></div>
+    </div>
+
+    <!-- Settings Toggles -->
+    <div class="settings-group">
+      <div class="toggle-row">
+        <div>
+          <span class="toggle-label" id="lblCapture">Intercept Downloads</span>
+          <div class="toggle-desc" id="descCapture">Capture browser downloads automatically</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="chkCapture" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <span class="toggle-label" id="lblVideoBadge">Floating Video Button</span>
+          <div class="toggle-desc" id="descVideoBadge">Show quick download badge on video players</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="chkVideoBadge" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <span class="version-txt">v1.0.0 · Tayyar Desktop Bridge</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

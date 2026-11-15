@@ -23,6 +23,8 @@ const bridge = {
   open: inv('open'),
   reveal: inv('reveal'),
   chooseDir: inv('chooseDir'),
+  openExtensionFolder: inv('openExtensionFolder'),
+  openUrl: inv('openUrl'),
   on(channel, cb) {
     if (!EVENTS.includes(channel)) return;
     ipcRenderer.on(channel, (_e, payload) => cb(payload));

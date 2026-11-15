@@ -26,6 +26,8 @@
     "files": [
       "src/**",
       "renderer/**",
+      "extension/**",
+      "extension-firefox/**",
       "package.json"
     ],
     "win": {
