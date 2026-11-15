@@ -629,6 +629,34 @@
       transEl.innerHTML = `${tNum} <span class="unit">${tUnit || 'B'}</span>`;
     }
 
+    // Apple Dynamic Island Status Player
+    const islandTitle = $('#islandTitle');
+    const islandSubtitle = $('#islandSubtitle');
+    const islandPlayIcon = $('#islandPlayIcon');
+    if (islandTitle && islandSubtitle) {
+      if (activeDownloads.length > 0) {
+        const topItem = activeDownloads[0];
+        islandTitle.textContent = topItem.name || (S.lang === 'ar' ? 'جارٍ التحميل...' : 'Downloading...');
+        islandSubtitle.textContent = `${speedTxt} • ${topItem.progress || 0}%`;
+        if (islandPlayIcon) {
+          islandPlayIcon.innerHTML = '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>';
+        }
+      } else if (waitingItems.length > 0) {
+        const waitItem = waitingItems[0];
+        islandTitle.textContent = waitItem.name || (S.lang === 'ar' ? 'متوقف مؤقتاً' : 'Paused');
+        islandSubtitle.textContent = S.lang === 'ar' ? 'متوقف مؤقتاً • انقر للاستئناف' : 'Paused • Click to resume';
+        if (islandPlayIcon) {
+          islandPlayIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        }
+      } else {
+        islandTitle.textContent = S.lang === 'ar' ? 'محرك طيّار النفاث' : 'Tayyar Turbo Engine';
+        islandSubtitle.textContent = S.lang === 'ar' ? 'جاهز للتحميل • 0 B/s' : 'Ready • 0 B/s';
+        if (islandPlayIcon) {
+          islandPlayIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        }
+      }
+    }
+
     // Tasks card mini list
     renderMiniTasks(items);
   }
@@ -1300,10 +1328,14 @@
       currentExtBrowser = bKey;
 
       const box = btn.closest('.browser-box');
-      const svgClone = box ? box.querySelector('.browser-svg')?.cloneNode(true) : null;
+      const iconClone = box ? (box.querySelector('.browser-icon-img')?.cloneNode(true) || box.querySelector('.browser-svg')?.cloneNode(true)) : null;
       if (extModalLogo) {
         extModalLogo.innerHTML = '';
-        if (svgClone) extModalLogo.appendChild(svgClone);
+        if (iconClone) {
+          iconClone.style.width = '42px';
+          iconClone.style.height = '42px';
+          extModalLogo.appendChild(iconClone);
+        }
       }
 
       if (extModalTitle) {
@@ -1338,6 +1370,51 @@
         window.tayyar.openExtensionFolder(targetFolder);
         toast(S.lang === 'ar' ? 'تم فتح مجلد الإضافة في مستكشف الملفات' : 'Opened extension folder in Explorer');
       }
+    });
+  }
+
+  // Apple Dynamic Island & Mobile Quick Add listeners
+  const islandPlayer = $('#glassIslandPlayer');
+  const bIslandToggle = $('#bIslandToggle');
+  const bIslandAdd = $('#bIslandAdd');
+  const bMobileQuickAdd = $('#bMobileQuickAdd');
+
+  if (bMobileQuickAdd) {
+    bMobileQuickAdd.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openAddModal();
+    });
+  }
+
+  if (bIslandAdd) {
+    bIslandAdd.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openAddModal();
+    });
+  }
+
+  if (bIslandToggle) {
+    bIslandToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const items = [...S.items.values()];
+      const activeDownloads = items.filter((d) => d.status === 'downloading');
+      if (activeDownloads.length > 0) {
+        activeDownloads.forEach((d) => {
+          if (window.tayyar?.pause) window.tayyar.pause(d.id);
+        });
+      } else {
+        const pausedItems = items.filter((d) => ['paused', 'queued'].includes(d.status));
+        if (pausedItems.length > 0 && window.tayyar?.resume) {
+          window.tayyar.resume(pausedItems[0].id);
+        }
+      }
+    });
+  }
+
+  if (islandPlayer) {
+    islandPlayer.addEventListener('click', (e) => {
+      if (e.target.closest('.island-btn')) return;
+      switchView('downloads');
     });
   }
 
