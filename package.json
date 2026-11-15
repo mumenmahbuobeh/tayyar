@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "author": "Mu'men Mahbuobeh",
   "description": "تيّار — مدير تحميلات حديث متعدد الاتصالات مفتوح المصدر | Modern Open Source Download Manager",
-  "homepage": "https://github.com/mumen-mahbuobeh/tayyar",
+  "homepage": "https://github.com/mumenmahbuobeh/tayyar",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mumen-mahbuobeh/tayyar.git"
+    "url": "https://github.com/mumenmahbuobeh/tayyar.git"
   },
   "main": "src/main.js",
   "scripts": {

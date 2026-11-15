@@ -30,24 +30,29 @@
           </svg>
         </div>
 
-      <div class="sidebar-top-actions">
-        <!-- Language Switcher Pill -->
-        <button class="lang-toggle-btn" id="bLangToggle" title="تبديل اللغة / Switch Language">
-          <span class="lang-code" id="langCodeLabel">AR</span>
-        </button>
-        <!-- Toggle Sidebar (Hide/Show Options) -->
-        <button class="icon-btn-ghost" id="bToggleSidebar" title="إخفاء/إظهار القائمة الجانبية | Toggle Sidebar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18"/></svg>
-        </button>
-        <button class="icon-btn-ghost" id="bQuickAdd" title="New Task">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-        </button>
+        <div class="sidebar-top-actions">
+          <!-- Language Switcher Pill -->
+          <button class="lang-toggle-btn" id="bLangToggle" title="تبديل اللغة / Switch Language">
+            <span class="lang-code" id="langCodeLabel">AR</span>
+          </button>
+          <!-- Toggle Sidebar (Hide/Show Options) -->
+          <button class="icon-btn-ghost" id="bToggleSidebar" title="إخفاء/إظهار القائمة الجانبية | Toggle Sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="3" />
+              <path d="M9 3v18" />
+            </svg>
+          </button>
+          <button class="icon-btn-ghost" id="bQuickAdd" title="New Task">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </div>
       </div>
-    </div>
 
-    <!-- Navigation links -->
-    <nav class="sidebar-nav">
-      <ul class="nav-list">
+      <!-- Navigation links -->
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
           <li>
             <button class="nav-item active" data-view="dashboard">
               <span class="nav-icon">
@@ -60,720 +65,749 @@
               </span>
               <span class="nav-label" data-i="dashboard">Dashboard</span>
             </button>
-          </li>
-          <li>
-            <button class="nav-item" data-view="downloads">
-              <span class="nav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 3v13m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
-                </svg>
-              </span>
-              <span class="nav-label" data-i="downloads">Downloads</span>
-              <span class="nav-badge" id="navBadge" hidden>0</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-item" data-view="trackers">
-              <span class="nav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path
-                    d="M4.93 4.93a10 10 0 0114.14 0M7.76 7.76a6 6 0 018.48 0M12 12m-2 0a2 2 0 104 0 2 2 0 10-4 0M12 14v7" />
-                </svg>
-              </span>
-              <span class="nav-label" data-i="trackers">Trackers</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-item" data-view="plugins">
-              <span class="nav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="4" width="18" height="16" rx="3" />
-                  <path d="M3 10h18M10 4v16" />
-                </svg>
-              </span>
-              <span class="nav-label" data-i="plugins">Plugins</span>
-            </button>
-          </li>
-        </ul>
-      </nav>
-
-      <!-- Sidebar Bottom -->
-      <div class="sidebar-bottom">
-        <ul class="nav-list">
-          <li>
-            <button class="nav-item" data-view="notifications">
-              <span class="nav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
-                </svg>
-              </span>
-              <span class="nav-label" data-i="notifications">Notifications</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-item" data-view="settings">
-              <span class="nav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="3" />
-                  <path
-                    d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-                </svg>
-              </span>
-              <span class="nav-label" data-i="settings">Settings</span>
-            </button>
-          </li>
-        </ul>
-      </div>
-    </aside>
-
-    <!-- ================= MAIN CONTENT ================= -->
-    <main class="main-content" id="mainContent">
-
-      <!-- ========== VIEW: DASHBOARD (Image 1 & 2) ========== -->
-      <section class="view-panel active" id="viewDashboard">
-        <header class="view-header">
-          <h1 class="view-title" data-i="dashboard">Dashboard</h1>
-
-          <!-- Customize Mode Toolbar (Image 2) -->
-          <div class="customize-bar" id="customizeBar" hidden>
-            <button class="icon-btn-round" id="bCloseCustom" title="Close"><svg viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2.5" fill="none">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg></button>
-            <button class="icon-btn-round" id="bResetCustom" title="Reset"><svg viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2" fill="none">
-                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-              </svg></button>
-            <button class="pill-btn primary" id="bApplyCustom"><svg viewBox="0 0 24 24" stroke="currentColor"
-                stroke-width="3" fill="none" style="width:14px;margin-right:4px;">
-                <path d="M20 6L9 17l-5-5" />
-              </svg> <span data-i="apply">Apply</span></button>
-            <div class="custom-dropdown-wrap">
-              <button class="pill-btn outline" id="bPresetMenu">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  style="width:15px;margin-right:6px;">
-                  <rect x="3" y="3" width="7" height="7" rx="1" />
-                  <rect x="14" y="3" width="7" height="7" rx="1" />
-                  <rect x="3" y="14" width="7" height="7" rx="1" />
-                  <rect x="14" y="14" width="7" height="7" rx="1" />
-                </svg>
-                <span id="curPresetLabel">Compact</span>
-                <svg class="chevron-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                  style="width:12px;margin-left:4px;">
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </button>
-              <div class="dropdown-popover" id="presetPopover" hidden>
-                <div class="dropdown-item" data-preset="balanced">Balanced</div>
-                <div class="dropdown-item" data-preset="task">Task Focus</div>
-                <div class="dropdown-item" data-preset="speed">Speed Focus</div>
-                <div class="dropdown-item active" data-preset="compact">Compact <svg viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5" class="check-ic">
-                    <path d="M20 6L9 17l-5-5" />
-                  </svg></div>
-              </div>
-            </div>
-            <button class="icon-btn-round" id="bAddWidget" title="Add Card"><svg viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2.5" fill="none">
-                <path d="M12 5v14M5 12h14" />
-              </svg></button>
-          </div>
-
-          <div class="header-actions" id="standardDashActions">
-            <button class="icon-btn-ghost" id="bToggleCustomize" title="Customize Layout">
+            <button class="icon-btn-ghost" id="bNewWindow" title="New Window">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
+                <rect x="3" y="3" width="18" height="18" rx="3" />
+                <path d="M9 3v18" />
               </svg>
             </button>
-          </div>
-        </header>
-
-        <!-- Bento Grid (9 Cards from Image 1) -->
-        <div class="bento-grid layout-compact" id="bentoGrid">
-
-          <!-- CARD 1: ENGINE -->
-          <div class="bento-card card-engine" data-widget="engine">
-            <div class="card-header">
-              <span class="card-label" data-i="engine">ENGINE</span>
-              <span class="card-header-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="4" y="4" width="16" height="16" rx="3" />
-                  <path d="M9 9h6M9 13h6M9 17h6M1 9h3M1 15h3M20 9h3M20 15h3M9 1v3M15 1v3M9 20v3M15 20v3" />
-                </svg>
-              </span>
-            </div>
-            <div class="card-main-val" id="engineStatusVal" data-i="ready">Ready</div>
-            <div class="card-footer">
-              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.0</span>
-              <span class="status-indicator online" id="engineStatusDot"></span>
-            </div>
-          </div>
-
-          <!-- CARD 2: NAT -->
-          <div class="bento-card card-nat" data-widget="nat">
-            <div class="card-header">
-              <span class="card-label">NAT</span>
-              <span class="card-header-icon dots-ic">•••</span>
-            </div>
-            <div class="card-main-val" data-i="mapping">Mapping</div>
-            <div class="card-footer">
-              <span class="footer-txt" id="natStatusTxt">Bridge (127.0.0.1:6824)</span>
-              <span class="status-indicator online"></span>
-            </div>
-          </div>
-
-          <!-- CARD 3: UPLOAD -->
-          <div class="bento-card card-speed card-upload" data-widget="upload">
-            <div class="card-header">
-              <span class="card-label" data-i="upload">UPLOAD</span>
-            </div>
-            <div class="card-main-val" id="uploadSpeedVal">0 <span class="unit">B/s</span></div>
-            <div class="card-speed-bar purple">
-              <div class="bar-glow-line" id="uploadGlowLine" style="width: 15%;"></div>
-            </div>
-          </div>
-
-          <!-- CARD 4: DOWNLOAD -->
-          <div class="bento-card card-speed card-download" data-widget="download">
-            <div class="card-header">
-              <span class="card-label" data-i="download">DOWNLOAD</span>
-            </div>
-            <div class="card-main-val" id="downloadSpeedVal">0 <span class="unit">B/s</span></div>
-            <div class="card-speed-bar cyan">
-              <div class="bar-glow-line" id="downloadGlowLine" style="width: 25%;"></div>
-            </div>
-          </div>
-
-          <!-- CARD 5: SPEED LIMIT -->
-          <div class="bento-card card-speed-limit" data-widget="speedLimit">
-            <div class="card-header">
-              <span class="card-label" data-i="speedLimit">SPEED LIMIT</span>
-              <span class="card-header-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="3" />
-                  <path
-                    d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-                </svg>
-              </span>
-            </div>
-            <div class="speed-modes">
-              <button class="mode-pill active" data-mode="unlimited" title="Unlimited Speed">
-                <span class="mode-emoji">🐇</span>
-              </button>
-              <button class="mode-pill" data-mode="eco" title="Eco Mode (2 MB/s)">
-                <span class="mode-emoji">🐢</span>
-              </button>
-              <button class="mode-pill" data-mode="slow" title="Slow Mode (500 KB/s)">
-                <span class="mode-emoji">🐿️</span>
-              </button>
-            </div>
-            <div class="card-footer">
-              <span class="footer-txt" id="speedModeDesc" data-i="standardMode">Standard mode</span>
-            </div>
-          </div>
-
-          <!-- CARD 6: TRANSFER -->
-          <div class="bento-card card-transfer" data-widget="transfer">
-            <div class="card-header">
-              <span class="card-label" data-i="transfer">TRANSFER</span>
-            </div>
-            <div class="card-main-val" id="transferTotalVal">0 <span class="unit">B</span></div>
-            <div class="card-footer">
-              <div class="select-pill-wrap">
-                <select id="transferPeriodSelect" class="select-pill">
-                  <option value="today" data-i="today">Today</option>
-                  <option value="week" data-i="thisWeek">This Week</option>
-                  <option value="month" data-i="thisMonth">This Month</option>
-                  <option value="all" data-i="allTime">All Time</option>
-                </select>
-                <svg class="chevron-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD 7: TASKS -->
-          <div class="bento-card card-tasks" data-widget="tasks">
-            <div class="card-header">
-              <span class="card-label" data-i="tasks">TASKS</span>
-              <div class="tab-pills">
-                <button class="tab-pill active" data-tab="active" data-i="active">Active</button>
-                <button class="tab-pill" data-tab="failed" data-i="failed">Failed</button>
-                <button class="tab-pill" data-tab="recent" data-i="recent">Recent</button>
-              </div>
-            </div>
-            <div class="tasks-body" id="tasksBodyContent">
-              <div class="empty-tasks-state" id="emptyTasksState">
-                <span class="empty-txt" data-i="noActiveTasks">No active tasks</span>
-                <button class="pill-btn light" id="bNewTaskFromCard" data-i="newTask">New task</button>
-              </div>
-              <div class="mini-tasks-list" id="miniTasksList" hidden></div>
-            </div>
-          </div>
-
-          <!-- CARD 8: ACTIVE TASKS -->
-          <div class="bento-card card-active-tasks" data-widget="activeTasks">
-            <div class="card-header">
-              <span class="card-label" data-i="activeTasks">ACTIVE TASKS</span>
-              <span class="status-indicator" id="activeTasksIndicator"></span>
-            </div>
-            <div class="card-main-val big-num" id="activeTasksCount">0</div>
-            <div class="active-tasks-subcols">
-              <div class="subcol">
-                <span class="subcol-num" id="subDownloadingCount">0</span>
-                <span class="subcol-lbl" data-i="downloadingCaps">DOWNLOADING</span>
-              </div>
-              <div class="subcol">
-                <span class="subcol-num" id="subWaitingCount">0</span>
-                <span class="subcol-lbl" data-i="waitingCaps">WAITING</span>
-              </div>
-              <div class="subcol">
-                <span class="subcol-num" id="subSeedingCount">0</span>
-                <span class="subcol-lbl" data-i="seedingCaps">SEEDING</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD 9: ACTIVITY (HEATMAP) -->
-          <div class="bento-card card-activity" data-widget="activity">
-            <div class="card-header">
-              <span class="card-label" data-i="activity">ACTIVITY</span>
-            </div>
-            <div class="heatmap-wrap">
-              <div class="heatmap-months">
-                <span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span>
-              </div>
-              <div class="heatmap-grid-container">
-                <div class="heatmap-days">
-                  <span>Mon</span><span>Wed</span><span>Fri</span>
-                </div>
-                <div class="heatmap-cells" id="heatmapCells">
-                  <!-- Generated by JS -->
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ========== VIEW: DOWNLOADS ========== -->
-      <section class="view-panel" id="viewDownloads">
-        <header class="view-header">
-          <div class="downloads-header-left">
-            <h1 class="view-title" data-i="downloads">Downloads</h1>
-            <div class="dl-filter-pills">
-              <button class="filter-pill active" data-dl-filter="all"><span data-i="all">All</span> <span class="cnt"
-                  id="cntAll">0</span></button>
-              <button class="filter-pill" data-dl-filter="active"><span data-i="downloading">Downloading</span> <span
-                  class="cnt" id="cntActive">0</span></button>
-              <button class="filter-pill" data-dl-filter="waiting"><span data-i="waiting">Waiting</span> <span
-                  class="cnt" id="cntWaiting">0</span></button>
-              <button class="filter-pill" data-dl-filter="done"><span data-i="completed">Completed</span> <span
-                  class="cnt" id="cntDone">0</span></button>
-              <button class="filter-pill" data-dl-filter="failed"><span data-i="failed">Failed</span> <span class="cnt"
-                  id="cntFailed">0</span></button>
-            </div>
-          </div>
-          <div class="downloads-header-right">
-            <div class="search-input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="6" />
-                <path d="M20 20l-4.5-4.5" />
+            <button class="icon-btn-ghost" id="bQuickAdd" title="New Task">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 5v14M5 12h14" />
               </svg>
-              <input type="search" id="dlSearchInput" placeholder="Search tasks...">
-            </div>
-            <button class="pill-btn primary" id="bAddDownload"><svg width="14" height="14" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M12 5v14M5 12h14" />
-              </svg> <span data-i="addTask">Add Task</span></button>
-            <button class="icon-btn-ghost" id="bResumeSelected" title="Resume" disabled><svg width="14" height="14"
-                viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5l11 7-11 7z" />
-              </svg></button>
-            <button class="icon-btn-ghost" id="bPauseSelected" title="Pause" disabled><svg width="14" height="14"
-                viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5h3v14H8zM13 5h3v14h-3z" />
-              </svg></button>
-            <button class="icon-btn-ghost danger" id="bDeleteSelected" title="Delete" disabled><svg width="14"
-                height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
-              </svg></button>
-          </div>
-        </header>
+            </button>
+  </div>
+  </div>
 
-        <div class="downloads-container">
-          <div class="downloads-list" id="downloadsList">
-            <!-- Rendered by JS -->
-          </div>
+  <!-- Navigation links -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li>
+        <button class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1.5" />
+              <rect x="14" y="3" width="7" height="7" rx="1.5" />
+              <rect x="14" y="14" width="7" height="7" rx="1.5" />
+              <rect x="3" y="14" width="7" height="7" rx="1.5" />
+            </svg>
+          </span>
+          <span class="nav-label" data-i="dashboard">Dashboard</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-view="downloads">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3v13m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+            </svg>
+          </span>
+          <span class="nav-label" data-i="downloads">Downloads</span>
+          <span class="nav-badge" id="navBadge" hidden>0</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-view="trackers">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M4.93 4.93a10 10 0 0114.14 0M7.76 7.76a6 6 0 018.48 0M12 12m-2 0a2 2 0 104 0 2 2 0 10-4 0M12 14v7" />
+            </svg>
+          </span>
+          <span class="nav-label" data-i="trackers">Trackers</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-view="plugins">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="16" rx="3" />
+              <path d="M3 10h18M10 4v16" />
+            </svg>
+          </span>
+          <span class="nav-label" data-i="plugins">Plugins</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
 
-          <!-- Detail Drawer -->
-          <aside class="downloads-detail" id="downloadsDetail" hidden>
-            <div class="detail-header">
-              <h3 id="detTitle">Task Details</h3>
-              <button class="icon-btn-ghost" id="bCloseDetail">✕</button>
-            </div>
-            <div class="detail-body" id="detBody"></div>
-          </aside>
-        </div>
-      </section>
-
-      <!-- ========== VIEW: TRACKERS (Images 2 & 3) ========== -->
-      <section class="view-panel" id="viewTrackers">
-        <header class="view-header">
-          <h1 class="view-title" data-i="trackers">Trackers</h1>
-          <div class="header-actions">
-            <button class="icon-btn-ghost" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <circle cx="11" cy="11" r="6" />
-                <path d="M20 20l-4.5-4.5" />
-              </svg></button>
-          </div>
-        </header>
-
-        <!-- Trackers Content Card -->
-        <div class="trackers-card-wrap">
-          <div class="trackers-top-bar">
-            <div class="tab-pills">
-              <button class="tab-pill active" id="tabTrackersEffective" data-i="effective">Effective</button>
-              <button class="tab-pill" id="tabTrackersBlacklist" data-i="blacklist">Blacklist</button>
-            </div>
-          </div>
-
-          <div class="trackers-toggle-row">
-            <div class="toggle-info">
-              <h4 data-i="injectCurated">Inject curated trackers</h4>
-              <p data-i="injectCuratedDesc">Add curated trackers to new public multi-source acceleration tasks.</p>
-            </div>
-            <label class="switch-toggle">
-              <input type="checkbox" id="chkInjectTrackers" checked>
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-
-          <!-- Trackers Source Tags -->
-          <div class="trackers-tags-row">
-            <span class="tracker-tag">ngosang/trackerslist (best) <button class="tag-close">×</button></span>
-            <span class="tracker-tag">XIU2/TrackersListCollection (best) <button class="tag-close">×</button></span>
-          </div>
-
-          <!-- Trackers Data Table -->
-          <div class="trackers-table-wrap">
-            <table class="trackers-table">
-              <thead>
-                <tr>
-                  <th>URL</th>
-                  <th>HEALTH</th>
-                  <th>LAST PROBED</th>
-                  <th>SOURCE</th>
-                </tr>
-              </thead>
-              <tbody id="trackersTableBody">
-                <!-- Rendered by JS -->
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Trackers Footer -->
-          <div class="trackers-footer">
-            <span class="footer-stat" id="trackersStatTxt">50 trackers · Last successful update: 11/15/2026, 8:27:33
-              AM</span>
-            <button class="pill-btn light" id="bSyncTrackers"><svg viewBox="0 0 24 24" stroke="currentColor"
-                stroke-width="2" fill="none" style="width:14px;margin-right:6px;">
-                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-              </svg> <span data-i="syncNow">Sync Now</span></button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ========== VIEW: PLUGINS (Image 1) ========== -->
-      <section class="view-panel" id="viewPlugins">
-        <header class="view-header">
-          <h1 class="view-title" data-i="plugins">Plugins</h1>
-          <div class="header-actions">
-            <button class="icon-btn-ghost" title="Add plugin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2.5">
-                <path d="M12 5v14M5 12h14" />
-              </svg></button>
-            <button class="icon-btn-ghost" title="Link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <path
-                  d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
-              </svg></button>
-            <button class="icon-btn-ghost" title="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-              </svg></button>
-            <button class="icon-btn-ghost" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <circle cx="11" cy="11" r="6" />
-                <path d="M20 20l-4.5-4.5" />
-              </svg></button>
-          </div>
-        </header>
-
-        <!-- Trust notice banner -->
-        <div class="plugins-banner">
-          <div class="banner-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg> <span data-i="addPluginsTrust">Add plugins you trust</span></div>
-          <p data-i="pluginsTrustDesc">Install from a source you trust, review the requested access, then enable the
-            plugin. Grant website access only for sites you expect the plugin to handle.</p>
-        </div>
-
-        <!-- Installed Plugins Grid -->
-        <div class="plugins-grid">
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-blue">MF</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">Tayyar Filename Template <span class="status-dot-blue"></span></div>
-                <div class="plugin-ver">v1.1.1 · tayyar.filename-template</div>
-              </div>
-              <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
-            </div>
-            <p class="plugin-desc">Renames downloads with safe, composable templates while preserving their extensions.
-            </p>
-            <div class="plugin-card-foot">
-              <button class="pill-btn light sm">Open</button>
-              <span class="badge-safe">Looks safe</span>
-            </div>
-          </div>
-
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-green">MU</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">Tayyar URL Resolver <span class="status-dot-blue"></span></div>
-                <div class="plugin-ver">v1.0.0 · tayyar.url-resolver</div>
-              </div>
-              <label class="switch-toggle"><input type="checkbox"><span class="switch-slider"></span></label>
-            </div>
-            <p class="plugin-desc">URL-resolver framework for Tayyar multi-source stream handling.</p>
-            <div class="plugin-card-foot">
-              <button class="pill-btn light sm">Open</button>
-              <span class="badge-safe">Looks safe</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Available Plugins Section -->
-        <h3 class="section-subtitle" style="margin:24px 0 14px;" data-i="availablePlugins">Available plugins</h3>
-        <div class="plugins-grid">
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-blue">FC</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">Folder Categories</div>
-                <div class="plugin-ver">by Ashkan4472 · v1.0.0</div>
-              </div>
-            </div>
-            <p class="plugin-desc">Sorts finished downloads into category folders (Compressed, Documents, Music,
-              Programs, Video).</p>
-          </div>
-
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-green">AR</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">AllDebrid Resolver</div>
-                <div class="plugin-ver">by DonTarken · v1.2.0</div>
-              </div>
-            </div>
-            <p class="plugin-desc">Automatically unlocks and debrids supported download links using your premium
-              account.</p>
-          </div>
-
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-blue">MS</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">Tayyar Smart Link</div>
-                <div class="plugin-ver">by griciaisl12 · v1.0.5</div>
-              </div>
-            </div>
-            <p class="plugin-desc">Resolves GitHub repository release, file links, Google Drive/Docs into real
-              downloads.</p>
-          </div>
-
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-blue">MM</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">Tayyar Media Merge</div>
-                <div class="plugin-ver">by Tayyar Team · v0.1.0</div>
-              </div>
-            </div>
-            <p class="plugin-desc">Combine separate video and audio files into one MP4 or MKV without re-encoding.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ========== VIEW: NOTIFICATIONS ========== -->
-      <section class="view-panel" id="viewNotifications">
-        <header class="view-header">
-          <h1 class="view-title" data-i="notifications">Notifications</h1>
-        </header>
-        <div class="subview-placeholder">
-          <div class="placeholder-card">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-              class="placeholder-icon">
+  <!-- Sidebar Bottom -->
+  <div class="sidebar-bottom">
+    <ul class="nav-list">
+      <li>
+        <button class="nav-item" data-view="notifications">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
             </svg>
-            <h3 data-i="notificationsCenter">Notification Center</h3>
-            <p data-i="noNotifsDesc">Completed downloads and system integration alerts will be listed here.</p>
+          </span>
+          <span class="nav-label" data-i="notifications">Notifications</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-view="settings">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+            </svg>
+          </span>
+          <span class="nav-label" data-i="settings">Settings</span>
+        </button>
+      </li>
+    </ul>
+  </div>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content" id="mainContent">
+
+    <!-- ========== VIEW: DASHBOARD (Image 1 & 2) ========== -->
+    <section class="view-panel active" id="viewDashboard">
+      <header class="view-header">
+        <h1 class="view-title" data-i="dashboard">Dashboard</h1>
+
+        <!-- Customize Mode Toolbar (Image 2) -->
+        <div class="customize-bar" id="customizeBar" hidden>
+          <button class="icon-btn-round" id="bCloseCustom" title="Close"><svg viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="2.5" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg></button>
+          <button class="icon-btn-round" id="bResetCustom" title="Reset"><svg viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="2" fill="none">
+              <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+            </svg></button>
+          <button class="pill-btn primary" id="bApplyCustom"><svg viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="3" fill="none" style="width:14px;margin-right:4px;">
+              <path d="M20 6L9 17l-5-5" />
+            </svg> <span data-i="apply">Apply</span></button>
+          <div class="custom-dropdown-wrap">
+            <button class="pill-btn outline" id="bPresetMenu">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                style="width:15px;margin-right:6px;">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              <span id="curPresetLabel">Compact</span>
+              <svg class="chevron-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                style="width:12px;margin-left:4px;">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <div class="dropdown-popover" id="presetPopover" hidden>
+              <div class="dropdown-item" data-preset="balanced">Balanced</div>
+              <div class="dropdown-item" data-preset="task">Task Focus</div>
+              <div class="dropdown-item" data-preset="speed">Speed Focus</div>
+              <div class="dropdown-item active" data-preset="compact">Compact <svg viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.5" class="check-ic">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg></div>
+            </div>
+          </div>
+          <button class="icon-btn-round" id="bAddWidget" title="Add Card"><svg viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="2.5" fill="none">
+              <path d="M12 5v14M5 12h14" />
+            </svg></button>
+        </div>
+
+        <div class="header-actions" id="standardDashActions">
+          <button class="icon-btn-ghost" id="bToggleCustomize" title="Customize Layout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Bento Grid (9 Cards from Image 1) -->
+      <div class="bento-grid layout-compact" id="bentoGrid">
+
+        <!-- CARD 1: ENGINE -->
+        <div class="bento-card card-engine" data-widget="engine">
+          <div class="card-header">
+            <span class="card-label" data-i="engine">ENGINE</span>
+            <span class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="4" y="4" width="16" height="16" rx="3" />
+                <path d="M9 9h6M9 13h6M9 17h6M1 9h3M1 15h3M20 9h3M20 15h3M9 1v3M15 1v3M9 20v3M15 20v3" />
+              </svg>
+            </span>
+          </div>
+          <div class="card-main-val" id="engineStatusVal" data-i="ready">Ready</div>
+          <div class="card-footer">
+            <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.0</span>
+            <span class="status-indicator online" id="engineStatusDot"></span>
           </div>
         </div>
-      </section>
 
-      <!-- ========== VIEW: SETTINGS (Matching Image 3) ========== -->
-      <section class="view-panel" id="viewSettings">
-        <header class="view-header">
-          <h1 class="view-title" data-i="settings">Settings</h1>
-        </header>
-
-        <!-- 8 Settings Cards Grid -->
-        <div class="settings-cards-grid">
-
-          <!-- Card 1: General (Pink 3D House) -->
-          <div class="settings-card" data-setting-modal="generalModal">
-            <div class="setting-card-icon-wrap icon-pink">
-              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-                <path d="M16 4L3 14h4v13a1 1 0 001 1h6v-8h4v8h6a1 1 0 001-1V14h4L16 4z" fill="#f43f5e" />
-                <path d="M16 4L3 14h4v13h4v-7h10v7h4V14h4L16 4z" fill="url(#gradHouse)" opacity="0.8" />
-                <defs>
-                  <linearGradient id="gradHouse" x1="3" y1="4" x2="29" y2="28">
-                    <stop stop-color="#fda4af" />
-                    <stop offset="1" stop-color="#f43f5e" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <div class="setting-card-info">
-              <h3 class="setting-card-title" data-i="setGeneralTitle">General</h3>
-              <p class="setting-card-desc" data-i="setGeneralDesc">Startup, default save folder, system integration</p>
-            </div>
+        <!-- CARD 2: NAT -->
+        <div class="bento-card card-nat" data-widget="nat">
+          <div class="card-header">
+            <span class="card-label">NAT</span>
+            <span class="card-header-icon dots-ic">•••</span>
           </div>
-
-          <!-- Card 2: Appearance (Colorful Logo) -->
-          <div class="settings-card" data-setting-modal="appearanceModal">
-            <div class="setting-card-icon-wrap icon-multi">
-              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-                <circle cx="16" cy="16" r="14" fill="#0f172a" />
-                <circle cx="16" cy="16" r="13" stroke="url(#gradAppr)" stroke-width="2.5" />
-                <path d="M11 11v10M11 16l5-5 5 5M21 11v10" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" />
-                <defs>
-                  <linearGradient id="gradAppr" x1="0" y1="0" x2="32" y2="32">
-                    <stop stop-color="#38bdf8" />
-                    <stop offset="0.5" stop-color="#a855f7" />
-                    <stop offset="1" stop-color="#f43f5e" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <div class="setting-card-info">
-              <h3 class="setting-card-title" data-i="setApprTitle">Appearance</h3>
-              <p class="setting-card-desc" data-i="setApprDesc">Theme, language, tray icon</p>
-            </div>
+          <div class="card-main-val" data-i="mapping">Mapping</div>
+          <div class="card-footer">
+            <span class="footer-txt" id="natStatusTxt">Bridge (127.0.0.1:6824)</span>
+            <span class="status-indicator online"></span>
           </div>
-
-          <!-- Card 3: Downloads (Cyan Tray) -->
-          <div class="settings-card" data-setting-modal="downloadsModal">
-            <div class="setting-card-icon-wrap icon-cyan">
-              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-                <path d="M16 6v14m0 0l-5-5m5 5l5-5" stroke="#06b6d4" stroke-width="3" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M6 20v6a2 2 0 002 2h16a2 2 0 002-2v-6" stroke="#22d3ee" stroke-width="2.5"
-                  stroke-linecap="round" />
-              </svg>
-            </div>
-            <div class="setting-card-info">
-              <h3 class="setting-card-title" data-i="setDlTitle">Downloads</h3>
-              <p class="setting-card-desc" data-i="setDlDesc">Concurrency, bandwidth limits, network reliability</p>
-            </div>
-          </div>
-
-          <!-- Card 4: BitTorrent (Purple/Blue Arrows) -->
-          <div class="settings-card" data-setting-modal="bittorrentModal">
-            <div class="setting-card-icon-wrap icon-purple">
-              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-                <path d="M11 26V8m0 0l-4 4m4-4l4 4" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round"
-                  stroke-linejoin="round" />
-                <path d="M21 6v18m0 0l-4-4m4 4l4-4" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-            </div>
-            <div class="setting-card-info">
-              <h3 class="setting-card-title" data-i="setBtTitle">BitTorrent</h3>
-              <p class="setting-card-desc" data-i="setBtDesc">DHT, listen ports, trackers, peer geo</p>
-            </div>
-          </div>
-
-          <!-- Card 5: Integration (Orange Puzzle) -->
-          <div class="settings-card" data-setting-modal="integrationModal">
-            <div class="setting-card-icon-wrap icon-orange">
-              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-                <path
-                  d="M13 5a3 3 0 016 0h5a2 2 0 012 2v5a3 3 0 010 6v5a2 2 0 01-2 2h-5a3 3 0 01-6 0H8a2 2 0 01-2-2v-5a3 3 0 000-6V7a2 2 0 012-2h5z"
-                  fill="#f97316" opacity="0.9" />
-              </svg>
-            </div>
-            <div class="setting-card-info">
-              <h3 class="setting-card-title" data-i="setIntTitle">Integration</h3>
-              <p class="setting-card-desc" data-i="setIntDesc">Browser extensions, CLI, system integrations</p>
-            </div>
-          </div>
-
-          <!-- Card 6: Network (Green Globe) -->
-          <div class="settings-card" data-setting-modal="networkModal">
-            <div class="setting-card-icon-wrap icon-green">
-              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-                <circle cx="16" cy="16" r="12" stroke="#10b981" stroke-width="2.5" />
-                <path d="M4 16h24M16 4a19 19 0 000 24 19 19 0 000-24" stroke="#34d399" stroke-width="2" />
-              </svg>
-            </div>
-            <div class="setting-card-info">
-              <h3 class="setting-card-title" data-i="setNetTitle">Network</h3>
-              <p class="setting-card-desc" data-i="setNetDesc">Proxy, DNS, and NAT/UPnP</p>
-            </div>
-          </div>
-
-          <!-- Card 7: Advanced (Blue Cog) -->
-          <div class="settings-card" data-setting-modal="advancedModal">
-            <div class="setting-card-icon-wrap icon-blue">
-              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-                <circle cx="16" cy="16" r="4" fill="#3b82f6" />
-                <path
-                  d="M26 16a10 10 0 00-.2-2l2.3-1.8a1 1 0 00.2-1.3l-2.2-3.8a1 1 0 00-1.2-.5l-2.7 1.1a10 10 0 00-3.5-2l-.4-2.9A1 1 0 0017.3 2h-4.6a1 1 0 00-1 .9l-.4 2.9a10 10 0 00-3.5 2L5.1 6.7a1 1 0 00-1.2.5L1.7 11a1 1 0 00.2 1.3l2.3 1.8A10 10 0 004 16a10 10 0 00.2 2l-2.3 1.8a1 1 0 00-.2 1.3l2.2 3.8a1 1 0 001.2.5l2.7-1.1a10 10 0 003.5 2l.4 2.9a1 1 0 001 .9h4.6a1 1 0 001-.9l.4-2.9a10 10 0 003.5-2l2.7 1.1a10 10 0 001.2-.5l2.2-3.8a1 1 0 00-.2-1.3L25.8 18c.1-.7.2-1.3.2-2z"
-                  stroke="#60a5fa" stroke-width="2" />
-              </svg>
-            </div>
-            <div class="setting-card-info">
-              <h3 class="setting-card-title" data-i="setAdvTitle">Advanced</h3>
-              <p class="setting-card-desc" data-i="setAdvDesc">RPC, SQLite persistence</p>
-            </div>
-          </div>
-
-          <!-- Card 8: About (Yellow Notebook - Image 13) -->
-          <div class="settings-card" data-setting-modal="aboutModal">
-            <div class="setting-card-icon-wrap icon-yellow">
-              <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
-                <rect x="7" y="5" width="18" height="22" rx="3" fill="#eab308" />
-                <path d="M11 11h10M11 16h10M11 21h6" stroke="#713f12" stroke-width="2" stroke-linecap="round" />
-                <circle cx="21" cy="7" r="2" fill="#ca8a04" />
-              </svg>
-            </div>
-            <div class="setting-card-info">
-              <h3 class="setting-card-title" data-i="setAboutTitle">About</h3>
-              <p class="setting-card-desc" data-i="setAboutDesc">Version, updates, source code and manual</p>
-            </div>
-          </div>
-
         </div>
-      </section>
 
-    </main>
+        <!-- CARD 3: UPLOAD -->
+        <div class="bento-card card-speed card-upload" data-widget="upload">
+          <div class="card-header">
+            <span class="card-label" data-i="upload">UPLOAD</span>
+          </div>
+          <div class="card-main-val" id="uploadSpeedVal">0 <span class="unit">B/s</span></div>
+          <div class="card-speed-bar purple">
+            <div class="bar-glow-line" id="uploadGlowLine" style="width: 15%;"></div>
+          </div>
+        </div>
+
+        <!-- CARD 4: DOWNLOAD -->
+        <div class="bento-card card-speed card-download" data-widget="download">
+          <div class="card-header">
+            <span class="card-label" data-i="download">DOWNLOAD</span>
+          </div>
+          <div class="card-main-val" id="downloadSpeedVal">0 <span class="unit">B/s</span></div>
+          <div class="card-speed-bar cyan">
+            <div class="bar-glow-line" id="downloadGlowLine" style="width: 25%;"></div>
+          </div>
+        </div>
+
+        <!-- CARD 5: SPEED LIMIT -->
+        <div class="bento-card card-speed-limit" data-widget="speedLimit">
+          <div class="card-header">
+            <span class="card-label" data-i="speedLimit">SPEED LIMIT</span>
+            <span class="card-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+              </svg>
+            </span>
+          </div>
+          <div class="speed-modes">
+            <button class="mode-pill active" data-mode="unlimited" title="Unlimited Speed">
+              <span class="mode-emoji">🐇</span>
+            </button>
+            <button class="mode-pill" data-mode="eco" title="Eco Mode (2 MB/s)">
+              <span class="mode-emoji">🐢</span>
+            </button>
+            <button class="mode-pill" data-mode="slow" title="Slow Mode (500 KB/s)">
+              <span class="mode-emoji">🐿️</span>
+            </button>
+          </div>
+          <div class="card-footer">
+            <span class="footer-txt" id="speedModeDesc" data-i="standardMode">Standard mode</span>
+          </div>
+        </div>
+
+        <!-- CARD 6: TRANSFER -->
+        <div class="bento-card card-transfer" data-widget="transfer">
+          <div class="card-header">
+            <span class="card-label" data-i="transfer">TRANSFER</span>
+          </div>
+          <div class="card-main-val" id="transferTotalVal">0 <span class="unit">B</span></div>
+          <div class="card-footer">
+            <div class="select-pill-wrap">
+              <select id="transferPeriodSelect" class="select-pill">
+                <option value="today" data-i="today">Today</option>
+                <option value="week" data-i="thisWeek">This Week</option>
+                <option value="month" data-i="thisMonth">This Month</option>
+                <option value="all" data-i="allTime">All Time</option>
+              </select>
+              <svg class="chevron-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 7: TASKS -->
+        <div class="bento-card card-tasks" data-widget="tasks">
+          <div class="card-header">
+            <span class="card-label" data-i="tasks">TASKS</span>
+            <div class="tab-pills">
+              <button class="tab-pill active" data-tab="active" data-i="active">Active</button>
+              <button class="tab-pill" data-tab="failed" data-i="failed">Failed</button>
+              <button class="tab-pill" data-tab="recent" data-i="recent">Recent</button>
+            </div>
+          </div>
+          <div class="tasks-body" id="tasksBodyContent">
+            <div class="empty-tasks-state" id="emptyTasksState">
+              <span class="empty-txt" data-i="noActiveTasks">No active tasks</span>
+              <button class="pill-btn light" id="bNewTaskFromCard" data-i="newTask">New task</button>
+            </div>
+            <div class="mini-tasks-list" id="miniTasksList" hidden></div>
+          </div>
+        </div>
+
+        <!-- CARD 8: ACTIVE TASKS -->
+        <div class="bento-card card-active-tasks" data-widget="activeTasks">
+          <div class="card-header">
+            <span class="card-label" data-i="activeTasks">ACTIVE TASKS</span>
+            <span class="status-indicator" id="activeTasksIndicator"></span>
+          </div>
+          <div class="card-main-val big-num" id="activeTasksCount">0</div>
+          <div class="active-tasks-subcols">
+            <div class="subcol">
+              <span class="subcol-num" id="subDownloadingCount">0</span>
+              <span class="subcol-lbl" data-i="downloadingCaps">DOWNLOADING</span>
+            </div>
+            <div class="subcol">
+              <span class="subcol-num" id="subWaitingCount">0</span>
+              <span class="subcol-lbl" data-i="waitingCaps">WAITING</span>
+            </div>
+            <div class="subcol">
+              <span class="subcol-num" id="subSeedingCount">0</span>
+              <span class="subcol-lbl" data-i="seedingCaps">SEEDING</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 9: ACTIVITY (HEATMAP) -->
+        <div class="bento-card card-activity" data-widget="activity">
+          <div class="card-header">
+            <span class="card-label" data-i="activity">ACTIVITY</span>
+          </div>
+          <div class="heatmap-wrap">
+            <div class="heatmap-months">
+              <span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span>
+            </div>
+            <div class="heatmap-grid-container">
+              <div class="heatmap-days">
+                <span>Mon</span><span>Wed</span><span>Fri</span>
+              </div>
+              <div class="heatmap-cells" id="heatmapCells">
+                <!-- Generated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========== VIEW: DOWNLOADS ========== -->
+    <section class="view-panel" id="viewDownloads">
+      <header class="view-header">
+        <div class="downloads-header-left">
+          <h1 class="view-title" data-i="downloads">Downloads</h1>
+          <div class="dl-filter-pills">
+            <button class="filter-pill active" data-dl-filter="all"><span data-i="all">All</span> <span class="cnt"
+                id="cntAll">0</span></button>
+            <button class="filter-pill" data-dl-filter="active"><span data-i="downloading">Downloading</span> <span
+                class="cnt" id="cntActive">0</span></button>
+            <button class="filter-pill" data-dl-filter="waiting"><span data-i="waiting">Waiting</span> <span class="cnt"
+                id="cntWaiting">0</span></button>
+            <button class="filter-pill" data-dl-filter="done"><span data-i="completed">Completed</span> <span
+                class="cnt" id="cntDone">0</span></button>
+            <button class="filter-pill" data-dl-filter="failed"><span data-i="failed">Failed</span> <span class="cnt"
+                id="cntFailed">0</span></button>
+          </div>
+        </div>
+        <div class="downloads-header-right">
+          <div class="search-input-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="6" />
+              <path d="M20 20l-4.5-4.5" />
+            </svg>
+            <input type="search" id="dlSearchInput" placeholder="Search tasks...">
+          </div>
+          <button class="pill-btn primary" id="bAddDownload"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5">
+              <path d="M12 5v14M5 12h14" />
+            </svg> <span data-i="addTask">Add Task</span></button>
+          <button class="icon-btn-ghost" id="bResumeSelected" title="Resume" disabled><svg width="14" height="14"
+              viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5l11 7-11 7z" />
+            </svg></button>
+          <button class="icon-btn-ghost" id="bPauseSelected" title="Pause" disabled><svg width="14" height="14"
+              viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5h3v14H8zM13 5h3v14h-3z" />
+            </svg></button>
+          <button class="icon-btn-ghost danger" id="bDeleteSelected" title="Delete" disabled><svg width="14" height="14"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+            </svg></button>
+        </div>
+      </header>
+
+      <div class="downloads-container">
+        <div class="downloads-list" id="downloadsList">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Detail Drawer -->
+        <aside class="downloads-detail" id="downloadsDetail" hidden>
+          <div class="detail-header">
+            <h3 id="detTitle">Task Details</h3>
+            <button class="icon-btn-ghost" id="bCloseDetail">✕</button>
+          </div>
+          <div class="detail-body" id="detBody"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ========== VIEW: TRACKERS (Images 2 & 3) ========== -->
+    <section class="view-panel" id="viewTrackers">
+      <header class="view-header">
+        <h1 class="view-title" data-i="trackers">Trackers</h1>
+        <div class="header-actions">
+          <button class="icon-btn-ghost" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="11" cy="11" r="6" />
+              <path d="M20 20l-4.5-4.5" />
+            </svg></button>
+        </div>
+      </header>
+
+      <!-- Trackers Content Card -->
+      <div class="trackers-card-wrap">
+        <div class="trackers-top-bar">
+          <div class="tab-pills">
+            <button class="tab-pill active" id="tabTrackersEffective" data-i="effective">Effective</button>
+            <button class="tab-pill" id="tabTrackersBlacklist" data-i="blacklist">Blacklist</button>
+          </div>
+        </div>
+
+        <div class="trackers-toggle-row">
+          <div class="toggle-info">
+            <h4 data-i="injectCurated">Inject curated trackers</h4>
+            <p data-i="injectCuratedDesc">Add curated trackers to new public multi-source acceleration tasks.</p>
+          </div>
+          <label class="switch-toggle">
+            <input type="checkbox" id="chkInjectTrackers" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <!-- Trackers Source Tags -->
+        <div class="trackers-tags-row">
+          <span class="tracker-tag">ngosang/trackerslist (best) <button class="tag-close">×</button></span>
+          <span class="tracker-tag">XIU2/TrackersListCollection (best) <button class="tag-close">×</button></span>
+        </div>
+
+        <!-- Trackers Data Table -->
+        <div class="trackers-table-wrap">
+          <table class="trackers-table">
+            <thead>
+              <tr>
+                <th>URL</th>
+                <th>HEALTH</th>
+                <th>LAST PROBED</th>
+                <th>SOURCE</th>
+              </tr>
+            </thead>
+            <tbody id="trackersTableBody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Trackers Footer -->
+        <div class="trackers-footer">
+          <span class="footer-stat" id="trackersStatTxt">50 trackers · Last successful update: 11/15/2026, 8:27:33
+            AM</span>
+          <button class="pill-btn light" id="bSyncTrackers"><svg viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="2" fill="none" style="width:14px;margin-right:6px;">
+              <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+            </svg> <span data-i="syncNow">Sync Now</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== VIEW: PLUGINS (Image 1) ========== -->
+    <section class="view-panel" id="viewPlugins">
+      <header class="view-header">
+        <h1 class="view-title" data-i="plugins">Plugins</h1>
+        <div class="header-actions">
+          <button class="icon-btn-ghost" title="Add plugin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.5">
+              <path d="M12 5v14M5 12h14" />
+            </svg></button>
+          <button class="icon-btn-ghost" title="Link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path
+                d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+            </svg></button>
+          <button class="icon-btn-ghost" title="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+            </svg></button>
+          <button class="icon-btn-ghost" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="11" cy="11" r="6" />
+              <path d="M20 20l-4.5-4.5" />
+            </svg></button>
+        </div>
+      </header>
+
+      <!-- Trust notice banner -->
+      <div class="plugins-banner">
+        <div class="banner-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg> <span data-i="addPluginsTrust">Add plugins you trust</span></div>
+        <p data-i="pluginsTrustDesc">Install from a source you trust, review the requested access, then enable the
+          plugin. Grant website access only for sites you expect the plugin to handle.</p>
+      </div>
+
+      <!-- Installed Plugins Grid -->
+      <div class="plugins-grid">
+        <div class="plugin-card">
+          <div class="plugin-card-top">
+            <span class="plugin-avatar avatar-blue">MF</span>
+            <div class="plugin-meta">
+              <div class="plugin-title">Tayyar Filename Template <span class="status-dot-blue"></span></div>
+              <div class="plugin-ver">v1.1.1 · tayyar.filename-template</div>
+            </div>
+            <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
+          </div>
+          <p class="plugin-desc">Renames downloads with safe, composable templates while preserving their extensions.
+          </p>
+          <div class="plugin-card-foot">
+            <button class="pill-btn light sm">Open</button>
+            <span class="badge-safe">Looks safe</span>
+          </div>
+        </div>
+
+        <div class="plugin-card">
+          <div class="plugin-card-top">
+            <span class="plugin-avatar avatar-green">MU</span>
+            <div class="plugin-meta">
+              <div class="plugin-title">Tayyar URL Resolver <span class="status-dot-blue"></span></div>
+              <div class="plugin-ver">v1.0.0 · tayyar.url-resolver</div>
+            </div>
+            <label class="switch-toggle"><input type="checkbox"><span class="switch-slider"></span></label>
+          </div>
+          <p class="plugin-desc">URL-resolver framework for Tayyar multi-source stream handling.</p>
+          <div class="plugin-card-foot">
+            <button class="pill-btn light sm">Open</button>
+            <span class="badge-safe">Looks safe</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Available Plugins Section -->
+      <h3 class="section-subtitle" style="margin:24px 0 14px;" data-i="availablePlugins">Available plugins</h3>
+      <div class="plugins-grid">
+        <div class="plugin-card">
+          <div class="plugin-card-top">
+            <span class="plugin-avatar avatar-blue">FC</span>
+            <div class="plugin-meta">
+              <div class="plugin-title">Folder Categories</div>
+              <div class="plugin-ver">by Ashkan4472 · v1.0.0</div>
+            </div>
+          </div>
+          <p class="plugin-desc">Sorts finished downloads into category folders (Compressed, Documents, Music,
+            Programs, Video).</p>
+        </div>
+
+        <div class="plugin-card">
+          <div class="plugin-card-top">
+            <span class="plugin-avatar avatar-green">AR</span>
+            <div class="plugin-meta">
+              <div class="plugin-title">AllDebrid Resolver</div>
+              <div class="plugin-ver">by DonTarken · v1.2.0</div>
+            </div>
+          </div>
+          <p class="plugin-desc">Automatically unlocks and debrids supported download links using your premium
+            account.</p>
+        </div>
+
+        <div class="plugin-card">
+          <div class="plugin-card-top">
+            <span class="plugin-avatar avatar-blue">MS</span>
+            <div class="plugin-meta">
+              <div class="plugin-title">Tayyar Smart Link</div>
+              <div class="plugin-ver">by griciaisl12 · v1.0.5</div>
+            </div>
+          </div>
+          <p class="plugin-desc">Resolves GitHub repository release, file links, Google Drive/Docs into real
+            downloads.</p>
+        </div>
+
+        <div class="plugin-card">
+          <div class="plugin-card-top">
+            <span class="plugin-avatar avatar-blue">MM</span>
+            <div class="plugin-meta">
+              <div class="plugin-title">Tayyar Media Merge</div>
+              <div class="plugin-ver">by Tayyar Team · v0.1.0</div>
+            </div>
+          </div>
+          <p class="plugin-desc">Combine separate video and audio files into one MP4 or MKV without re-encoding.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== VIEW: NOTIFICATIONS ========== -->
+    <section class="view-panel" id="viewNotifications">
+      <header class="view-header">
+        <h1 class="view-title" data-i="notifications">Notifications</h1>
+      </header>
+      <div class="subview-placeholder">
+        <div class="placeholder-card">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            class="placeholder-icon">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          <h3 data-i="notificationsCenter">Notification Center</h3>
+          <p data-i="noNotifsDesc">Completed downloads and system integration alerts will be listed here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== VIEW: SETTINGS (Matching Image 3) ========== -->
+    <section class="view-panel" id="viewSettings">
+      <header class="view-header">
+        <h1 class="view-title" data-i="settings">Settings</h1>
+      </header>
+
+      <!-- 8 Settings Cards Grid -->
+      <div class="settings-cards-grid">
+
+        <!-- Card 1: General (Pink 3D House) -->
+        <div class="settings-card" data-setting-modal="generalModal">
+          <div class="setting-card-icon-wrap icon-pink">
+            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+              <path d="M16 4L3 14h4v13a1 1 0 001 1h6v-8h4v8h6a1 1 0 001-1V14h4L16 4z" fill="#f43f5e" />
+              <path d="M16 4L3 14h4v13h4v-7h10v7h4V14h4L16 4z" fill="url(#gradHouse)" opacity="0.8" />
+              <defs>
+                <linearGradient id="gradHouse" x1="3" y1="4" x2="29" y2="28">
+                  <stop stop-color="#fda4af" />
+                  <stop offset="1" stop-color="#f43f5e" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="setting-card-info">
+            <h3 class="setting-card-title" data-i="setGeneralTitle">General</h3>
+            <p class="setting-card-desc" data-i="setGeneralDesc">Startup, default save folder, system integration</p>
+          </div>
+        </div>
+
+        <!-- Card 2: Appearance (Colorful Logo) -->
+        <div class="settings-card" data-setting-modal="appearanceModal">
+          <div class="setting-card-icon-wrap icon-multi">
+            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+              <circle cx="16" cy="16" r="14" fill="#0f172a" />
+              <circle cx="16" cy="16" r="13" stroke="url(#gradAppr)" stroke-width="2.5" />
+              <path d="M11 11v10M11 16l5-5 5 5M21 11v10" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" />
+              <defs>
+                <linearGradient id="gradAppr" x1="0" y1="0" x2="32" y2="32">
+                  <stop stop-color="#38bdf8" />
+                  <stop offset="0.5" stop-color="#a855f7" />
+                  <stop offset="1" stop-color="#f43f5e" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="setting-card-info">
+            <h3 class="setting-card-title" data-i="setApprTitle">Appearance</h3>
+            <p class="setting-card-desc" data-i="setApprDesc">Theme, language, tray icon</p>
+          </div>
+        </div>
+
+        <!-- Card 3: Downloads (Cyan Tray) -->
+        <div class="settings-card" data-setting-modal="downloadsModal">
+          <div class="setting-card-icon-wrap icon-cyan">
+            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+              <path d="M16 6v14m0 0l-5-5m5 5l5-5" stroke="#06b6d4" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <path d="M6 20v6a2 2 0 002 2h16a2 2 0 002-2v-6" stroke="#22d3ee" stroke-width="2.5"
+                stroke-linecap="round" />
+            </svg>
+          </div>
+          <div class="setting-card-info">
+            <h3 class="setting-card-title" data-i="setDlTitle">Downloads</h3>
+            <p class="setting-card-desc" data-i="setDlDesc">Concurrency, bandwidth limits, network reliability</p>
+          </div>
+        </div>
+
+        <!-- Card 4: BitTorrent (Purple/Blue Arrows) -->
+        <div class="settings-card" data-setting-modal="bittorrentModal">
+          <div class="setting-card-icon-wrap icon-purple">
+            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+              <path d="M11 26V8m0 0l-4 4m4-4l4 4" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <path d="M21 6v18m0 0l-4-4m4 4l4-4" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="setting-card-info">
+            <h3 class="setting-card-title" data-i="setBtTitle">BitTorrent</h3>
+            <p class="setting-card-desc" data-i="setBtDesc">DHT, listen ports, trackers, peer geo</p>
+          </div>
+        </div>
+
+        <!-- Card 5: Integration (Orange Puzzle) -->
+        <div class="settings-card" data-setting-modal="integrationModal">
+          <div class="setting-card-icon-wrap icon-orange">
+            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+              <path
+                d="M13 5a3 3 0 016 0h5a2 2 0 012 2v5a3 3 0 010 6v5a2 2 0 01-2 2h-5a3 3 0 01-6 0H8a2 2 0 01-2-2v-5a3 3 0 000-6V7a2 2 0 012-2h5z"
+                fill="#f97316" opacity="0.9" />
+            </svg>
+          </div>
+          <div class="setting-card-info">
+            <h3 class="setting-card-title" data-i="setIntTitle">Integration</h3>
+            <p class="setting-card-desc" data-i="setIntDesc">Browser extensions, CLI, system integrations</p>
+          </div>
+        </div>
+
+        <!-- Card 6: Network (Green Globe) -->
+        <div class="settings-card" data-setting-modal="networkModal">
+          <div class="setting-card-icon-wrap icon-green">
+            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+              <circle cx="16" cy="16" r="12" stroke="#10b981" stroke-width="2.5" />
+              <path d="M4 16h24M16 4a19 19 0 000 24 19 19 0 000-24" stroke="#34d399" stroke-width="2" />
+            </svg>
+          </div>
+          <div class="setting-card-info">
+            <h3 class="setting-card-title" data-i="setNetTitle">Network</h3>
+            <p class="setting-card-desc" data-i="setNetDesc">Proxy, DNS, and NAT/UPnP</p>
+          </div>
+        </div>
+
+        <!-- Card 7: Advanced (Blue Cog) -->
+        <div class="settings-card" data-setting-modal="advancedModal">
+          <div class="setting-card-icon-wrap icon-blue">
+            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+              <circle cx="16" cy="16" r="4" fill="#3b82f6" />
+              <path
+                d="M26 16a10 10 0 00-.2-2l2.3-1.8a1 1 0 00.2-1.3l-2.2-3.8a1 1 0 00-1.2-.5l-2.7 1.1a10 10 0 00-3.5-2l-.4-2.9A1 1 0 0017.3 2h-4.6a1 1 0 00-1 .9l-.4 2.9a10 10 0 00-3.5 2L5.1 6.7a1 1 0 00-1.2.5L1.7 11a1 1 0 00.2 1.3l2.3 1.8A10 10 0 004 16a10 10 0 00.2 2l-2.3 1.8a1 1 0 00-.2 1.3l2.2 3.8a1 1 0 001.2.5l2.7-1.1a10 10 0 003.5 2l.4 2.9a1 1 0 001 .9h4.6a1 1 0 001-.9l.4-2.9a10 10 0 003.5-2l2.7 1.1a10 10 0 001.2-.5l2.2-3.8a1 1 0 00-.2-1.3L25.8 18c.1-.7.2-1.3.2-2z"
+                stroke="#60a5fa" stroke-width="2" />
+            </svg>
+          </div>
+          <div class="setting-card-info">
+            <h3 class="setting-card-title" data-i="setAdvTitle">Advanced</h3>
+            <p class="setting-card-desc" data-i="setAdvDesc">RPC, SQLite persistence</p>
+          </div>
+        </div>
+
+        <!-- Card 8: About (Yellow Notebook - Image 13) -->
+        <div class="settings-card" data-setting-modal="aboutModal">
+          <div class="setting-card-icon-wrap icon-yellow">
+            <svg viewBox="0 0 32 32" fill="none" class="setting-svg">
+              <rect x="7" y="5" width="18" height="22" rx="3" fill="#eab308" />
+              <path d="M11 11h10M11 16h10M11 21h6" stroke="#713f12" stroke-width="2" stroke-linecap="round" />
+              <circle cx="21" cy="7" r="2" fill="#ca8a04" />
+            </svg>
+          </div>
+          <div class="setting-card-info">
+            <h3 class="setting-card-title" data-i="setAboutTitle">About</h3>
+            <p class="setting-card-desc" data-i="setAboutDesc">Version, updates, source code and manual</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
   </div>
 
   <!-- ================= MODALS SECTION ================= -->
@@ -1413,27 +1447,27 @@
               beauty enter your orbit of preservation.</p>
             <div class="about-dev-by">
               <span data-i="createdBy">Created & Developed by</span> <b class="dev-name" id="devNameText">Mu'men
-                Mahbuobeh</b> · <a href="https://github.com/mumen-mahbuobeh/tayyar" target="_blank" class="about-link"
+                Mahbuobeh</b> · <a href="https://github.com/mumenmahbuobeh/tayyar" target="_blank" class="about-link"
                 id="repoLink"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"
                   style="vertical-align:-2px;margin-right:4px;">
                   <path
                     d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                </svg>GitHub: mumen-mahbuobeh/tayyar</a> · <span>MIT Open Source</span>
+                </svg>GitHub: mumenmahbuobeh/tayyar</a> · <span>MIT Open Source</span>
             </div>
           </div>
         </div>
 
         <!-- Links row -->
         <div class="about-links-row">
-          <a href="https://github.com/mumen-mahbuobeh/tayyar" target="_blank" class="about-nav-link"
+          <a href="https://github.com/mumenmahbuobeh/tayyar" target="_blank" class="about-nav-link"
             data-i="officialWebsite">Official website</a>
-          <a href="https://github.com/mumen-mahbuobeh/tayyar#readme" target="_blank" class="about-nav-link"
+          <a href="https://github.com/mumenmahbuobeh/tayyar#readme" target="_blank" class="about-nav-link"
             data-i="manual">Manual</a>
-          <a href="https://github.com/mumen-mahbuobeh/tayyar" target="_blank" class="about-nav-link"
+          <a href="https://github.com/mumenmahbuobeh/tayyar" target="_blank" class="about-nav-link"
             data-i="sourceCode">Source Code</a>
-          <a href="https://github.com/mumen-mahbuobeh/tayyar/releases" target="_blank" class="about-nav-link"
+          <a href="https://github.com/mumenmahbuobeh/tayyar/releases" target="_blank" class="about-nav-link"
             data-i="changelog">Changelog</a>
-          <a href="https://github.com/mumen-mahbuobeh/tayyar/blob/main/LICENSE" target="_blank" class="about-nav-link"
+          <a href="https://github.com/mumenmahbuobeh/tayyar/blob/main/LICENSE" target="_blank" class="about-nav-link"
             data-i="acknowledgments">License (MIT)</a>
         </div>
 

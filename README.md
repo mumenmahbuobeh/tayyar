@@ -3,7 +3,7 @@
 **Modern, High-Speed, Open-Source Multi-Connection Desktop Download Manager**
 
 **تطوير وبرمجة / Developed by:** **Mu'men Mahbuobeh (مؤمن محبوبة)**  
-**مستودع المشروع / GitHub Repository:** [https://github.com/mumen-mahbuobeh/tayyar](https://github.com/mumen-mahbuobeh/tayyar)  
+**مستودع المشروع / GitHub Repository:** [https://github.com/mumenmahbuobeh/tayyar](https://github.com/mumenmahbuobeh/tayyar)  
 **الترخيص / License:** MIT Open Source License  
 
 ---
