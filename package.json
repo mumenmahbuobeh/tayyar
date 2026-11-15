@@ -58,8 +58,7 @@
       "icon": "assets/icon.png",
       "target": [
         "AppImage",
-        "deb",
-        "tar.gz"
+        "deb"
       ],
       "category": "Network"
     }

@@ -707,8 +707,11 @@ html[dir="rtl"] .select-pill-wrap .chevron-ic {
 .tasks-body {
   flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   justify-content: center;
+  width: 100%;
+  position: relative;
 }
 
 .empty-tasks-state {

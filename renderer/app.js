@@ -573,7 +573,7 @@
 
     let filtered = [];
     if (S.tasksTab === 'active') {
-      filtered = items.filter((d) => d.status === 'downloading');
+      filtered = items.filter((d) => ['downloading', 'queued', 'scheduled'].includes(d.status));
     } else if (S.tasksTab === 'failed') {
       filtered = items.filter((d) => d.status === 'error');
     } else {
@@ -585,6 +585,7 @@
       emptyState.style.setProperty('display', 'flex', 'important');
       listEl.hidden = true;
       listEl.style.setProperty('display', 'none', 'important');
+      listEl.innerHTML = '';
     } else {
       emptyState.hidden = true;
       emptyState.style.setProperty('display', 'none', 'important');
@@ -675,8 +676,11 @@
   const curPresetLabel = $('#curPresetLabel');
   const bentoGrid = $('#bentoGrid');
 
-  if (bToggleCustomize) {
-    bToggleCustomize.addEventListener('click', () => {
+  const toggleCustomize = () => {
+    const isCustomizing = customizeBar && !customizeBar.hidden && customizeBar.style.display !== 'none';
+    if (isCustomizing) {
+      closeCustomize();
+    } else {
       if (customizeBar) {
         customizeBar.hidden = false;
         customizeBar.style.setProperty('display', 'flex', 'important');
@@ -686,7 +690,11 @@
         standardDashActions.style.setProperty('display', 'none', 'important');
       }
       if (bentoGrid) bentoGrid.classList.add('customizing');
-    });
+    }
+  };
+
+  if (bToggleCustomize) {
+    bToggleCustomize.addEventListener('click', toggleCustomize);
   }
 
   const closeCustomize = () => {
