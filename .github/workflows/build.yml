@@ -96,12 +96,18 @@ jobs:
         run: npm ci || npm install
 
       - name: Sync Capacitor Web Assets
-        run: npx cap sync android
+        run: npx cap copy android
 
       - name: Install Android SDK & Accept Licenses
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0" || true
+          mkdir -p "$ANDROID_HOME/licenses"
+          printf "\n24333f8a63b6825ea9c5514f83c2829b004d1fee\nd56f5187479451eabf01fb78af6dfcb131a6481e\n2fa8c25502d3d38c614b566304d537931f60a924" > "$ANDROID_HOME/licenses/android-sdk-license"
+          printf "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+          SDK_BIN=$(which sdkmanager || find $ANDROID_HOME -name sdkmanager -type f | head -n 1)
+          if [ -n "$SDK_BIN" ]; then
+            yes | "$SDK_BIN" --licenses || true
+            yes | "$SDK_BIN" --sdk_root="$ANDROID_HOME" "platforms;android-35" "build-tools;35.0.0" || true
+          fi
 
       - name: Build Android APK
         run: |
@@ -137,13 +143,13 @@ jobs:
       - name: Install Dependencies
         run: npm ci || npm install
 
-      - name: Sync Capacitor Web Assets
-        run: npx cap sync ios
+      - name: Copy Web Assets to iOS
+        run: npx cap copy ios
 
       - name: Build iOS App & Package IPA
         run: |
           cd ios/App
-          pod install
+          pod install --repo-update || pod install
           xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" clean archive -archivePath build/App.xcarchive
           mkdir -p build/Payload
           cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/

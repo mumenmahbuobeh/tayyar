@@ -405,6 +405,22 @@ html[dir="rtl"] .app-layout.sidebar-collapsed {
   height: 100vh;
   position: relative;
   background-color: var(--bg-app);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.main-content::-webkit-scrollbar {
+  width: 6px;
+}
+.main-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.main-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .view-panel {
@@ -2060,134 +2076,63 @@ html[dir="rtl"] .select-pill-wrap .chevron-ic {
   z-index: 1000;
 }
 
-/* ================= RESPONSIVE DESIGN (WINDOW SHRINK / RESIZE & MOBILE) ================= */
-
-@media (max-width: 1200px) {
-  .bento-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  .bento-grid .card-engine { grid-column: span 1 !important; }
-  .bento-grid .card-nat { grid-column: span 1 !important; }
-  .bento-grid .card-upload { grid-column: span 1 !important; }
-  .bento-grid .card-download { grid-column: span 1 !important; }
-  .bento-grid .card-speed-limit { grid-column: span 1 !important; }
-  .bento-grid .card-transfer { grid-column: span 1 !important; }
-  .bento-grid .card-tasks { grid-column: span 2 !important; }
-  .bento-grid .card-active-tasks { grid-column: span 2 !important; }
-  .bento-grid .card-activity { grid-column: span 2 !important; }
+/* ================= SLEEK DARK SCROLLBAR (NO WHITE BARS) ================= */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-app);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
-@media (max-width: 960px) {
-  .app-layout {
-    grid-template-columns: 68px 1fr !important;
+/* ================= RESPONSIVE DESIGN (PROPORTIONAL SCALING) ================= */
+@media (max-width: 1100px) {
+  .bento-card {
+    padding: 12px 14px !important;
+    min-height: 120px !important;
   }
-  html[dir="rtl"] .app-layout {
-    grid-template-columns: 1fr 68px !important;
+  .card-main-val {
+    font-size: 22px !important;
   }
-  .sidebar {
-    padding: 14px 6px !important;
-    align-items: center;
-  }
-  .sidebar-top {
-    flex-direction: column;
-    gap: 10px;
-    padding: 0;
-    width: 100%;
-    align-items: center;
-  }
-  .brand-dropdown .chevron-ic {
-    display: none !important;
-  }
-  .sidebar-top-actions {
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    align-items: center;
-  }
-  .nav-list {
-    align-items: center;
-    width: 100%;
-  }
-  .nav-item {
-    width: 44px;
-    height: 44px;
-    padding: 0 !important;
-    justify-content: center !important;
-    border-radius: 10px;
-    position: relative;
-  }
-  .nav-item .nav-label {
-    display: none !important;
-  }
-  .nav-badge {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    min-width: 16px;
-    height: 16px;
-    font-size: 10px;
-    padding: 0 4px;
-  }
-  .sidebar-bottom {
-    width: 100%;
-    padding-top: 10px;
-  }
-  .sidebar-bottom .nav-item {
-    width: 44px;
-    height: 44px;
-    padding: 0 !important;
-    justify-content: center !important;
-  }
-  .sidebar-bottom .nav-item .nav-label {
-    display: none !important;
+  .card-main-val.big-num {
+    font-size: 32px !important;
   }
   .view-panel {
-    padding: 18px 20px 32px !important;
+    padding: 16px 20px 24px !important;
   }
 }
 
-@media (max-width: 680px) {
-  .app-layout {
-    grid-template-columns: 56px 1fr !important;
+@media (max-width: 760px) {
+  .bento-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
   }
-  html[dir="rtl"] .app-layout {
-    grid-template-columns: 1fr 56px !important;
+  .bento-grid .card-tasks,
+  .bento-grid .card-active-tasks,
+  .bento-grid .card-activity {
+    grid-column: span 2 !important;
   }
+  .view-panel {
+    padding: 12px 14px 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
   .bento-grid {
     grid-template-columns: 1fr !important;
-    gap: 12px !important;
   }
   .bento-card {
     grid-column: span 1 !important;
-    padding: 14px 16px !important;
-    min-height: auto;
-  }
-  .view-panel {
-    padding: 14px 12px 28px !important;
-  }
-  .card-main-val {
-    font-size: 24px !important;
-  }
-  .card-main-val.big-num {
-    font-size: 30px !important;
-  }
-  .heatmap-wrap {
-    overflow-x: auto;
-    max-width: 100%;
-    padding-bottom: 6px;
-  }
-  .downloads-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-  .downloads-filters {
-    overflow-x: auto;
-    max-width: 100%;
-    padding-bottom: 4px;
-  }
-  .modal-box {
-    max-width: 95vw !important;
-    padding: 18px 16px !important;
   }
 }
