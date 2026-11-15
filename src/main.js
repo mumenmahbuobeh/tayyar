@@ -17,7 +17,13 @@ if (!app.requestSingleInstanceLock()) {
   console.log('Another instance is holding single instance lock! Quitting.');
   app.quit();
 }
-app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.focus(); } });
+app.on('second-instance', () => {
+  if (win) {
+    if (win.isMinimized()) win.restore();
+    win.focus();
+    try { win.webContents.reloadIgnoringCache(); } catch (_) {}
+  }
+});
 
 const send = (ch, payload) => { if (win && !win.isDestroyed()) win.webContents.send(ch, payload); };
 
@@ -39,6 +45,13 @@ function createWindow() {
     console.log('HTML loaded successfully');
     win.show();
     win.focus();
+  });
+  win.webContents.on('before-input-event', (event, input) => {
+    if (input.type === 'keyDown') {
+      if (input.key === 'F5' || ((input.control || input.meta) && input.key.toLowerCase() === 'r')) {
+        win.webContents.reloadIgnoringCache();
+      }
+    }
   });
   win.webContents.on('did-fail-load', (_e, code, desc) => {
     console.error('did-fail-load error:', code, desc);

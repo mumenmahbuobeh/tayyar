@@ -40,7 +40,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfuse2t64 libarchive-tools desktop-file-utils || sudo apt-get install -y libfuse2 libarchive-tools desktop-file-utils
+          sudo apt-get install -y libfuse2t64 libarchive-tools desktop-file-utils imagemagick graphicsmagick || sudo apt-get install -y libfuse2 libarchive-tools desktop-file-utils imagemagick graphicsmagick
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
 
       - name: Build & Package Desktop Binaries
@@ -100,8 +100,9 @@ jobs:
 
       - name: Install Android SDK & Accept Licenses
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "platforms;android-36" "build-tools;35.0.0" || true
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          SDKMANAGER=$(which sdkmanager || echo "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager")
+          echo y | $SDKMANAGER --sdk_root=$ANDROID_HOME "platforms;android-35" "build-tools;35.0.0" || true
+          echo y | $SDKMANAGER --sdk_root=$ANDROID_HOME --licenses || true
 
       - name: Build Android APK
         run: |

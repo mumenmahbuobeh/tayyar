@@ -55,7 +55,7 @@
       "category": "public.app-category.utilities"
     },
     "linux": {
-      "icon": "assets/icon.png",
+      "icon": "assets/icons",
       "target": [
         "AppImage",
         "deb"
