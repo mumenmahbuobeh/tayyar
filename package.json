@@ -65,13 +65,7 @@
         "AppImage",
         "deb"
       ],
-      "category": "Network",
-      "deb": {
-        "artifactName": "tayyar_${version}_${arch}.${ext}"
-      },
-      "appImage": {
-        "artifactName": "Tayyar-${version}.${ext}"
-      }
+      "category": "Network"
     }
   },
   "dependencies": {
