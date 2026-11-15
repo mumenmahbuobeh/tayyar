@@ -105,25 +105,13 @@ jobs:
 
       - name: Install Android SDK & Accept Licenses
         run: |
-          mkdir -p "$ANDROID_HOME/licenses"
-          printf "\n24333f8a63b6825ea9c5514f83c2829b004d1fee\nd56f5187479451eabf01fb78af6dfcb131a6481e\n2fa8c25502d3d38c614b566304d537931f60a924" > "$ANDROID_HOME/licenses/android-sdk-license"
-          printf "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
-          SDK_BIN=$(which sdkmanager || find $ANDROID_HOME -name sdkmanager -type f | head -n 1)
-          if [ -n "$SDK_BIN" ]; then
-            yes | "$SDK_BIN" --licenses || true
-            yes | "$SDK_BIN" --sdk_root="$ANDROID_HOME" "platforms;android-35" "build-tools;35.0.0" || true
-          fi
+          mkdir -p "$ANDROID_HOME/licenses" || true
+          yes | sdkmanager --licenses || true
 
       - name: Ensure Android Cordova variables stub
         run: |
           mkdir -p android/capacitor-cordova-android-plugins
-          cat << 'EOF' > android/capacitor-cordova-android-plugins/cordova.variables.gradle
-          ext {
-            cdvMinSdkVersion = project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 24
-            cdvPluginPostBuildExtras = []
-            cordovaConfig = [:]
-          }
-          EOF
+          echo "ext { cdvMinSdkVersion = 24; cdvPluginPostBuildExtras = []; cordovaConfig = [:] }" > android/capacitor-cordova-android-plugins/cordova.variables.gradle
 
       - name: Build Android APK
         run: |
@@ -203,8 +191,11 @@ jobs:
           path: release-assets
           merge-multiple: true
 
-      - name: Display Release Assets
-        run: ls -la release-assets
+      - name: Flatten & Collect All Release Assets
+        run: |
+          mkdir -p final-release
+          find release-assets -type f -exec cp -v {} final-release/ \;
+          ls -la final-release
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
@@ -235,10 +226,11 @@ jobs:
             * 200+ Universal File Extensions categorized automatically
             * Seamless download resilience for Russian, Chinese, Iranian, and international servers
             * Integrated Browser Extensions for Chrome, Edge, Firefox, Safari, Brave, Opera, Vivaldi, Arc
-            * Pure Vanilla Glassmorphism Bento Grid UI with native Arabic (RTL) & English (LTR) support
-          files: release-assets/*
+            * Apple Liquid Glass Design Language with native Arabic (RTL) & English (LTR) support
+          files: final-release/*
           fail_on_unmatched_files: false
           draft: false
           prerelease: false
+          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
