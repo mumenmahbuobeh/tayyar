@@ -1,6 +1,5 @@
 /* ==========================================================================
-   Tayyar - Modern Bento Grid & Dark Slate Theme (Matching Motrix Next)
-   Complete styling for Dashboard, Downloads, Trackers, Plugins & Settings Modals
+   Tayyar - Next Gen Download Manager (Complete Design System)
    ========================================================================== */
 
 :root {
@@ -51,6 +50,67 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ================= STRICT SVG SIZING SAFEGUARDS ================= */
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+svg:not([width]) {
+  max-width: 36px;
+  max-height: 36px;
+}
+
+.placeholder-icon {
+  width: 52px !important;
+  height: 52px !important;
+  max-width: 52px !important;
+  max-height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+  color: var(--color-cyan) !important;
+  opacity: 0.85;
+  margin: 0 auto 12px !important;
+}
+
+.search-input-wrap svg {
+  width: 14px !important;
+  height: 14px !important;
+  color: var(--text-dim) !important;
+}
+
+.icon-btn-ghost svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.brand-svg {
+  width: 36px !important;
+  height: 18px !important;
+}
+
+.chevron-ic {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.nav-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.setting-svg {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+.browser-svg {
+  width: 32px !important;
+  height: 32px !important;
+}
+
 /* ================= RTL SUPPORT ================= */
 html[dir="rtl"] .app-layout {
   grid-template-columns: 1fr 220px;
@@ -70,6 +130,16 @@ html[dir="rtl"] .nav-badge {
   margin-left: 0;
   margin-right: auto;
 }
+html[dir="rtl"] .trackers-table {
+  text-align: right;
+}
+html[dir="rtl"] .heatmap-months {
+  padding-left: 0;
+  padding-right: 28px;
+}
+html[dir="rtl"] .modal-foot {
+  justify-content: flex-start;
+}
 
 /* ================= LAYOUT ================= */
 .app-layout {
@@ -86,8 +156,13 @@ html[dir="rtl"] .nav-badge {
   border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
-  padding: 16px 12px;
+  padding: 14px 12px;
   gap: 16px;
+  -webkit-app-region: drag;
+}
+
+.sidebar button, .sidebar a, .sidebar input {
+  -webkit-app-region: no-drag;
 }
 
 .sidebar-top {
@@ -103,26 +178,13 @@ html[dir="rtl"] .nav-badge {
   gap: 6px;
   cursor: pointer;
   color: var(--text-main);
-  padding: 4px 8px;
+  padding: 4px 6px;
   border-radius: var(--radius-sm);
   transition: background 0.15s ease;
 }
 
 .brand-dropdown:hover {
   background-color: rgba(255, 255, 255, 0.05);
-}
-
-.brand-svg {
-  width: 36px;
-  height: 18px;
-  display: block;
-  color: var(--text-main);
-}
-
-.chevron-ic {
-  width: 14px;
-  height: 14px;
-  color: var(--text-muted);
 }
 
 .sidebar-top-actions {
@@ -160,11 +222,6 @@ html[dir="rtl"] .nav-badge {
   justify-content: center;
   cursor: pointer;
   transition: all 0.15s ease;
-}
-
-.icon-btn-ghost svg {
-  width: 16px;
-  height: 16px;
 }
 
 .icon-btn-ghost:hover:not(:disabled) {
@@ -215,12 +272,6 @@ html[dir="rtl"] .nav-badge {
   font-weight: 600;
 }
 
-.nav-icon svg {
-  width: 18px;
-  height: 18px;
-  display: block;
-}
-
 .nav-badge {
   margin-left: auto;
   background-color: var(--color-cyan);
@@ -262,6 +313,11 @@ html[dir="rtl"] .nav-badge {
   justify-content: space-between;
   margin-bottom: 22px;
   min-height: 40px;
+  -webkit-app-region: drag;
+}
+
+.view-header button, .view-header input, .view-header a, .view-header select {
+  -webkit-app-region: no-drag;
 }
 
 .view-title {
@@ -627,10 +683,6 @@ html[dir="rtl"] .select-pill-wrap .chevron-ic {
   color: var(--text-dim);
   padding-left: 28px;
 }
-html[dir="rtl"] .heatmap-months {
-  padding-left: 0;
-  padding-right: 28px;
-}
 
 .heatmap-grid-container {
   display: flex;
@@ -690,11 +742,6 @@ html[dir="rtl"] .heatmap-months {
   background-color: rgba(255, 255, 255, 0.16);
 }
 
-.icon-btn-round svg {
-  width: 14px;
-  height: 14px;
-}
-
 .custom-dropdown-wrap {
   position: relative;
 }
@@ -741,58 +788,271 @@ html[dir="rtl"] .heatmap-months {
   color: var(--color-cyan);
 }
 
-/* ================= SETTINGS VIEW (Image 3) ================= */
-.settings-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+/* ================= DOWNLOADS VIEW (SCREENSHOT 1 FIX) ================= */
+.downloads-header-left {
+  display: flex;
+  align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
-.settings-card {
-  background-color: var(--bg-card);
+.dl-filter-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-card);
-  padding: 24px 20px;
+}
+
+.filter-pill {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.filter-pill .cnt {
+  font-size: 11px;
+  opacity: 0.8;
+  background-color: rgba(255, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+}
+
+.filter-pill.active {
+  background-color: #23343c;
+  color: #ffffff;
+}
+
+.downloads-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  padding: 5px 14px;
+  height: 34px;
+}
+
+.search-input-wrap input {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: #ffffff !important;
+  font-size: 12.5px;
+  width: 140px;
+  font-family: inherit;
+}
+
+.downloads-container {
+  display: flex;
+  gap: 20px;
+  height: calc(100vh - 120px);
+  margin-top: 10px;
+}
+
+.downloads-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dl-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  margin: auto;
+  padding: 48px 32px;
+  gap: 12px;
+  color: var(--text-dim);
   text-align: center;
-  gap: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  background-color: var(--bg-card);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-card);
+  max-width: 440px;
+  width: 100%;
 }
 
-.settings-card:hover {
-  background-color: var(--bg-card-hover);
-  border-color: var(--border-highlight);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-.setting-card-icon-wrap {
+.dl-empty-state .empty-icon-wrap {
   width: 56px;
   height: 56px;
+  border-radius: 50%;
+  background: rgba(6, 182, 212, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.setting-svg {
-  width: 44px;
-  height: 44px;
-}
-
-.setting-card-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #ffffff;
   margin-bottom: 4px;
 }
 
-.setting-card-desc {
-  font-size: 12.5px;
+.dl-empty-state .empty-icon-wrap svg {
+  width: 28px !important;
+  height: 28px !important;
+  color: var(--color-cyan) !important;
+  opacity: 0.85;
+}
+
+.dl-empty-state h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.dl-empty-state p {
+  font-size: 13px;
   color: var(--text-muted);
+  max-width: 300px;
   line-height: 1.45;
+}
+
+.dl-item-row {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dl-item-row:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border-highlight);
+}
+
+.dl-item-row.selected {
+  outline: 2px solid var(--color-cyan);
+}
+
+.dl-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dl-file-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+}
+
+.dl-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.dl-progress-bar-wrap {
+  height: 5px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.dl-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0284c7, #38bdf8);
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+.dl-item-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.dl-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.downloads-detail {
+  width: 320px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ================= PLACEHOLDER VIEWS (SCREENSHOT 2 FIX) ================= */
+.subview-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 30px;
+}
+
+.placeholder-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: 44px 56px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  max-width: 480px;
+  width: 100%;
+  margin: auto;
+}
+
+.placeholder-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 4px;
+}
+
+.placeholder-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
 }
 
 /* ================= TRACKERS VIEW (Images 2 & 3) ================= */
@@ -868,9 +1128,6 @@ html[dir="rtl"] .heatmap-months {
   border-collapse: collapse;
   font-size: 12.5px;
   text-align: left;
-}
-html[dir="rtl"] .trackers-table {
-  text-align: right;
 }
 
 .trackers-table th {
@@ -1041,7 +1298,7 @@ html[dir="rtl"] .trackers-table {
   font-weight: 600;
 }
 
-/* ================= SWITCH TOGGLE (Fluent style) ================= */
+/* ================= SWITCH TOGGLE ================= */
 .switch-toggle {
   position: relative;
   display: inline-block;
@@ -1084,6 +1341,55 @@ html[dir="rtl"] .trackers-table {
 .switch-toggle input:checked + .switch-slider:before {
   transform: translateX(18px);
   background-color: #03141b;
+}
+
+/* ================= SETTINGS VIEW (Image 3) ================= */
+.settings-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.settings-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-card:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border-highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.setting-card-icon-wrap {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.setting-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.setting-card-desc {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
 }
 
 /* ================= MODALS & SETTINGS DIALOGS ================= */
@@ -1237,11 +1543,6 @@ html[dir="rtl"] .trackers-table {
   align-items: center;
   gap: 8px;
   text-align: center;
-}
-
-.browser-svg {
-  width: 32px;
-  height: 32px;
 }
 
 .browser-name {

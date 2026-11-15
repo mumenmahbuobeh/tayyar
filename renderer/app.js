@@ -712,16 +712,22 @@
 
     if (!filtered.length) {
       listEl.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:240px;gap:12px;color:var(--text-dim);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;opacity:0.4;">
-            <path d="M12 3v13m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
-          </svg>
-          <p style="font-size:14px;">No downloads in this view</p>
-          <button class="pill-btn primary" id="bEmptyAdd">Add Download</button>
+        <div class="dl-empty-state">
+          <div class="empty-icon-wrap">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 3v13m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+            </svg>
+          </div>
+          <h3>${S.lang === 'ar' ? 'لا توجد تحميلات في هذه القائمة' : 'No downloads in this view'}</h3>
+          <p>${S.lang === 'ar' ? 'انقر على إضافة مهمة للبدء في تحميل الروابط والملفات' : 'Click Add Task to start downloading files or torrents'}</p>
+          <button class="pill-btn primary" id="bEmptyAdd">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><path d="M12 5v14M5 12h14"/></svg>
+            <span>${S.lang === 'ar' ? 'إضافة مهمة' : 'Add Task'}</span>
+          </button>
         </div>
       `;
       const emptyAdd = $('#bEmptyAdd');
-      if (emptyAdd) emptyAdd.addEventListener('click', openAddModal);
+      if (emptyAdd) emptyAdd.addEventListener('click', () => openAddModal());
       return;
     }
 

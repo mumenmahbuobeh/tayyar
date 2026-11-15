@@ -4,9 +4,13 @@ const { contextBridge, ipcRenderer } = require('electron');
 const EVENTS = ['dl:update', 'dl:progress', 'dl:removed', 'settings', 'ui:add-url', 'ui:clip-url'];
 const inv = (name) => (...args) => ipcRenderer.invoke(name, ...args);
 
-contextBridge.exposeInMainWorld('api', {
+const bridge = {
   list: inv('list'),
   platform: inv('platform'),
+  settings: {
+    get: inv('settings:get'),
+    set: inv('settings:set'),
+  },
   getSettings: inv('settings:get'),
   setSettings: inv('settings:set'),
   probe: inv('probe'),
@@ -23,4 +27,9 @@ contextBridge.exposeInMainWorld('api', {
     if (!EVENTS.includes(channel)) return;
     ipcRenderer.on(channel, (_e, payload) => cb(payload));
   },
-});
+};
+
+// Expose both window.tayyar and window.api for maximum compatibility
+contextBridge.exposeInMainWorld('tayyar', bridge);
+contextBridge.exposeInMainWorld('api', bridge);
+
