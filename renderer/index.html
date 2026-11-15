@@ -1286,9 +1286,10 @@
       <div class="modal-body">
         <div class="settings-group-title" data-i="proxy">Proxy</div>
         <div class="setting-toggle-row">
-          <span data-i="enableProxy">Enable proxy</span>
-          <button type="button" class="pill-btn outline sm" style="margin-right:auto;margin-left:14px;"
-            data-i="importSystem">Import from system</button>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span data-i="enableProxy">Enable proxy</span>
+            <button type="button" class="pill-btn outline sm" data-i="importSystem">Import from system</button>
+          </div>
           <label class="switch-toggle"><input type="checkbox" id="cfgEnableProxy"><span
               class="switch-slider"></span></label>
         </div>
@@ -1372,7 +1373,7 @@
         <label class="field-label" style="margin-top:10px;"><span>Recovery data file</span>
           <div class="input-with-btn">
             <input type="text" value="Default location" readonly style="color:var(--text-muted);">
-            <button type="button" class="pill-btn outline sm">Default location</button>
+            <button type="button" class="pill-btn outline sm">Change...</button>
           </div>
         </label>
         <div class="setting-select-row" style="margin-top:10px;">
