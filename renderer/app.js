@@ -582,14 +582,23 @@
 
     if (!filtered.length) {
       emptyState.hidden = false;
+      emptyState.style.display = 'flex';
       listEl.hidden = true;
+      listEl.style.display = 'none';
     } else {
       emptyState.hidden = true;
+      emptyState.style.display = 'none';
       listEl.hidden = false;
+      listEl.style.display = 'flex';
       listEl.innerHTML = filtered.slice(0, 3).map((d) => `
-        <div class="mini-task-item" style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;">
-          <span style="max-width:65%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;">${d.filename || d.url}</span>
-          <span style="color:var(--color-cyan);font-weight:600;">${pct(d)}%</span>
+        <div class="mini-task-item">
+          <div class="mini-task-info">
+            <span class="mini-task-name" title="${d.filename || d.url}">${d.filename || d.url}</span>
+            <span class="mini-task-pct">${pct(d)}%</span>
+          </div>
+          <div class="mini-task-bar">
+            <div class="mini-task-fill" style="width: ${pct(d)}%"></div>
+          </div>
         </div>
       `).join('');
     }
@@ -636,12 +645,31 @@
     });
   });
 
+  /* ---------------- SIDEBAR COLLAPSE / EXPAND ---------------- */
+  const bToggleSidebar = $('#bToggleSidebar');
+  const appLayout = $('.app-layout') || $('#app');
+
+  if (localStorage.getItem('sidebarCollapsed') === 'true' && appLayout) {
+    appLayout.classList.add('sidebar-collapsed');
+  }
+
+  if (bToggleSidebar && appLayout) {
+    bToggleSidebar.addEventListener('click', () => {
+      appLayout.classList.toggle('sidebar-collapsed');
+      const isCollapsed = appLayout.classList.contains('sidebar-collapsed');
+      localStorage.setItem('sidebarCollapsed', isCollapsed ? 'true' : 'false');
+      toast(S.lang === 'ar' ? (isCollapsed ? 'تم إخفاء القائمة الجانبية' : 'تم إظهار القائمة الجانبية') : (isCollapsed ? 'Sidebar collapsed' : 'Sidebar expanded'));
+    });
+  }
+
   /* ---------------- CUSTOMIZE MODE (Image 2) ---------------- */
   const bToggleCustomize = $('#bToggleCustomize');
   const customizeBar = $('#customizeBar');
+  const standardDashActions = $('#standardDashActions');
   const bCloseCustom = $('#bCloseCustom');
   const bApplyCustom = $('#bApplyCustom');
   const bResetCustom = $('#bResetCustom');
+  const bAddWidget = $('#bAddWidget');
   const bPresetMenu = $('#bPresetMenu');
   const presetPopover = $('#presetPopover');
   const curPresetLabel = $('#curPresetLabel');
@@ -649,36 +677,67 @@
 
   if (bToggleCustomize) {
     bToggleCustomize.addEventListener('click', () => {
-      customizeBar.hidden = false;
-      bToggleCustomize.hidden = true;
+      if (customizeBar) {
+        customizeBar.hidden = false;
+        customizeBar.style.display = 'flex';
+      }
+      if (standardDashActions) {
+        standardDashActions.hidden = true;
+        standardDashActions.style.display = 'none';
+      }
+      if (bentoGrid) bentoGrid.classList.add('customizing');
     });
   }
 
   const closeCustomize = () => {
-    if (customizeBar) customizeBar.hidden = true;
-    if (bToggleCustomize) bToggleCustomize.hidden = false;
-    if (presetPopover) presetPopover.hidden = true;
+    if (customizeBar) {
+      customizeBar.hidden = true;
+      customizeBar.style.display = 'none';
+    }
+    if (standardDashActions) {
+      standardDashActions.hidden = false;
+      standardDashActions.style.display = 'flex';
+    }
+    if (presetPopover) {
+      presetPopover.hidden = true;
+      presetPopover.style.display = 'none';
+    }
+    if (bentoGrid) bentoGrid.classList.remove('customizing');
   };
 
   if (bCloseCustom) bCloseCustom.addEventListener('click', closeCustomize);
-  if (bApplyCustom) bApplyCustom.addEventListener('click', closeCustomize);
+  if (bApplyCustom) {
+    bApplyCustom.addEventListener('click', () => {
+      closeCustomize();
+      toast(S.lang === 'ar' ? 'تم تطبيق تخصيص اللوحة' : 'Layout customization applied');
+    });
+  }
   if (bResetCustom) {
     bResetCustom.addEventListener('click', () => {
       setPreset('compact');
-      toast('Layout reset to default');
+      toast(S.lang === 'ar' ? 'تمت إعادة ضبط اللوحة إلى الوضع الافتراضي' : 'Layout reset to default');
     });
   }
 
-  if (bPresetMenu) {
+  if (bAddWidget) {
+    bAddWidget.addEventListener('click', () => {
+      toast(S.lang === 'ar' ? 'جميع البطاقات مفعلة حالياً على اللوحة' : 'All widgets are active on dashboard');
+    });
+  }
+
+  if (bPresetMenu && presetPopover) {
     bPresetMenu.addEventListener('click', (e) => {
       e.stopPropagation();
-      presetPopover.hidden = !presetPopover.hidden;
+      const isHidden = presetPopover.hidden || presetPopover.style.display === 'none';
+      presetPopover.hidden = !isHidden;
+      presetPopover.style.display = isHidden ? 'block' : 'none';
     });
   }
 
   document.addEventListener('click', (e) => {
     if (presetPopover && !presetPopover.contains(e.target) && e.target !== bPresetMenu) {
       presetPopover.hidden = true;
+      presetPopover.style.display = 'none';
     }
   });
 
@@ -694,7 +753,10 @@
     if (bentoGrid) {
       bentoGrid.className = `bento-grid layout-${presetName}`;
     }
-    if (presetPopover) presetPopover.hidden = true;
+    if (presetPopover) {
+      presetPopover.hidden = true;
+      presetPopover.style.display = 'none';
+    }
   }
 
   $$('.dropdown-item', presetPopover).forEach((item) => {
