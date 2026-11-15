@@ -36,6 +36,15 @@
       waitingCaps: 'WAITING',
       seedingCaps: 'SEEDING',
       activity: 'ACTIVITY',
+      mon: 'Mon',
+      wed: 'Wed',
+      fri: 'Fri',
+      jun: 'Jun',
+      jul: 'Jul',
+      aug: 'Aug',
+      sep: 'Sep',
+      oct: 'Oct',
+      nov: 'Nov',
       all: 'All',
       downloading: 'Downloading',
       waiting: 'Waiting',
@@ -179,6 +188,15 @@
       waitingCaps: 'في الانتظار',
       seedingCaps: 'مكتملة / مشاركة',
       activity: 'النشاط',
+      mon: 'إثن',
+      wed: 'أرب',
+      fri: 'جمع',
+      jun: 'يونيو',
+      jul: 'يوليو',
+      aug: 'أغسطس',
+      sep: 'سبتمبر',
+      oct: 'أكتوبر',
+      nov: 'نوفمبر',
       all: 'الكل',
       downloading: 'قيد التحميل',
       waiting: 'في الانتظار',
@@ -416,6 +434,9 @@
     const langSelect = $('#cfgLang');
     if (langSelect) langSelect.value = lang;
 
+    // Refresh heatmap with current language
+    initHeatmap();
+
     // Toast feedback
     toast(lang === 'ar' ? 'تم تحويل اللغة إلى العربية' : 'Switched to English');
   }
@@ -456,18 +477,62 @@
   /* ---------------- HEATMAP GENERATOR ---------------- */
   function initHeatmap() {
     const container = $('#heatmapCells');
-    if (!container || container.children.length > 0) return;
+    if (!container) return;
+    container.innerHTML = '';
 
-    const totalCols = 24;
-    const totalRows = 4;
+    const totalCols = 26; // 26 weeks spanning Jun to end of Nov
+    const totalRows = 7;  // 7 days per week (Sun, Mon, Tue, Wed, Thu, Fri, Sat)
+
+    // Base date starting ~26 weeks ago
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - (26 * 7));
+
+    // Stable pseudo-random generator so cell pattern remains consistent across renders
+    let seed = 1337;
+    function prng() {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    }
+
     for (let c = 0; c < totalCols; c++) {
       for (let r = 0; r < totalRows; r++) {
         const cell = document.createElement('div');
         cell.className = 'hm-cell';
-        const rand = Math.random();
-        if (rand > 0.85) cell.classList.add('lvl-3');
-        else if (rand > 0.65) cell.classList.add('lvl-2');
-        else if (rand > 0.45) cell.classList.add('lvl-1');
+
+        const d = new Date(startDate);
+        d.setDate(d.getDate() + (c * 7 + r));
+        const dateStr = d.toLocaleDateString(S.lang === 'ar' ? 'ar-EG' : 'en-US', {
+          month: 'short',
+          day: 'numeric',
+        });
+
+        // More activity in recent weeks (October and November)
+        const recentBonus = c > 18 ? 0.35 : (c > 10 ? 0.15 : 0);
+        const rand = prng() + recentBonus;
+
+        let count = 0;
+        if (rand > 1.05) {
+          cell.classList.add('lvl-4');
+          count = Math.floor(prng() * 6) + 10;
+        } else if (rand > 0.85) {
+          cell.classList.add('lvl-3');
+          count = Math.floor(prng() * 4) + 5;
+        } else if (rand > 0.65) {
+          cell.classList.add('lvl-2');
+          count = Math.floor(prng() * 3) + 2;
+        } else if (rand > 0.45) {
+          cell.classList.add('lvl-1');
+          count = 1;
+        } else {
+          cell.classList.add('lvl-0');
+          count = 0;
+        }
+
+        const tooltip = count > 0
+          ? (S.lang === 'ar' ? `${count} تنزيل في ${dateStr}` : `${count} download${count > 1 ? 's' : ''} on ${dateStr}`)
+          : (S.lang === 'ar' ? `لا يوجد نشاط في ${dateStr}` : `No downloads on ${dateStr}`);
+        cell.title = tooltip;
+
         container.appendChild(cell);
       }
     }

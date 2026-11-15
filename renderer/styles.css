@@ -877,57 +877,107 @@ html[dir="rtl"] .select-pill-wrap .chevron-ic {
 }
 
 /* ACTIVITY (HEATMAP) CARD (Span 2) */
-.card-activity { grid-column: span 2; }
+.card-activity { 
+  grid-column: span 2; 
+  min-height: 160px;
+}
 
 .heatmap-wrap {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: 6px;
-  max-width: 100%;
+  gap: 8px;
+  margin-top: 4px;
+  width: 100%;
+  min-width: 0;
   overflow-x: auto;
 }
 
 .heatmap-months {
-  display: flex;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(26, 1fr);
+  gap: 4px;
   font-size: 11px;
+  font-weight: 500;
   color: var(--text-dim);
   padding-left: 28px;
+  margin-bottom: 2px;
 }
+
+html[dir="rtl"] .heatmap-months {
+  padding-left: 0;
+  padding-right: 28px;
+}
+
+.heatmap-months .m-lbl {
+  text-align: left;
+  white-space: nowrap;
+}
+html[dir="rtl"] .heatmap-months .m-lbl {
+  text-align: right;
+}
+
+.heatmap-months .m-jun { grid-column: 1 / span 4; }
+.heatmap-months .m-jul { grid-column: 5 / span 5; }
+.heatmap-months .m-aug { grid-column: 10 / span 4; }
+.heatmap-months .m-sep { grid-column: 14 / span 4; }
+.heatmap-months .m-oct { grid-column: 18 / span 5; }
+.heatmap-months .m-nov { grid-column: 23 / span 4; }
 
 .heatmap-grid-container {
   display: flex;
   gap: 8px;
-  align-items: center;
+  align-items: stretch;
+  width: 100%;
 }
 
 .heatmap-days {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 4px;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.heatmap-days .day-slot {
   display: flex;
-  flex-direction: column;
-  gap: 7px;
-  font-size: 10px;
+  align-items: center;
+  font-size: 9.5px;
+  font-weight: 500;
   color: var(--text-dim);
+  line-height: 1;
 }
 
 .heatmap-cells {
   display: grid;
-  grid-template-rows: repeat(4, 9px);
+  grid-template-rows: repeat(7, 1fr);
+  grid-template-columns: repeat(26, 1fr);
   grid-auto-flow: column;
-  grid-auto-columns: 9px;
   gap: 4px;
+  flex: 1;
+  width: 100%;
 }
 
 .hm-cell {
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
-  background-color: #162024;
+  aspect-ratio: 1;
+  border-radius: 2.5px;
+  background-color: #162226;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  cursor: pointer;
+  position: relative;
 }
 
-.hm-cell.lvl-1 { background-color: #104838; }
-.hm-cell.lvl-2 { background-color: #106f52; }
-.hm-cell.lvl-3 { background-color: #10b981; }
+.hm-cell:hover {
+  transform: scale(1.25);
+  z-index: 10;
+  outline: 1.5px solid var(--color-cyan);
+}
+
+.hm-cell.lvl-0 { background-color: #162226; }
+.hm-cell.lvl-1 { background-color: #0f4536; }
+.hm-cell.lvl-2 { background-color: #0d6e52; }
+.hm-cell.lvl-3 { background-color: #10b981; box-shadow: 0 0 5px rgba(16, 185, 129, 0.4); }
+.hm-cell.lvl-4 { background-color: #34d399; box-shadow: 0 0 7px rgba(52, 211, 153, 0.6); }
 
 /* ================= CUSTOMIZE MODE TOOLBAR (Image 2) ================= */
 .customize-bar {
@@ -2131,14 +2181,24 @@ html, body, #app, .main-content, * {
   .view-panel {
     padding: 14px 18px 20px !important;
   }
-  .heatmap-cells {
-    grid-template-rows: repeat(4, 7px) !important;
-    grid-auto-columns: 7px !important;
-    gap: 3px !important;
+  .heatmap-months {
+    gap: 2.5px !important;
+    padding-left: 22px !important;
+    font-size: 9.5px !important;
   }
-  .hm-cell {
-    width: 7px !important;
-    height: 7px !important;
+  html[dir="rtl"] .heatmap-months {
+    padding-left: 0 !important;
+    padding-right: 22px !important;
+  }
+  .heatmap-days {
+    gap: 2.5px !important;
+    width: 16px !important;
+  }
+  .heatmap-days .day-slot {
+    font-size: 8px !important;
+  }
+  .heatmap-cells {
+    gap: 2.5px !important;
   }
 }
 
@@ -2171,5 +2231,175 @@ html, body, #app, .main-content, * {
   }
   .bento-card {
     grid-column: span 1 !important;
+  }
+}
+
+/* ================= MOBILE OPTIMIZATIONS (CAPACITOR/APP) ================= */
+@media (max-width: 768px) {
+  /* 1. Stack the layout vertically */
+  .app-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  html[dir=rtl] .app-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 2. Turn the Sidebar into a Bottom Navigation Bar */
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100% !important;
+    height: 65px !important;
+    order: 3;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    padding: 0 !important;
+    z-index: 1000;
+    border-right: none !important;
+    border-left: none !important;
+    border-top: 1px solid var(--border-subtle) !important;
+    background-color: var(--bg-sidebar) !important;
+    -webkit-app-region: no-drag;
+    padding-bottom: env(safe-area-inset-bottom) !important; /* iPhone Notch/Bar support */
+  }
+
+  /* Hide the top actions and branding in the sidebar since it's a bottom nav now */
+  .sidebar-top, .sidebar-bottom, .storage-widget {
+    display: none !important;
+  }
+
+  /* Make the nav list horizontal */
+  .sidebar-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    margin: 0 !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    padding: 0 !important;
+  }
+
+  .nav-list {
+    flex-direction: row !important;
+    width: 100% !important;
+    justify-content: space-around !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .nav-item {
+    flex-direction: column !important;
+    padding: 8px 4px !important;
+    margin: 0 !important;
+    font-size: 10px !important;
+    gap: 4px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 0 !important;
+    width: auto !important;
+    height: 100% !important;
+    background: transparent !important;
+  }
+
+  .nav-item svg {
+    margin: 0 !important;
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .nav-item .nav-label {
+    display: block !important; /* Show small text below icon */
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+
+  .nav-badge {
+    position: absolute !important;
+    top: 2px !important;
+    right: 50% !important;
+    transform: translateX(15px);
+  }
+
+  /* 3. Main Content - Takes remaining space above bottom nav */
+  .main-content {
+    order: 1 !important;
+    width: 100% !important;
+    height: calc(100vh - 65px - env(safe-area-inset-bottom)) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 10px !important;
+    padding-top: env(safe-area-inset-top) !important; /* iPhone Notch/Bar support */
+  }
+
+  /* 4. Dashboard & Cards Layout fixes */
+  .bento-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .bento-card, .chart-card {
+    width: 100% !important;
+    grid-column: auto !important;
+  }
+
+  /* 5. Header and view titles */
+  .view-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    padding: 10px !important;
+    height: auto !important;
+  }
+
+  .view-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .search-wrapper {
+    width: 100% !important;
+  }
+  .search-wrapper input {
+    width: 100% !important;
+  }
+
+  /* 6. Modals and Overlays */
+  .modal-content {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin: 20px auto !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+
+  /* 7. Settings Page */
+  .settings-layout {
+    flex-direction: column !important;
+  }
+
+  .settings-nav {
+    width: 100% !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    padding-bottom: 10px !important;
+    white-space: nowrap !important;
+  }
+
+  /* 8. Table and List fixes (Tasks) */
+  .downloads-table {
+    display: block !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
   }
 }
