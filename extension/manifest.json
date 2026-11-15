@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Tayyar Integration — تيّار",
+  "version": "1.0.0",
+  "description": "Send downloads and links from the browser to the Tayyar desktop app.",
+  "permissions": ["contextMenus", "downloads", "storage"],
+  "host_permissions": ["http://127.0.0.1:6824/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Tayyar: capture browser downloads (click to toggle)" }
+}

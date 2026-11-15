@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تيّار</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name" data-i="app">تيّار</span></div>
+    <div class="tools">
+      <button class="btn primary" id="bAdd"><span class="ic" data-ic="plus"></span><span data-i="add">إضافة رابط</span></button>
+      <button class="btn" id="bResume" disabled><span class="ic" data-ic="play"></span><span data-i="resume">استئناف</span></button>
+      <button class="btn" id="bPause" disabled><span class="ic" data-ic="pause"></span><span data-i="pause">إيقاف مؤقت</span></button>
+      <button class="btn" id="bPauseAll"><span class="ic" data-ic="stop"></span><span data-i="pauseAll">إيقاف الكل</span></button>
+      <button class="btn danger" id="bDelete" disabled><span class="ic" data-ic="trash"></span><span data-i="remove">حذف</span></button>
+    </div>
+    <label class="search"><span class="ic" data-ic="search"></span><input id="q" type="search" data-ip="search" placeholder="بحث في التحميلات"></label>
+    <button class="btn icon" id="bSettings" data-it="settings" title="الإعدادات"><span class="ic" data-ic="sliders"></span></button>
+  </header>
+
+  <nav class="rail" aria-label="التصفية">
+    <ul id="navMain"></ul>
+    <h3 data-i="categories">التصنيفات</h3>
+    <ul id="navCats"></ul>
+    <div class="rail-foot">
+      <div class="gauge"><canvas id="gSpark" height="44"></canvas></div>
+      <div class="gauge-read"><b id="gSpeed">0</b><span id="gUnit">KB/s</span></div>
+      <div class="gauge-sub" id="gSub"></div>
+    </div>
+  </nav>
+
+  <main class="list" id="list" tabindex="0" aria-live="polite"></main>
+
+  <aside class="detail" id="detail" aria-label="التفاصيل"></aside>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<dialog id="addDlg">
+  <form method="dialog" id="addForm">
+    <h2 data-i="addTitle">تحميل جديد</h2>
+    <label class="field"><span data-i="urls">الرابط (أو عدة روابط، كل رابط في سطر)</span>
+      <textarea id="aUrl" rows="3" dir="ltr" spellcheck="false" placeholder="https://example.com/file.zip"></textarea></label>
+    <div class="probe" id="aProbe" hidden>
+      <div class="probe-main"><input id="aName" dir="auto" aria-label="اسم الملف"><span class="chip" id="aMeta"></span></div>
+      <div class="probe-sub" id="aSub"></div>
+    </div>
+    <div class="row2">
+      <label class="field"><span data-i="saveTo">حفظ في</span>
+        <div class="dir-pick"><input id="aDir" dir="ltr" readonly><button type="button" class="btn" id="aBrowse" data-i="browse">استعراض</button></div></label>
+      <label class="field narrow"><span data-i="conns">الاتصالات</span>
+        <select id="aConns"><option>1</option><option>2</option><option>4</option><option selected>8</option><option>16</option><option>32</option></select></label>
+    </div>
+    <div class="row2 when">
+      <label class="check"><input type="radio" name="aWhen" value="now" checked><span data-i="startNow">ابدأ الآن</span></label>
+      <label class="check"><input type="radio" name="aWhen" value="later"><span data-i="later">حمّل لاحقاً</span></label>
+      <label class="check"><input type="radio" name="aWhen" value="sched"><span data-i="sched">جدولة</span></label>
+      <input type="datetime-local" id="aAt" disabled>
+    </div>
+    <div class="err" id="aErr" hidden></div>
+    <div class="actions">
+      <button type="button" class="btn" id="aCancel" data-i="cancel">إلغاء</button>
+      <button type="submit" class="btn primary" id="aGo" data-i="download">تحميل</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="setDlg">
+  <form method="dialog" id="setForm">
+    <h2 data-i="settings">الإعدادات</h2>
+    <label class="field"><span data-i="saveTo">حفظ في</span>
+      <div class="dir-pick"><input id="sDir" dir="ltr" readonly><button type="button" class="btn" id="sBrowse" data-i="browse">استعراض</button></div></label>
+    <div class="grid2">
+      <label class="field"><span data-i="conns">الاتصالات</span><input type="number" id="sConns" min="1" max="32"></label>
+      <label class="field"><span data-i="maxActive">تحميلات متزامنة</span><input type="number" id="sMax" min="1" max="10"></label>
+      <label class="field"><span data-i="limit">حد السرعة (KB/s، 0 = بلا حد)</span><input type="number" id="sLimit" min="0"></label>
+      <label class="field"><span data-i="retries">إعادة المحاولة</span><input type="number" id="sRetries" min="0" max="20"></label>
+      <label class="field"><span data-i="theme">المظهر</span><select id="sTheme"><option value="dark" data-i="dark">داكن</option><option value="light" data-i="light">فاتح</option></select></label>
+      <label class="field"><span data-i="lang">اللغة</span><select id="sLang"><option value="ar">العربية</option><option value="en">English</option></select></label>
+    </div>
+    <label class="check"><input type="checkbox" id="sCat"><span data-i="autoCat">ترتيب الملفات في مجلدات حسب النوع</span></label>
+    <label class="check"><input type="checkbox" id="sClip"><span data-i="watchClip">اقتراح التحميل عند نسخ رابط ملف</span></label>
+    <div class="actions">
+      <button type="button" class="btn" id="sCancel" data-i="cancel">إلغاء</button>
+      <button type="submit" class="btn primary" data-i="save">حفظ</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

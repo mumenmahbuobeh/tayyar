@@ -1,0 +1,51 @@
+{
+  "name": "tayyar-download-manager",
+  "productName": "Tayyar",
+  "version": "1.0.0",
+  "description": "تيّار — مدير تحميلات حديث متعدد الاتصالات",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/engine.test.js",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux",
+    "dist:mac": "electron-builder --mac"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.mahbuobeh.tayyar",
+    "productName": "Tayyar",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**",
+      "renderer/**",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Network"
+    }
+  }
+}
