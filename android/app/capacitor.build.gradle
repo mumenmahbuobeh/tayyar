@@ -7,7 +7,15 @@ android {
   }
 }
 
-apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
+if (file("../capacitor-cordova-android-plugins/cordova.variables.gradle").exists()) {
+    apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
+} else {
+    ext {
+        cdvMinSdkVersion = project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 24
+        cdvPluginPostBuildExtras = []
+        cordovaConfig = [:]
+    }
+}
 dependencies {
 
 

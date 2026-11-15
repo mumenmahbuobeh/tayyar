@@ -37,7 +37,7 @@ function createWindow() {
   console.log('createWindow called');
   const t = THEMES[mgr.settings.theme] || THEMES.dark;
   win = new BrowserWindow({
-    width: 1320, height: 820, minWidth: 920, minHeight: 560,
+    width: 1320, height: 820, minWidth: 800, minHeight: 520,
     show: true, title: 'تيّار', backgroundColor: t.color,
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false },
   });

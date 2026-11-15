@@ -442,6 +442,8 @@
     if (targetPanel) {
       targetPanel.classList.add('active');
     }
+    const mc = $('#mainContent');
+    if (mc) mc.scrollTop = 0;
   }
 
   $$('.nav-item').forEach((btn) => {

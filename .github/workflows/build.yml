@@ -48,10 +48,15 @@ jobs:
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
             npm run dist:win
+            cp dist/Tayyar-Setup-*.exe dist/Tayyar.Setup.1.0.0.exe 2>/dev/null || true
+            cp dist/Tayyar-1.0.0.exe dist/Tayyar.1.0.0.exe 2>/dev/null || true
           elif [ "${{ runner.os }}" = "macOS" ]; then
             npm run dist:mac
+            cp dist/Tayyar-*.dmg dist/Tayyar-1.0.0.dmg 2>/dev/null || true
           else
             npm run dist:linux
+            cp dist/*.deb dist/tayyar_1.0.0_amd64.deb 2>/dev/null || true
+            cp dist/*.AppImage dist/Tayyar-1.0.0.AppImage 2>/dev/null || true
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -109,6 +114,17 @@ jobs:
             yes | "$SDK_BIN" --sdk_root="$ANDROID_HOME" "platforms;android-35" "build-tools;35.0.0" || true
           fi
 
+      - name: Ensure Android Cordova variables stub
+        run: |
+          mkdir -p android/capacitor-cordova-android-plugins
+          cat << 'EOF' > android/capacitor-cordova-android-plugins/cordova.variables.gradle
+          ext {
+            cdvMinSdkVersion = project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 24
+            cdvPluginPostBuildExtras = []
+            cordovaConfig = [:]
+          }
+          EOF
+
       - name: Build Android APK
         run: |
           cd android
@@ -118,7 +134,12 @@ jobs:
       - name: Rename & Prepare APK
         run: |
           mkdir -p build-apk
-          cp android/app/build/outputs/apk/debug/app-debug.apk build-apk/Tayyar-Android-v1.0.0.apk
+          APK_FILE=$(find android/app/build/outputs/apk -type f -name "*.apk" | head -n 1)
+          if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
+            cp "$APK_FILE" build-apk/Tayyar-Android-v1.0.0.apk
+          else
+            echo "Error: APK file not found!" && exit 1
+          fi
 
       - name: Upload Android APK Artifact
         uses: actions/upload-artifact@v4
@@ -150,10 +171,15 @@ jobs:
         run: |
           cd ios/App
           pod install --repo-update || pod install
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" clean archive -archivePath build/App.xcarchive
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -destination 'generic/platform=iOS' -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" clean build
           mkdir -p build/Payload
-          cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/
-          cd build && zip -r ../../../Tayyar-iOS-v1.0.0.ipa Payload
+          APP_PATH=$(find build/Build/Products -name "*.app" -type d | head -n 1)
+          if [ -n "$APP_PATH" ] && [ -d "$APP_PATH" ]; then
+            cp -r "$APP_PATH" build/Payload/
+            cd build && zip -r ../../../Tayyar-iOS-v1.0.0.ipa Payload
+          else
+            echo "Error: iOS .app bundle not found!" && exit 1
+          fi
 
       - name: Upload iOS IPA Artifact
         uses: actions/upload-artifact@v4

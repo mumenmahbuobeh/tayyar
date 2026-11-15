@@ -2,7 +2,10 @@
   "name": "tayyar-download-manager",
   "productName": "Tayyar",
   "version": "1.0.0",
-  "author": "Mu'men Mahbuobeh",
+  "author": {
+    "name": "Mu'men Mahbuobeh",
+    "email": "mumenmahbuobeh@users.noreply.github.com"
+  },
   "description": "Tayyar — Next-Generation Open Source Multi-Connection Download Manager",
   "homepage": "https://github.com/mumenmahbuobeh/tayyar",
   "repository": {
@@ -57,11 +60,18 @@
       "category": "public.app-category.utilities"
     },
     "linux": {
+      "maintainer": "Mu'men Mahbuobeh <mumenmahbuobeh@users.noreply.github.com>",
       "target": [
         "AppImage",
         "deb"
       ],
-      "category": "Network"
+      "category": "Network",
+      "deb": {
+        "artifactName": "tayyar_${version}_${arch}.${ext}"
+      },
+      "appImage": {
+        "artifactName": "Tayyar-${version}.${ext}"
+      }
     }
   },
   "dependencies": {
