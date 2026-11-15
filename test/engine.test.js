@@ -43,7 +43,7 @@ const waitFor = (mgr, id, status, ms = 30000) => new Promise((res, rej) => {
   const iv = setInterval(() => {
     const d = mgr.list().find((x) => x.id === id);
     if (d && d.status === status) { clearInterval(iv); res(d); }
-    else if (Date.now() - t0 > ms) { clearInterval(iv); rej(new Error(`timeout waiting for ${status} (now ${d && d.status})`)); }
+    else if (Date.now() - t0 > ms) { clearInterval(iv); rej(new Error(`timeout waiting for ${status} (now ${d && d.status}, error: ${d && d.error})`)); }
   }, 50);
 });
 const mk = () => {

@@ -2,7 +2,7 @@
 const { app, BrowserWindow, ipcMain, dialog, shell, Notification, clipboard, Menu } = require('electron');
 const path = require('path');
 const http = require('http');
-const { DownloadManager } = require('./engine');
+const { DownloadManager, isDownloadableUrl } = require('./engine');
 
 const BRIDGE_PORT = 6824;
 const THEMES = {
@@ -85,14 +85,16 @@ function startBridge() {
   srv.listen(BRIDGE_PORT, '127.0.0.1');
 }
 
-/** Suggest a download when a file link is copied (IDM-style clipboard monitoring). */
+/** Suggest a download when a file link is copied (IDM-style clipboard monitoring for 200+ formats). */
 function watchClipboard() {
   let last = '';
-  const fileLink = /^https?:\/\/\S+\.(zip|rar|7z|tar|gz|iso|exe|msi|dmg|pkg|deb|apk|mp4|mkv|avi|mov|webm|mp3|flac|wav|pdf|docx?|xlsx?|pptx?)(\?\S*)?$/i;
   setInterval(() => {
-    if (!mgr.settings.watchClipboard) return;
+    if (!mgr || !mgr.settings || !mgr.settings.watchClipboard) return;
     const text = clipboard.readText().trim();
-    if (text && text !== last && fileLink.test(text)) { last = text; send('ui:clip-url', { url: text }); }
+    if (text && text !== last && isDownloadableUrl(text)) {
+      last = text;
+      send('ui:clip-url', { url: text });
+    }
   }, 1200);
 }
 

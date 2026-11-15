@@ -140,6 +140,12 @@
       install: 'Install',
       openFolder: 'Open Extension Folder',
       done: 'Done',
+      fileTypesTitle: 'Supported File Types (200+ Formats)',
+      fileTypesDesc: 'Universal format auto-capture list',
+      fileTypesHint: 'Downloads automatically sorted into organized folders (Video, Music, Compressed, Documents, Programs, 3D-Models, AI-Datasets, Images, Games-ROMs).',
+      globalServersTitle: 'Global Server Compatibility',
+      globalServersBypass: 'Universal Regional Server Compatibility',
+      globalServersDesc: 'Bypass regional CA restrictions (Russian domestic CAs, Chinese CDNs, Iranian national gateways) & anti-hotlink blocks without SSL termination errors.',
     },
     ar: {
       dashboard: 'لوحة التحكم',
@@ -276,6 +282,12 @@
       install: 'تثبيت',
       openFolder: 'فتح مجلد الإضافة',
       done: 'تم',
+      fileTypesTitle: 'صيغ وتنسيقات الملفات المدعومة (أكثر من 200 صيغة)',
+      fileTypesDesc: 'قائمة الالتقاط التلقائي الشاملة لجميع الصيغ',
+      fileTypesHint: 'يتم فرز التنزيلات آلياً داخل مجلدات مخصصة (فيديو، صوتيات، مضغوطات، مستندات، برامج، نماذج ثلاثية الأبعاد، بيانات الذكاء الاصطناعي، صور، ألعاب).',
+      globalServersTitle: 'توافق السيرفرات الإقليمية والعالمية',
+      globalServersBypass: 'توافق كامل مع السيرفرات العالمية (روسيا، الصين، إيران)',
+      globalServersDesc: 'تجاوز قيود الشهادات الإقليمية (الروسية GOST، الصينية، والبوابات الوطنية الإيرانية) وروابط منع السرقة (Anti-Hotlink) دون انقطاع التحميل.',
     },
   };
 

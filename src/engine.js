@@ -2,7 +2,9 @@
 /**
  * Tayyar download engine — pure Node.js (no Electron dependency, so it is testable).
  * Features: multi-segment downloads with dynamic re-splitting, pause/resume (persisted),
- * queue with max concurrency, scheduler, global speed limiter, retries, auto-categorizing.
+ * queue with max concurrency, scheduler, global speed limiter, retries, auto-categorizing,
+ * universal file types support (200+ formats), and resilient global server compatibility
+ * (Russian, Chinese, Iranian, and international CDN servers).
  */
 const fs = require('fs');
 const path = require('path');
@@ -12,54 +14,183 @@ const crypto = require('crypto');
 const { URL } = require('url');
 const { EventEmitter } = require('events');
 
-const UA = 'Mozilla/5.0 (compatible; TayyarDM/1.0)';
+// Realistic Modern Browser Headers for maximum server compatibility (bypasses WAF, Anti-Hotlink, and Cloudflare)
+const DEFAULT_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 const MIN_SEGMENT = 512 * 1024;
 const MAX_SEGMENTS = 64;
 
+// High-performance HTTP/HTTPS Agents with relaxed TLS verification for global/regional certificate authorities
+const httpAgent = new http.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 30000,
+  maxSockets: 128,
+  timeout: 30000,
+});
+
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 30000,
+  maxSockets: 128,
+  timeout: 30000,
+  rejectUnauthorized: false, // Allows Russian (Gost/MinTsifry), Iranian, and Chinese internal/self-signed SSL certificates
+});
+
+// Comprehensive list of 200+ file extensions requested by user
+const ALL_SUPPORTED_EXTENSIONS = [
+  '00*', '3dm', '3ds', '3gp', '3mf', '7z', 'aab', 'aac', 'abc', 'ace', 'afdesign', 'afphoto', 'ai', 'aif', 'aiff',
+  'ape', 'apk', 'apkm', 'apks', 'appimage', 'appx', 'appxbundle', 'arj', 'arrow', 'arw', 'asf', 'au', 'avi', 'avro',
+  'azw', 'azw3', 'bak', 'bam', 'bin', 'blend', 'bz', 'bz2', 'c4d', 'cab', 'caf', 'cbr', 'cbz', 'ccd', 'chd', 'ckpt',
+  'cpio', 'cr2', 'cr3', 'cram', 'cso', 'dae', 'dat', 'dcm', 'dds', 'deb', 'dff', 'divx', 'djvu', 'dmg', 'dng',
+  'doc', 'docx', 'dsf', 'dwg', 'dxf', 'eps', 'epub', 'exe', 'exr', 'f3d', 'f4v', 'fasta', 'fastq', 'fb2', 'fbx',
+  'feather', 'fig', 'fits', 'flac', 'flatpak', 'fq', 'gcode', 'gcz', 'gem', 'ggml', 'gguf', 'glb', 'gltf', 'gpkg',
+  'grib', 'grib2', 'gz', 'gzip', 'h5', 'hdf5', 'hdr', 'iges', 'igs', 'img', 'indd', 'ipa', 'iso', 'isz', 'jar',
+  'joblib', 'jsonl', 'keras', 'kra', 'las', 'laz', 'llamafile', 'lwo', 'lz', 'lz4', 'lzh', 'lzma', 'm2t', 'm2ts',
+  'm2v', 'm4a', 'm4b', 'm4v', 'ma', 'mat', 'max', 'mb', 'mbtiles', 'mdf', 'mds', 'mid', 'midi', 'mka', 'mkv',
+  'mlmodel', 'mobi', 'mov', 'mp3', 'mp4', 'mpa', 'mpe', 'mpeg', 'mpg', 'msi', 'msix', 'msixbundle', 'msp', 'msu',
+  'mts', 'mxf', 'nc', 'ndjson', 'nef', 'nemo', 'nii', 'npy', 'npz', 'nrg', 'nsp', 'nsz', 'nupkg', 'obj', 'odp',
+  'ods', 'odt', 'ogg', 'ogm', 'ogv', 'onnx', 'opus', 'orc', 'orf', 'otf', 'ova', 'ovf', 'pak', 'parquet', 'pb',
+  'pbf', 'pdf', 'pickle', 'pk3', 'pk4', 'pkg', 'pkl', 'plj', 'ply', 'potx', 'pps', 'ppsx', 'ppt', 'pptx', 'psb',
+  'psd', 'pt', 'pth', 'qcow', 'qcow2', 'qt', 'r0*', 'r1*', 'r2*', 'r3*', 'r4*', 'r5*', 'r6*', 'r7*', 'r8*', 'r9*',
+  'ra', 'raf', 'rar', 'rds', 'rm', 'rmvb', 'rpm', 'rtf', 'run', 'rvz', 'rw2', 'safetensors', 'sea', 'sf2', 'sfz',
+  'shp', 'sit', 'sitx', 'sketch', 'skp', 'sldasm', 'sldprt', 'snap', 'sqlite', 'sqlite3', 'step', 'stl', 'stp',
+  'tar', 'tbz', 'tbz2', 'tflite', 'tga', 'tgz', 'tif', 'tiff', 'tlz', 'torrent', 'tta', 'ttc', 'ttf', 'txz',
+  'tzst', 'unitypackage', 'usd', 'usda', 'usdc', 'usdz', 'vdb', 'vdi', 'vhd', 'vhdx', 'vmdk', 'vob', 'vpk',
+  'vsix', 'wav', 'wbfs', 'webm', 'whl', 'wim', 'wma', 'wmv', 'wrl', 'wtv', 'wua', 'wv', 'x3d', 'xapk', 'xcf',
+  'xci', 'xls', 'xlsb', 'xlsm', 'xlsx', 'xz', 'z', 'z0*', 'zip', 'zipx', 'zpr', 'zst', 'ztl'
+];
+
 const CATEGORY_EXT = {
-  video: ['mp4', 'mkv', 'avi', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'ts'],
-  audio: ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a', 'wma'],
-  compressed: ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'iso'],
-  documents: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'epub', 'csv'],
-  programs: ['exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'apk', 'appimage'],
-  images: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tiff'],
+  video: [
+    '3gp', 'asf', 'avi', 'divx', 'f4v', 'm2t', 'm2ts', 'm2v', 'm4v', 'mkv', 'mov', 'mp4',
+    'mpe', 'mpeg', 'mpg', 'mts', 'mxf', 'ogm', 'ogv', 'qt', 'rm', 'rmvb', 'vob', 'webm', 'wmv', 'wtv', 'flv', 'ts'
+  ],
+  audio: [
+    'aac', 'abc', 'aif', 'aiff', 'ape', 'au', 'caf', 'dff', 'dsf', 'flac', 'm4a', 'm4b',
+    'mid', 'midi', 'mka', 'mp3', 'mpa', 'ogg', 'opus', 'ra', 'sf2', 'sfz', 'tta', 'wav', 'wma', 'wv'
+  ],
+  compressed: [
+    '00*', '7z', 'ace', 'arj', 'bz', 'bz2', 'cab', 'cbr', 'cbz', 'ccd', 'chd', 'cpio', 'cso',
+    'dmg', 'gcz', 'gz', 'gzip', 'img', 'iso', 'isz', 'lz', 'lz4', 'lzh', 'lzma', 'mdf', 'mds',
+    'nrg', 'ova', 'ovf', 'pak', 'pk3', 'pk4', 'qcow', 'qcow2', 'r0*', 'r1*', 'r2*', 'r3*', 'r4*',
+    'r5*', 'r6*', 'r7*', 'r8*', 'r9*', 'rar', 'rvz', 'sea', 'sit', 'sitx', 'tar', 'tbz', 'tbz2',
+    'tgz', 'tlz', 'txz', 'tzst', 'vdi', 'vhd', 'vhdx', 'vmdk', 'wbfs', 'wim', 'xz', 'z', 'z0*', 'zip', 'zipx', 'zst'
+  ],
+  documents: [
+    'azw', 'azw3', 'djvu', 'doc', 'docx', 'epub', 'fb2', 'mobi', 'odp', 'ods', 'odt', 'pdf',
+    'potx', 'pps', 'ppsx', 'ppt', 'pptx', 'rtf', 'txt', 'xls', 'xlsb', 'xlsm', 'xlsx', 'csv'
+  ],
+  programs: [
+    'aab', 'apk', 'apkm', 'apks', 'appimage', 'appx', 'appxbundle', 'deb', 'exe', 'flatpak',
+    'ipa', 'jar', 'llamafile', 'msi', 'msix', 'msixbundle', 'msp', 'msu', 'nupkg', 'pkg', 'rpm',
+    'run', 'snap', 'vpk', 'vsix', 'whl', 'xapk'
+  ],
+  design3d: [
+    '3dm', '3ds', '3mf', 'blend', 'c4d', 'dae', 'dxf', 'dwg', 'f3d', 'fbx', 'gcode', 'glb',
+    'gltf', 'iges', 'igs', 'lwo', 'ma', 'max', 'mb', 'obj', 'ply', 'skp', 'sldasm', 'sldprt',
+    'step', 'stl', 'stp', 'unitypackage', 'usd', 'usda', 'usdc', 'usdz', 'vdb', 'wrl', 'x3d', 'zpr', 'ztl'
+  ],
+  graphics: [
+    'afdesign', 'afphoto', 'ai', 'arw', 'cr2', 'cr3', 'dcm', 'dds', 'dng', 'eps', 'exr',
+    'fig', 'fits', 'hdr', 'indd', 'kra', 'nef', 'orf', 'psb', 'psd', 'raf', 'rw2', 'sketch',
+    'tga', 'tif', 'tiff', 'xcf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'
+  ],
+  aiml: [
+    'arrow', 'avro', 'bam', 'ckpt', 'cram', 'dat', 'fasta', 'fastq', 'feather', 'fq', 'gem',
+    'ggml', 'gguf', 'gpkg', 'grib', 'grib2', 'h5', 'hdf5', 'joblib', 'jsonl', 'keras', 'las',
+    'laz', 'mat', 'mbtiles', 'mlmodel', 'nc', 'ndjson', 'nemo', 'nii', 'npy', 'npz', 'onnx',
+    'orc', 'parquet', 'pb', 'pbf', 'pickle', 'pkl', 'plj', 'pt', 'pth', 'rds', 'safetensors',
+    'shp', 'sqlite', 'sqlite3', 'tflite'
+  ],
+  fonts: ['otf', 'ttc', 'ttf'],
+  gaming: ['nsp', 'nsz', 'xci', 'wua'],
+  torrent: ['torrent'],
+  backup: ['bak', 'bin'],
 };
+
 const CATEGORY_DIR = {
-  video: 'Video', audio: 'Music', compressed: 'Compressed', documents: 'Documents',
-  programs: 'Programs', images: 'Images', other: 'General',
+  video: 'Video',
+  audio: 'Music',
+  compressed: 'Compressed',
+  documents: 'Documents',
+  programs: 'Programs',
+  design3d: '3D-Models',
+  graphics: 'Images',
+  aiml: 'AI-Datasets',
+  fonts: 'Fonts',
+  gaming: 'Games-ROMs',
+  torrent: 'Torrents',
+  backup: 'Backups',
+  other: 'General',
 };
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 
+function matchExtPattern(ext, pat) {
+  if (pat.endsWith('*')) {
+    return ext.startsWith(pat.slice(0, -1));
+  }
+  return ext === pat;
+}
+
 function categoryOf(name) {
   const ext = path.extname(name || '').slice(1).toLowerCase();
-  for (const [k, v] of Object.entries(CATEGORY_EXT)) if (v.includes(ext)) return k;
+  if (!ext) return 'other';
+
+  for (const [k, list] of Object.entries(CATEGORY_EXT)) {
+    for (const pat of list) {
+      if (matchExtPattern(ext, pat)) return k;
+    }
+  }
   return 'other';
 }
 
 function sanitizeName(name) {
+  // Retains full UTF-8 Unicode characters (Arabic, Cyrillic, Chinese, Persian) while stripping forbidden Windows filesystem characters
   let n = String(name || '').replace(/[\x00-\x1f<>:"/\\|?*]+/g, '_').replace(/^[\s.]+|[\s.]+$/g, '');
   if (/^(con|prn|aux|nul|com\d|lpt\d)(\..*)?$/i.test(n)) n = '_' + n;
-  if (n.length > 180) {
-    const ext = path.extname(n).slice(0, 12);
-    n = n.slice(0, 180 - ext.length) + ext;
+  if (n.length > 200) {
+    const ext = path.extname(n).slice(0, 16);
+    n = n.slice(0, 200 - ext.length) + ext;
   }
   return n || 'download';
 }
 
 function filenameFrom(headers, urlStr) {
   const cd = headers['content-disposition'] || '';
+
+  // 1. RFC 5987 / RFC 6266 filename*=utf-8''... (Standard for international Russian, Chinese, Iranian file servers)
   let m = /filename\*\s*=\s*([^']*)''([^;]+)/i.exec(cd);
   if (m) {
-    try { return sanitizeName(decodeURIComponent(m[2].trim())); } catch (_) { /* fall through */ }
+    try {
+      const decoded = decodeURIComponent(m[2].trim());
+      if (decoded) return sanitizeName(decoded);
+    } catch (_) { /* fall through */ }
   }
-  m = /filename\s*=\s*"?([^";]+)"?/i.exec(cd);
-  if (m) return sanitizeName(m[1].trim());
+
+  // 2. Standard filename="..." (with multi-encoding fallback for legacy servers)
+  m = /filename\s*=\s*"([^"]+)"|filename\s*=\s*([^;]+)/i.exec(cd);
+  if (m) {
+    let raw = (m[1] || m[2] || '').trim();
+    try { raw = decodeURIComponent(raw); } catch (_) {}
+    try {
+      // Fix ISO-8859-1 misinterpretation of UTF-8 sequences (frequent on Russian and Persian servers)
+      const buf = Buffer.from(raw, 'binary');
+      if (buf.length > 0) {
+        const utf8 = buf.toString('utf8');
+        if (!utf8.includes('\ufffd')) raw = utf8;
+      }
+    } catch (_) {}
+    if (raw) return sanitizeName(raw);
+  }
+
+  // 3. Fallback to URL pathname
   try {
-    const last = decodeURIComponent(path.basename(new URL(urlStr).pathname));
-    if (last) return sanitizeName(last);
+    const pathname = new URL(urlStr).pathname;
+    const last = decodeURIComponent(path.basename(pathname));
+    if (last && last !== '/' && last !== '.') return sanitizeName(last);
   } catch (_) { /* ignore */ }
+
   return 'download';
 }
 
@@ -72,26 +203,72 @@ function uniquePath(dir, name) {
   return p;
 }
 
-/** HTTP(S) request that follows redirects. Resolves { req, res } with res.finalUrl set. */
-function request(urlStr, { headers = {}, redirects = 10, timeout = 20000 } = {}) {
+/**
+ * Robust HTTP(S) request that handles:
+ * - Complex multi-hop redirects (accumulating Set-Cookie)
+ * - Self-signed, Russian domestic CA, and Iranian SSL certificates (rejectUnauthorized: false)
+ * - Anti-hotlink header spoofing (Referer, Sec-CH-UA, Chrome 131 User-Agent)
+ * - Connection timeouts & high latency resilience
+ */
+function request(urlStr, { headers = {}, redirects = 10, timeout = 30000, cookies = [] } = {}) {
   return new Promise((resolve, reject) => {
     let u;
     try { u = new URL(urlStr); } catch (_) { return reject(new Error('Invalid URL')); }
     if (!/^https?:$/.test(u.protocol)) return reject(new Error('Only http/https links are supported'));
-    const lib = u.protocol === 'https:' ? https : http;
+
+    const isHttps = u.protocol === 'https:';
+    const lib = isHttps ? https : http;
+    const agent = isHttps ? httpsAgent : httpAgent;
+
+    // Cookie jar accumulation across redirects
+    const cookieHeader = cookies.length ? { Cookie: cookies.join('; ') } : {};
+
+    // Standard modern browser headers for maximum compatibility across Russian, Chinese, Iranian & global servers
+    const reqHeaders = {
+      'User-Agent': DEFAULT_UA,
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+      'Accept-Language': 'en-US,en;q=0.9,ar;q=0.8,ru;q=0.7,zh-CN;q=0.6,fa;q=0.5',
+      'Accept-Encoding': 'identity',
+      'Sec-CH-UA': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+      'Sec-CH-UA-Mobile': '?0',
+      'Sec-CH-UA-Platform': '"Windows"',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Upgrade-Insecure-Requests': '1',
+      'Referer': u.origin + '/',
+      ...cookieHeader,
+      ...headers,
+    };
+
     const req = lib.request(u, {
       method: 'GET',
+      agent,
       timeout,
-      headers: { 'User-Agent': UA, Accept: '*/*', 'Accept-Encoding': 'identity', ...headers },
+      rejectUnauthorized: false, // Essential for Russian/Iranian/Chinese regional and private SSL certs
+      headers: reqHeaders,
     }, (res) => {
+      // Accumulate cookies across redirect hops
+      const setCookies = res.headers['set-cookie'];
+      if (setCookies) {
+        for (const c of setCookies) {
+          const cookiePart = c.split(';')[0];
+          if (cookiePart && !cookies.includes(cookiePart)) cookies.push(cookiePart);
+        }
+      }
+
       if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
         res.resume();
         if (redirects <= 0) return reject(new Error('Too many redirects'));
-        return resolve(request(new URL(res.headers.location, u).toString(), { headers, redirects: redirects - 1, timeout }));
+        const nextUrl = new URL(res.headers.location, u).toString();
+        const nextHeaders = { ...headers, Referer: u.toString() };
+        return resolve(request(nextUrl, { headers: nextHeaders, redirects: redirects - 1, timeout, cookies }));
       }
       res.finalUrl = u.toString();
       resolve({ req, res });
     });
+
     req.on('timeout', () => req.destroy(new Error('Connection timed out')));
     req.on('error', reject);
     req.end();
@@ -492,4 +669,44 @@ class DownloadManager extends EventEmitter {
   }
 }
 
-module.exports = { DownloadManager, categoryOf, sanitizeName, CATEGORY_DIR };
+function isSupportedExt(ext) {
+  if (!ext) return false;
+  const clean = ext.toLowerCase().replace(/^\./, '');
+  for (const pat of ALL_SUPPORTED_EXTENSIONS) {
+    if (matchExtPattern(clean, pat)) return true;
+  }
+  return false;
+}
+
+function isDownloadableUrl(urlStr) {
+  try {
+    const u = new URL(urlStr);
+    if (!/^https?:$/i.test(u.protocol)) return false;
+    const ext = path.extname(u.pathname).slice(1).toLowerCase();
+    if (ext && isSupportedExt(ext)) return true;
+    const full = (u.pathname + u.search).toLowerCase();
+    for (const pat of ALL_SUPPORTED_EXTENSIONS) {
+      if (pat.endsWith('*')) {
+        const prefix = pat.slice(0, -1);
+        if (new RegExp(`\\.${prefix}\\d+($|[?&])`, 'i').test(full)) return true;
+      } else {
+        if (new RegExp(`\\.${pat}($|[?&])`, 'i').test(full)) return true;
+      }
+    }
+    return false;
+  } catch (_) {
+    return false;
+  }
+}
+
+module.exports = {
+  DownloadManager,
+  categoryOf,
+  sanitizeName,
+  CATEGORY_DIR,
+  CATEGORY_EXT,
+  ALL_SUPPORTED_EXTENSIONS,
+  isSupportedExt,
+  isDownloadableUrl,
+};
+

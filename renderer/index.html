@@ -916,6 +916,13 @@
         <button type="button" class="pill-btn light sm sim-preset" data-val="20">20</button>
         <button type="button" class="pill-btn light sm sim-preset" data-val="30">30</button>
       </div>
+
+      <div class="settings-group-title" style="margin-top:20px;" data-i="fileTypesTitle">Supported File Types (200+ Formats)</div>
+      <label class="field-label">
+        <span data-i="fileTypesDesc">Universal format auto-capture list</span>
+        <textarea id="cfgFileTypes" class="styled-textarea" rows="4" readonly style="font-family:monospace;font-size:11px;line-height:1.6;resize:none;color:var(--color-cyan);background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;width:100%;margin-top:4px;">00* 3DM 3DS 3GP 3MF 7Z AAB AAC ABC ACE AFDESIGN AFPHOTO AI AIF AIFF APE APK APKM APKS APPIMAGE APPX APPXBUNDLE ARJ ARROW ARW ASF AU AVI AVRO AZW AZW3 BAK BAM BIN BLEND BZ BZ2 C4D CAB CAF CBR CBZ CCD CHD CKPT CPIO CR2 CR3 CRAM CSO DAE DAT DCM DDS DEB DFF DIVX DJVU DMG DNG DOC DOCX DSF DWG DXF EPS EPUB EXE EXR F3D F4V FASTA FASTQ FB2 FBX FEATHER FIG FITS FLAC FLATPAK FQ GCODE GCZ GEM GGML GGUF GLB GLTF GPKG GRIB GRIB2 GZ GZIP H5 HDF5 HDR IGES IGS IMG INDD IPA ISO ISZ JAR JOBLIB JSONL KERAS KRA LAS LAZ LLAMAFILE LWO LZ LZ4 LZH LZMA M2T M2TS M2V M4A M4B M4V MA MAT MAX MB MBTILES MDF MDS MID MIDI MKA MKV MLMODEL MOBI MOV MP3 MP4 MPA MPE MPEG MPG MSI MSIX MSIXBUNDLE MSP MSU MTS MXF NC NDJSON NEF NEMO NII NPY NPZ NRG NSP NSZ NUPKG OBJ ODP ODS ODT OGG OGM OGV ONNX OPUS ORC ORF OTF OVA OVF PAK PARQUET PB PBF PDF PICKLE PK3 PK4 PKG PKL PLJ PLY POTX PPS PPSX PPT PPTX PSB PSD PT PTH QCOW QCOW2 QT R0* R1* R2* R3* R4* R5* R6* R7* R8* R9* RA RAF RAR RDS RM RMVB RPM RTF RUN RVZ RW2 SAFETENSORS SEA SF2 SFZ SHP SIT SITX SKETCH SKP SLDASM SLDPRT SNAP SQLITE SQLITE3 STEP STL STP TAR TBZ TBZ2 TFLITE TGA TGZ TIF TIFF TLZ TORRENT TTA TTC TTF TXZ TZST UNITYPACKAGE USD USDA USDC USDZ VDB VDI VHD VHDX VMDK VOB VPK VSIX WAV WBFS WEBM WHL WIM WMA WMV WRL WTV WUA WV X3D XAPK XCF XCI XLS XLSB XLSM XLSX XZ Z Z0* ZIP ZIPX ZPR ZST ZTL</textarea>
+        <div class="row-hint" style="margin-top:4px;" data-i="fileTypesHint">Downloads automatically sorted into organized folders (Video, Music, Compressed, Documents, Programs, 3D-Models, AI-Datasets, Images, Games-ROMs).</div>
+      </label>
     </div>
     <div class="modal-foot">
       <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>
@@ -1174,6 +1181,15 @@
           <div class="row-hint">Ask the router to open the ports set in network settings.</div>
         </div>
         <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
+      </div>
+
+      <div class="settings-group-title" style="margin-top:20px;" data-i="globalServersTitle">Global Server Compatibility</div>
+      <div class="setting-toggle-row">
+        <div>
+          <span data-i="globalServersBypass">Universal Regional Server Compatibility</span>
+          <div class="row-hint" data-i="globalServersDesc">Bypass regional CA restrictions (Russian domestic CAs, Chinese CDNs, Iranian national gateways) &amp; anti-hotlink blocks without SSL termination errors.</div>
+        </div>
+        <label class="switch-toggle"><input type="checkbox" id="cfgGlobalBypass" checked><span class="switch-slider"></span></label>
       </div>
     </div>
     <div class="modal-foot">
