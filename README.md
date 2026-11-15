@@ -21,16 +21,16 @@
 
 ## 📥 Downloads & Binary Releases
 
-Download the ready-to-run packages for your operating system directly from [GitHub Releases](https://github.com/mumenmahbuobeh/tayyar/releases/latest):
+Download the official ready-to-run packages directly from [GitHub Releases v1.0.0](https://github.com/mumenmahbuobeh/tayyar/releases/tag/v1.0.0):
 
-| Platform | Format | Direct Download / Package | Status |
+| Platform | Format | Direct Download / Package | Release Status |
 | :--- | :--- | :--- | :--- |
-| **Windows** | `.exe` (Installer) | [Download Tayyar-Setup-1.0.0.exe](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
-| **Windows** | `.exe` (Portable) | [Download Tayyar-1.0.0-Portable.exe](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
-| **Android** | `.apk` (Mobile) | [Download Tayyar-Android-v1.0.0.apk](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
-| **Linux** | `.AppImage` | [Download Tayyar-1.0.0.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
-| **Linux** | `.deb` (Debian/Ubuntu) | [Download tayyar_1.0.0_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
-| **macOS** | `.dmg` (Universal) | [Download Tayyar-1.0.0.dmg](https://github.com/mumenmahbuobeh/tayyar/releases) | Stable |
+| **Windows** | `.exe` (Installer) | [📥 Download Tayyar Setup 1.0.0.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar.Setup.1.0.0.exe) | ✅ Available |
+| **Windows** | `.exe` (Portable) | [📥 Download Tayyar 1.0.0.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar.1.0.0.exe) | ✅ Available |
+| **Android** | `.apk` (Mobile) | [📱 Download Tayyar-Android-v1.0.0.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar-Android-v1.0.0.apk) | ✅ Available |
+| **macOS** | `.dmg` (Universal) | [🍎 Download Tayyar-1.0.0.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar-1.0.0.dmg) | ✅ Available |
+| **Linux** | `.AppImage` | [🐧 Download Tayyar-1.0.0.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar-1.0.0.AppImage) | ✅ Available |
+| **Linux** | `.deb` (Debian/Ubuntu) | [📦 Download tayyar_1.0.0_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/tayyar_1.0.0_amd64.deb) | ✅ Available |
 
 ---
 
