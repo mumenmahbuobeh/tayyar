@@ -146,6 +146,7 @@
       globalServersTitle: 'Global Server Compatibility',
       globalServersBypass: 'Universal Regional Server Compatibility',
       globalServersDesc: 'Bypass regional CA restrictions (Russian domestic CAs, Chinese CDNs, Iranian national gateways) & anti-hotlink blocks without SSL termination errors.',
+      sourceCode: 'Source Code (GitHub)',
     },
     ar: {
       dashboard: 'لوحة التحكم',
@@ -288,6 +289,7 @@
       globalServersTitle: 'توافق السيرفرات الإقليمية والعالمية',
       globalServersBypass: 'توافق كامل مع السيرفرات العالمية (روسيا، الصين، إيران)',
       globalServersDesc: 'تجاوز قيود الشهادات الإقليمية (الروسية GOST، الصينية، والبوابات الوطنية الإيرانية) وروابط منع السرقة (Anti-Hotlink) دون انقطاع التحميل.',
+      sourceCode: 'كود المصدر على GitHub (مفتوح المصدر)',
     },
   };
 
@@ -1041,6 +1043,21 @@
       }, 1000);
     });
   }
+
+  // Open external links safely via shell.openExternal
+  $$('.about-link, .about-nav-link').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      const url = link.getAttribute('href');
+      if (url && /^https?:\/\//i.test(url)) {
+        e.preventDefault();
+        if (window.tayyar?.openUrl) {
+          window.tayyar.openUrl(url);
+        } else {
+          window.open(url, '_blank');
+        }
+      }
+    });
+  });
 
   /* ---------------- BROWSER EXTENSION INSTALLATION MODAL ---------------- */
   let currentExtBrowser = 'chrome';

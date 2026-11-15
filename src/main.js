@@ -43,7 +43,10 @@ function createWindow() {
   win.webContents.on('did-fail-load', (_e, code, desc) => {
     console.error('did-fail-load error:', code, desc);
   });
-  win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//i.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
   win.webContents.on('will-navigate', (e) => e.preventDefault());
   win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
   win.on('closed', () => { win = null; });
