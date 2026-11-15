@@ -40,7 +40,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libarchive-tools icns-utils graphicsmagick
+          sudo apt-get install -y libarchive-tools desktop-file-utils
 
       - name: Build & Package Desktop Binaries
         shell: bash
@@ -82,6 +82,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -94,11 +97,14 @@ jobs:
       - name: Sync Capacitor Web Assets
         run: npx cap sync android
 
-      - name: Build Android APK (Debug / Unsigned Release)
+      - name: Accept Android SDK Licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      - name: Build Android APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon
 
       - name: Rename & Prepare APK
         run: |
@@ -114,7 +120,7 @@ jobs:
   publish-release:
     name: Create GitHub Release
     needs: [build-desktop, build-android]
-    if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+    if: always() && !cancelled() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
 
     steps:
