@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # تيّار — Tayyar Download Manager
 **برنامج تنزيل ملفات حديث فائق السرعة مفتوح المصدر لسطح المكتب (ويندوز، لينكس، ماك)**  
 **Modern, High-Speed, Open-Source Multi-Connection Desktop Download Manager**
@@ -56,3 +57,7 @@ npm run dist:mac
 ## ترخيص المشروع / License
 هذا المشروع مفتوح المصدر ومتاح بموجب ترخيص [MIT License](LICENSE).  
 Copyright (c) 2026 **Mu'men Mahbuobeh**.
+=======
+# tayyar
+tayyar 
+>>>>>>> f2bb87a23141228f1fb9b6ab1c40d7e70edc195c
