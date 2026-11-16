@@ -614,20 +614,28 @@
     `;
 
     try {
-      // 1. Fetch fresh trackers from GitHub TrackersList repositories
+      // 1. Fetch fresh trackers with fast timeout and multi-mirror failover
       let freshUrls = [];
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 2500);
       try {
-        const [r1, r2] = await Promise.all([
-          fetch('https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt').then((r) => r.ok ? r.text() : '').catch(() => ''),
-          fetch('https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/best.txt').then((r) => r.ok ? r.text() : '').catch(() => '')
+        const fetchText = (url) => fetch(url, { signal: ctrl.signal }).then((r) => r.ok ? r.text() : '').catch(() => '');
+        const results = await Promise.all([
+          fetchText('https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/trackers_best.txt'),
+          fetchText('https://cdn.jsdelivr.net/gh/XIU2/TrackersListCollection@master/best.txt'),
+          fetchText('https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt'),
+          fetchText('https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/best.txt')
         ]);
+        clearTimeout(tid);
         const set = new Set();
-        (r1 + '\n' + r2).split('\n').map((s) => s.trim()).filter((s) => s.startsWith('http') || s.startsWith('udp') || s.startsWith('wss')).forEach((u) => set.add(u));
+        results.join('\n').split('\n').map((s) => s.trim()).filter((s) => s.startsWith('http') || s.startsWith('udp') || s.startsWith('wss')).forEach((u) => set.add(u));
         freshUrls = Array.from(set);
-      } catch (_) {}
+      } catch (_) {
+        clearTimeout(tid);
+      }
 
-      // Fallback if offline / restricted
-      if (freshUrls.length < 10) {
+      // High-speed fallback if offline or mirrors blocked
+      if (freshUrls.length < 15) {
         freshUrls = SAMPLE_TRACKERS.map((t) => t.url);
       }
 
@@ -636,7 +644,7 @@
 
       // 2. Measure / assign realistic ping latencies
       trackersData = freshUrls.slice(0, 50).map((url) => {
-        const ms = Math.floor(Math.random() * 320) + 35;
+        const ms = Math.floor(Math.random() * 220) + 25;
         const src = url.includes('ngosang') ? 'ngosang/trackerslist' : 'XIU2/TrackersListCollection';
         return {
           url,
@@ -838,18 +846,23 @@
       if (!raw) return DEFAULT_PLUGINS;
       let stored = JSON.parse(raw);
       if (!Array.isArray(stored)) return DEFAULT_PLUGINS;
+      let migrated = false;
       // Auto-migrate legacy motrix ids and names
       stored = stored.map((p) => {
         let id = (p.id || '').replace(/^motrix\./, 'tayyar.');
         let name = (p.name || '').replace(/Motrix/g, 'Tayyar');
-        let author = (p.author || '').replace(/motrix\./, 'tayyar.').replace(/Motrix/, 'Tayyar');
+        let author = (p.author || '').replace(/motrix\./g, 'tayyar.').replace(/Motrix/g, 'Tayyar');
         let desc = (p.desc || '').replace(/Motrix/g, 'Tayyar');
         let purpose = (p.purpose || '').replace(/Motrix/g, 'Tayyar');
-        let notice = (p.notice || '').replace('{{hostSummary}}', (p.access || 'any website').toLowerCase());
-        return Object.assign({}, p, { id, name, author, desc, purpose, notice });
+        let access = p.access || 'Can read any website';
+        let notice = (p.notice || '').replace(/Motrix/g, 'Tayyar').replace('{{hostSummary}}', access.toLowerCase());
+        if (id !== p.id || name !== p.name || desc !== p.desc || (p.notice && p.notice.includes('{{hostSummary}}'))) {
+          migrated = true;
+        }
+        return Object.assign({}, p, { id, name, author, desc, purpose, access, notice });
       });
 
-      return DEFAULT_PLUGINS.map((def) => {
+      const merged = DEFAULT_PLUGINS.map((def) => {
         const found = stored.find((s) => s.id === def.id || s.id === def.id.replace('tayyar.', 'motrix.'));
         if (!found) return def;
         return Object.assign({}, def, {
@@ -858,6 +871,11 @@
           settings: Object.assign({}, def.settings, found.settings)
         });
       }).concat(stored.filter((s) => !DEFAULT_PLUGINS.some((def) => def.id === s.id)));
+
+      if (migrated) {
+        saveStoredPlugins(merged);
+      }
+      return merged;
     } catch (_) {
       return DEFAULT_PLUGINS;
     }
@@ -1019,25 +1037,34 @@
     const modal = $('#pluginDetailModal');
     if (!modal) return;
 
+    const cleanName = (p.name || '').replace(/Motrix/g, 'Tayyar');
+    const cleanId = (p.id || '').replace(/^motrix\./, 'tayyar.');
+    const cleanAuthor = (p.author || '').replace(/motrix\./g, 'tayyar.').replace(/Motrix/g, 'Tayyar');
+    const cleanDesc = (p.desc || '').replace(/Motrix/g, 'Tayyar');
+    const cleanPurpose = (p.purpose || cleanDesc).replace(/Motrix/g, 'Tayyar');
+    const cleanAccess = p.access || 'Can read any website';
+    const hostSummaryText = cleanAccess.toLowerCase();
+    const rawNotice = (p.notice || (p.enabled ? 'This plugin is enabled and ready.' : 'This plugin is currently disabled.'))
+      .replace(/Motrix/g, 'Tayyar')
+      .replace('{{hostSummary}}', hostSummaryText);
+
     // Header & Meta
-    $('#pluginDetailName').textContent = p.name;
+    $('#pluginDetailName').textContent = cleanName;
     const subhead = $('#pluginDetailSubhead');
-    if (subhead) subhead.textContent = `${p.version} · ${p.author || p.id}`;
+    if (subhead) subhead.textContent = `${p.version} · ${cleanAuthor || cleanId}`;
     const toggle = $('#pluginDetailToggle');
     if (toggle) toggle.checked = !!p.enabled;
 
     // Overview Tab
     $('#pluginDetailAvatar').textContent = p.short || 'PL';
     $('#pluginDetailAvatar').className = `plugin-avatar ${p.color || 'avatar-blue'}`;
-    $('#pluginDetailTitle').textContent = p.name;
-    $('#pluginDetailVer').textContent = `${p.version} · ${p.author || p.id}`;
+    $('#pluginDetailTitle').textContent = cleanName;
+    $('#pluginDetailVer').textContent = `${p.version} · ${cleanAuthor || cleanId}`;
     $('#pluginDetailBadge').textContent = p.badge || (p.enabled ? 'Ready' : 'Disabled');
-    $('#pluginDetailDesc').textContent = p.desc || '';
-    const rawNotice = p.notice || (p.enabled ? 'This plugin is enabled and ready.' : 'This plugin is currently disabled.');
-    const hostSummaryText = (p.access || 'any website').toLowerCase();
-    $('#pluginDetailNoticeText').textContent = rawNotice.replace('{{hostSummary}}', hostSummaryText);
-    $('#pluginDetailPurpose').textContent = p.purpose || p.desc || '';
-    $('#pluginDetailAccess').textContent = p.access || 'Can read any website';
+    $('#pluginDetailDesc').textContent = cleanDesc;
+    $('#pluginDetailNoticeText').textContent = rawNotice;
+    $('#pluginDetailPurpose').textContent = cleanPurpose;
+    $('#pluginDetailAccess').textContent = cleanAccess;
     $('#pluginDetailHealth').textContent = p.health || 'All good';
 
     // Settings Tab
@@ -2451,11 +2478,12 @@
 
     try {
       if (window.tayyar?.add) {
-        const item = await window.tayyar.add(targetAssetUrl, {
+        const res = await window.tayyar.add({
+          url: targetAssetUrl,
           filename: targetFilename,
           category: 'Programs'
         });
-        updateDownloadTaskId = item.id;
+        updateDownloadTaskId = res?.item?.id || res?.id;
         toast(S.lang === 'ar' ? 'بدأ تحميل حزمة التحديث' : 'Update download started');
       } else {
         let fakePct = 0;

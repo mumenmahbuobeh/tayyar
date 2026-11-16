@@ -124,8 +124,16 @@ function wireIpc() {
   h('probe', async (url, referer) => {
     try { return await mgr.probe(url, referer); } catch (e) { return { error: e.message }; }
   });
-  h('add', (opts) => {
-    try { return { ok: true, item: mgr.add(opts) }; } catch (e) { return { ok: false, error: e.message }; }
+  h('add', (opts, extra) => {
+    try {
+      let finalOpts = opts;
+      if (typeof opts === 'string') {
+        finalOpts = Object.assign({ url: opts }, extra || {});
+      }
+      return { ok: true, item: mgr.add(finalOpts) };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
   });
   h('pause', (ids) => ids.forEach((id) => mgr.pause(id)));
   h('resume', (ids) => ids.forEach((id) => mgr.resume(id)));
