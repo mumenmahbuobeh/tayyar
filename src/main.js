@@ -3,6 +3,7 @@ const { app, BrowserWindow, ipcMain, dialog, shell, Notification, clipboard, Men
 const path = require('path');
 const http = require('http');
 const { DownloadManager, isDownloadableUrl } = require('./engine');
+const social = require('./social');
 
 const BRIDGE_PORT = 6824;
 const THEMES = {
@@ -152,6 +153,22 @@ function wireIpc() {
       return { ok: true };
     }
     return { ok: false };
+  });
+  h('social:detect', (url) => social.detectPlatform(url));
+  h('social:resolve', async (url) => {
+    try {
+      return await social.resolveWithYtDlp(url);
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  });
+  h('ytdlp:check', async () => social.isYtDlpAvailable());
+  h('ytdlp:install', async () => {
+    try {
+      return await social.downloadYtDlp((prog) => send('ytdlp:progress', prog));
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
   });
 }
 

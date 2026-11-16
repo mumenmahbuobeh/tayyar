@@ -1,7 +1,7 @@
 'use strict';
 const { contextBridge, ipcRenderer } = require('electron');
 
-const EVENTS = ['dl:update', 'dl:progress', 'dl:removed', 'settings', 'ui:add-url', 'ui:clip-url'];
+const EVENTS = ['dl:update', 'dl:progress', 'dl:removed', 'settings', 'ui:add-url', 'ui:clip-url', 'ytdlp:progress'];
 const inv = (name) => (...args) => ipcRenderer.invoke(name, ...args);
 
 const bridge = {
@@ -26,6 +26,10 @@ const bridge = {
   openExtensionFolder: inv('openExtensionFolder'),
   openUrl: inv('openUrl'),
   installUpdate: inv('installUpdate'),
+  socialDetect: inv('social:detect'),
+  socialResolve: inv('social:resolve'),
+  ytdlpCheck: inv('ytdlp:check'),
+  ytdlpInstall: inv('ytdlp:install'),
   on(channel, cb) {
     if (!EVENTS.includes(channel)) return;
     ipcRenderer.on(channel, (_e, payload) => cb(payload));

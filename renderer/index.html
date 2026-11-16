@@ -786,6 +786,37 @@
         <label class="field-label"><span data-i="urlsLabel">URL (or multiple links, one per line)</span>
           <textarea id="taskUrlInput" rows="3" placeholder="https://example.com/file.zip" required></textarea>
         </label>
+
+        <!-- SOCIAL MEDIA AUTO-RESOLVE CARD (Apple Liquid Glass) -->
+        <div class="social-preview-box" id="socialMediaBox" hidden>
+          <div class="social-preview-card">
+            <div class="social-preview-thumb-wrap">
+              <img id="socialMediaThumb" src="" alt="Thumbnail" class="social-thumb-img" />
+              <div class="social-thumb-overlay">
+                <span class="social-platform-badge" id="socialPlatformBadge">🎬 YouTube</span>
+              </div>
+            </div>
+            <div class="social-preview-info">
+              <div class="social-media-title" id="socialMediaTitle">Video Title</div>
+              <div class="social-media-author" id="socialMediaAuthor">Channel / Creator</div>
+              <div class="social-format-picker">
+                <label class="social-picker-lbl">
+                  <span data-i="socialFormatLbl">Quality / Format:</span>
+                  <select id="socialQualitySelect" class="styled-select sm">
+                    <option value="best_nowm" selected>⚡ Video (No Watermark - MP4)</option>
+                    <option value="best_hd">🎬 Best Video (1080p Full HD)</option>
+                    <option value="audio_mp3">🎵 Audio Only (MP3)</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="social-resolving-bar" id="socialResolvingBar" hidden>
+            <div class="social-pulse-dot"></div>
+            <span id="socialResolvingTxt">Extracting high-speed direct stream without watermark...</span>
+          </div>
+        </div>
+
         <div class="probe-box" id="probeBox" hidden>
           <div class="probe-row">
             <input type="text" id="probeFileName" class="probe-input" placeholder="File name">
@@ -1051,6 +1082,22 @@
             organized folders (Video, Music, Compressed, Documents, Programs, 3D-Models, AI-Datasets, Images,
             Games-ROMs).</div>
         </label>
+
+        <div class="settings-group-title" style="margin-top:20px;" data-i="socialEngineTitle">Social Media & Video Downloader</div>
+        <div class="setting-toggle-row">
+          <div>
+            <span data-i="socialNoWatermark">No Watermark for TikTok & Shorts</span>
+            <div class="row-hint" data-i="socialNoWatermarkHint">Automatically extract watermark-free HD video for TikTok, Shorts, and Reels.</div>
+          </div>
+          <label class="switch-toggle"><input type="checkbox" id="cfgSocialNoWatermark" checked><span class="switch-slider"></span></label>
+        </div>
+        <div class="setting-toggle-row" style="margin-top:10px;">
+          <div>
+            <span data-i="socialLocalEngine">Desktop Core Engine (yt-dlp)</span>
+            <div class="row-hint" id="ytdlpStatusTxt">Checking engine status...</div>
+          </div>
+          <button type="button" class="pill-btn outline sm" id="bInstallYtDlp">Download / Update Engine</button>
+        </div>
       </div>
       <div class="modal-foot">
         <button type="button" class="pill-btn light modal-cancel" data-i="cancel">Cancel</button>

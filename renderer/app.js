@@ -156,6 +156,11 @@
       globalServersBypass: 'Universal Regional Server Compatibility',
       globalServersDesc: 'Bypass regional CA restrictions (Russian domestic CAs, Chinese CDNs, Iranian national gateways) & anti-hotlink blocks without SSL termination errors.',
       sourceCode: 'Source Code (GitHub)',
+      socialEngineTitle: 'Social Media & Video Downloader',
+      socialNoWatermark: 'No Watermark for TikTok & Shorts',
+      socialNoWatermarkHint: 'Automatically extract watermark-free HD video for TikTok, Shorts, and Reels.',
+      socialLocalEngine: 'Desktop Core Engine (yt-dlp)',
+      socialFormatLbl: 'Quality / Format:',
     },
     ar: {
       dashboard: 'لوحة التحكم',
@@ -308,6 +313,11 @@
       globalServersBypass: 'توافق كامل مع السيرفرات العالمية (روسيا، الصين، إيران)',
       globalServersDesc: 'تجاوز قيود الشهادات الإقليمية (الروسية GOST، الصينية، والبوابات الوطنية الإيرانية) وروابط منع السرقة (Anti-Hotlink) دون انقطاع التحميل.',
       sourceCode: 'كود المصدر على GitHub (مفتوح المصدر)',
+      socialEngineTitle: 'محرك وسائط التواصل والفيديو',
+      socialNoWatermark: 'تحميل بدون علامة مائية (تيك توك والريلز)',
+      socialNoWatermarkHint: 'استخراج الفيديو عالي الدقة بدون أي شعار أو علامة مائية لتيك توك والريلز وشورتس.',
+      socialLocalEngine: 'المحرك المحلي المدمج للكمبيوتر (yt-dlp)',
+      socialFormatLbl: 'الجودة والصيغة:',
     },
   };
 
@@ -1803,6 +1813,9 @@
       taskUrlInput.focus();
     }
     if (probeBox) probeBox.hidden = true;
+    const socialBox = $('#socialMediaBox');
+    if (socialBox) socialBox.hidden = true;
+    activeSocialData = null;
     if (addErrMsg) addErrMsg.hidden = true;
 
     if (taskSaveDir && S.settings.defaultDir) {
@@ -1812,6 +1825,9 @@
 
   function closeAddModal() {
     if (addModal) addModal.close();
+    const socialBox = $('#socialMediaBox');
+    if (socialBox) socialBox.hidden = true;
+    activeSocialData = null;
   }
 
   if (bQuickAdd) bQuickAdd.addEventListener('click', () => openAddModal());
@@ -1829,11 +1845,276 @@
     });
   }
 
+  /* ================= SOCIAL MEDIA & VIDEO ENGINE (Multi-Platform) ================= */
+  const SOCIAL_PLATFORMS = [
+    { id: 'youtube', name: 'YouTube', icon: '🎬', color: '#ff0000', pattern: /(?:youtube\.com\/(?:watch\?|shorts\/|live\/|embed\/)|youtu\.be\/)/i },
+    { id: 'tiktok', name: 'TikTok', icon: '🎵', color: '#00f2fe', pattern: /(?:tiktok\.com\/|vt\.tiktok\.com\/|vm\.tiktok\.com\/)/i },
+    { id: 'instagram', name: 'Instagram', icon: '📸', color: '#e1306c', pattern: /(?:instagram\.com\/(?:p|reel|tv|stories)\/)/i },
+    { id: 'facebook', name: 'Facebook', icon: '📘', color: '#1877f2', pattern: /(?:facebook\.com\/(?:watch|reel|videos|stories)|fb\.watch\/)/i },
+    { id: 'snapchat', name: 'Snapchat', icon: '👻', color: '#fffc00', pattern: /(?:snapchat\.com\/(?:spotlight|t|add|story)\/)/i },
+    { id: 'twitter', name: 'X / Twitter', icon: '🐦', color: '#1da1f2', pattern: /(?:twitter\.com|x\.com)\/[^/]+\/status\//i },
+    { id: 'pinterest', name: 'Pinterest', icon: '📌', color: '#e60023', pattern: /(?:pinterest\.com\/pin\/|pin\.it\/)/i },
+    { id: 'reddit', name: 'Reddit', icon: '🤖', color: '#ff4500', pattern: /(?:reddit\.com\/r\/[^/]+\/comments\/|v\.redd\.it\/)/i }
+  ];
+
+  function detectSocialPlatform(url) {
+    if (!url || typeof url !== 'string') return null;
+    const u = url.trim();
+    for (const p of SOCIAL_PLATFORMS) {
+      if (p.pattern.test(u)) return p;
+    }
+    return null;
+  }
+
+  let activeSocialData = null;
+
+  async function resolveSocialMedia(url, platform) {
+    // 1. Desktop local yt-dlp first
+    if (window.tayyar?.socialResolve) {
+      try {
+        const desktopRes = await window.tayyar.socialResolve(url);
+        if (desktopRes && desktopRes.ok && desktopRes.formats?.length) {
+          return desktopRes;
+        }
+      } catch (e) {
+        console.warn('Desktop yt-dlp resolve failed, trying universal web resolver:', e);
+      }
+    }
+
+    // 2. Universal Web & Mobile API Resolvers (Android, iOS, Web & Desktop Fallback)
+    const cleanUrl = url.trim();
+
+    // A. TikTok No-Watermark direct API
+    if (platform.id === 'tiktok') {
+      try {
+        const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data) {
+            const d = json.data;
+            const formats = [];
+            if (d.play) {
+              formats.push({
+                id: 'nowm',
+                quality: S.lang === 'ar' ? '⚡ فيديو أصلي بدون علامة مائية (MP4)' : '⚡ Video (No Watermark - MP4)',
+                ext: 'mp4',
+                url: d.play
+              });
+            }
+            if (d.hdplay) {
+              formats.push({
+                id: 'hd',
+                quality: S.lang === 'ar' ? '🎬 جودة فائقة HD بدون علامة مائية (MP4)' : '🎬 HD Quality (No Watermark - MP4)',
+                ext: 'mp4',
+                url: d.hdplay
+              });
+            }
+            if (d.music) {
+              formats.push({
+                id: 'audio',
+                quality: S.lang === 'ar' ? '🎵 الصوت والموسيقى فقط (MP3)' : '🎵 Audio Only (MP3)',
+                ext: 'mp3',
+                url: d.music
+              });
+            }
+            return {
+              ok: true,
+              platform: 'TikTok',
+              title: d.title || 'TikTok_Video',
+              author: d.author?.nickname || d.author?.unique_id || 'TikTok Creator',
+              thumbnail: d.cover || d.origin_cover || '',
+              formats
+            };
+          }
+        }
+      } catch (err) {
+        console.warn('TikWM API error:', err);
+      }
+
+      try {
+        const res2 = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(cleanUrl)}`);
+        if (res2.ok) {
+          const j2 = await res2.json();
+          const vUrl = j2.video?.noWatermark || j2.video?.watermark;
+          if (vUrl) {
+            return {
+              ok: true,
+              platform: 'TikTok',
+              title: j2.title || 'TikTok_Video',
+              author: j2.author?.name || 'TikTok Creator',
+              thumbnail: j2.video?.cover || '',
+              formats: [
+                { id: 'nowm', quality: S.lang === 'ar' ? '⚡ فيديو أصلي بدون علامة مائية' : '⚡ Video (No Watermark - MP4)', ext: 'mp4', url: vUrl },
+                ...(j2.music?.play_url ? [{ id: 'audio', quality: S.lang === 'ar' ? '🎵 ملف صوتي فقط (MP3)' : '🎵 Audio Only (MP3)', ext: 'mp3', url: j2.music.play_url }] : [])
+              ]
+            };
+          }
+        }
+      } catch (_) {}
+    }
+
+    // B. Twitter / X Video direct API
+    if (platform.id === 'twitter') {
+      try {
+        const m = cleanUrl.match(/(?:twitter\.com|x\.com)\/([^/]+)\/status\/(\d+)/i);
+        if (m) {
+          const user = m[1];
+          const id = m[2];
+          const r = await fetch(`https://api.fxtwitter.com/${user}/status/${id}`);
+          if (r.ok) {
+            const data = await r.json();
+            const media = data.tweet?.media?.videos?.[0];
+            if (media && media.url) {
+              return {
+                ok: true,
+                platform: 'X / Twitter',
+                title: data.tweet.text?.slice(0, 50) || 'X_Video',
+                author: data.tweet.author?.name || user,
+                thumbnail: media.thumbnail_url || '',
+                formats: [
+                  { id: 'best', quality: '🎬 Best Video (MP4)', ext: 'mp4', url: media.url }
+                ]
+              };
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
+    // C. Reddit Video direct API
+    if (platform.id === 'reddit') {
+      try {
+        const jsonUrl = cleanUrl.split('?')[0].replace(/\/$/, '') + '.json';
+        const redRes = await fetch(jsonUrl);
+        if (redRes.ok) {
+          const redData = await redRes.json();
+          const post = redData[0]?.data?.children?.[0]?.data;
+          const vid = post?.secure_media?.reddit_video || post?.media?.reddit_video;
+          if (vid && vid.fallback_url) {
+            return {
+              ok: true,
+              platform: 'Reddit',
+              title: post.title || 'Reddit_Video',
+              author: post.author ? `u/${post.author}` : 'Reddit User',
+              thumbnail: post.thumbnail && post.thumbnail.startsWith('http') ? post.thumbnail : '',
+              formats: [
+                { id: 'best', quality: '🎬 HD Video (MP4)', ext: 'mp4', url: vid.fallback_url }
+              ]
+            };
+          }
+        }
+      } catch (_) {}
+    }
+
+    // D. Generic Multi-Platform Fallback (YouTube, Facebook, Instagram, Snapchat)
+    const publicResolvers = [
+      'https://cobalt.api.sc-sc.org',
+      'https://cobalt-api.kwiatekm.tokyo',
+      'https://api.cobalt.tools'
+    ];
+
+    for (const host of publicResolvers) {
+      try {
+        const cRes = await fetch(host, {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: cleanUrl, videoQuality: '1080', youtubeVideoCodec: 'h264' })
+        });
+        if (cRes.ok) {
+          const cData = await cRes.json();
+          if (cData.url) {
+            return {
+              ok: true,
+              platform: platform.name,
+              title: cData.filename ? cData.filename.replace(/\.[^.]+$/, '') : `${platform.name}_Video`,
+              author: platform.name,
+              thumbnail: '',
+              formats: [
+                { id: 'best', quality: S.lang === 'ar' ? '🎬 أعلى جودة متاحة (MP4)' : '🎬 Best Video (MP4)', ext: 'mp4', url: cData.url }
+              ]
+            };
+          }
+        }
+      } catch (_) {}
+    }
+
+    return {
+      ok: false,
+      platform: platform.name,
+      title: `${platform.name}_Media`,
+      author: platform.name,
+      formats: [
+        { id: 'direct', quality: 'Original Stream', ext: 'mp4', url: cleanUrl }
+      ]
+    };
+  }
+
   let probeTimer = 0;
+  let socialTimer = 0;
+
   if (taskUrlInput) {
     taskUrlInput.addEventListener('input', () => {
       clearTimeout(probeTimer);
+      clearTimeout(socialTimer);
       const url = taskUrlInput.value.trim().split('\n')[0];
+
+      const socialPlat = detectSocialPlatform(url);
+      const socialBox = $('#socialMediaBox');
+      const resolvingBar = $('#socialResolvingBar');
+
+      if (socialPlat) {
+        if (probeBox) probeBox.hidden = true;
+        if (socialBox) {
+          socialBox.hidden = false;
+          const badge = $('#socialPlatformBadge');
+          if (badge) {
+            badge.textContent = `${socialPlat.icon} ${socialPlat.name}`;
+            badge.style.borderColor = socialPlat.color;
+          }
+          $('#socialMediaTitle').textContent = S.lang === 'ar' ? 'جاري فحص واستخراج رابط الفيديو...' : 'Analyzing video stream...';
+          $('#socialMediaAuthor').textContent = socialPlat.name;
+          const thumb = $('#socialMediaThumb');
+          if (thumb) thumb.style.display = 'none';
+          if (resolvingBar) resolvingBar.hidden = false;
+        }
+
+        socialTimer = setTimeout(async () => {
+          try {
+            const data = await resolveSocialMedia(url, socialPlat);
+            activeSocialData = data;
+            if (resolvingBar) resolvingBar.hidden = true;
+
+            if (data && data.ok) {
+              $('#socialMediaTitle').textContent = data.title;
+              $('#socialMediaAuthor').textContent = data.author || socialPlat.name;
+              const thumb = $('#socialMediaThumb');
+              if (thumb && data.thumbnail) {
+                thumb.src = data.thumbnail;
+                thumb.style.display = 'block';
+              }
+
+              const qualitySelect = $('#socialQualitySelect');
+              if (qualitySelect && data.formats?.length) {
+                qualitySelect.innerHTML = data.formats.map((f, idx) =>
+                  `<option value="${idx}">${f.quality}</option>`
+                ).join('');
+              }
+            } else {
+              $('#socialMediaTitle').textContent = `${socialPlat.name} Media`;
+              $('#socialMediaAuthor').textContent = S.lang === 'ar' ? 'سيتم التنزيل كملف مباشر' : 'Will download as direct stream';
+            }
+          } catch (err) {
+            if (resolvingBar) resolvingBar.hidden = true;
+            console.error('Social resolve error:', err);
+          }
+        }, 300);
+        return;
+      } else {
+        if (socialBox) socialBox.hidden = true;
+        activeSocialData = null;
+      }
+
+      // Standard HTTP/HTTPS probe
       if (/^https?:\/\//i.test(url) && window.tayyar?.probe) {
         probeTimer = setTimeout(async () => {
           try {
@@ -1858,7 +2139,7 @@
 
       if (!urls.length) {
         if (addErrMsg) {
-          addErrMsg.textContent = 'Please enter a valid HTTP or HTTPS link.';
+          addErrMsg.textContent = S.lang === 'ar' ? 'يرجى إدخال رابط صحيح.' : 'Please enter a valid link.';
           addErrMsg.hidden = false;
         }
         return;
@@ -1868,9 +2149,28 @@
       const dir = taskSaveDir?.value || '';
 
       for (const u of urls) {
+        let finalDownloadUrl = u;
+        let finalFilename = '';
+
+        if (activeSocialData && activeSocialData.formats?.length) {
+          const selectedIdx = parseInt($('#socialQualitySelect')?.value || '0', 10);
+          const fmt = activeSocialData.formats[selectedIdx] || activeSocialData.formats[0];
+          if (fmt && fmt.url) {
+            finalDownloadUrl = fmt.url;
+            const ext = fmt.ext || 'mp4';
+            const cleanTitle = (activeSocialData.title || 'video')
+              .replace(/[\/\\:*?"<>|]/g, '_')
+              .slice(0, 60)
+              .trim();
+            finalFilename = `${activeSocialData.platform || 'Tayyar'}_${cleanTitle}.${ext}`;
+          }
+        }
+
         if (window.tayyar?.add) {
           const res = await window.tayyar.add({
-            url: u,
+            url: finalDownloadUrl,
+            filename: finalFilename || undefined,
+            userFileName: finalFilename || undefined,
             dir: dir || undefined,
             connections: conns,
           });
@@ -1881,7 +2181,7 @@
       }
 
       closeAddModal();
-      toast(`Started ${urls.length} download task(s)`);
+      toast(S.lang === 'ar' ? `بدأ تحميل ${urls.length} مهمة بنجاح` : `Started ${urls.length} download task(s)`);
       updateDashboard();
       renderDownloadsList();
     });
@@ -1943,6 +2243,55 @@
       if (sim) sim.value = btn.dataset.val;
     });
   });
+
+  // Desktop Local Engine (yt-dlp) status & 1-click installer
+  const bInstallYtDlp = $('#bInstallYtDlp');
+  const ytdlpStatusTxt = $('#ytdlpStatusTxt');
+
+  async function checkYtDlpStatus() {
+    if (!ytdlpStatusTxt) return;
+    if (window.tayyar?.ytdlpCheck) {
+      try {
+        const res = await window.tayyar.ytdlpCheck();
+        if (res && res.available) {
+          ytdlpStatusTxt.textContent = S.lang === 'ar' ? `✅ محرك yt-dlp مثبت ومفعل محلياً (v${res.version})` : `✅ yt-dlp core engine installed (v${res.version})`;
+          if (bInstallYtDlp) bInstallYtDlp.textContent = S.lang === 'ar' ? 'تحديث المحرك' : 'Update Engine';
+        } else {
+          ytdlpStatusTxt.textContent = S.lang === 'ar' ? '⚠️ غير مثبت محلياً (المحرك السحابي العالمي فعال)' : '⚠️ Not installed locally (Universal Web Engine active)';
+          if (bInstallYtDlp) bInstallYtDlp.textContent = S.lang === 'ar' ? 'تحميل وتثبيت (نقرة واحدة)' : 'Download / Install Engine';
+        }
+      } catch (_) {}
+    } else {
+      ytdlpStatusTxt.textContent = S.lang === 'ar' ? 'محرك الهاتف والويب الشامل فعال' : 'Universal Mobile/Web Engine active';
+      if (bInstallYtDlp) bInstallYtDlp.style.display = 'none';
+    }
+  }
+
+  checkYtDlpStatus();
+
+  if (bInstallYtDlp) {
+    bInstallYtDlp.addEventListener('click', async () => {
+      if (window.tayyar?.ytdlpInstall) {
+        bInstallYtDlp.disabled = true;
+        bInstallYtDlp.textContent = S.lang === 'ar' ? 'جاري التحميل...' : 'Downloading...';
+        if (ytdlpStatusTxt) ytdlpStatusTxt.textContent = S.lang === 'ar' ? 'جاري تنزيل المحرك الرسمي...' : 'Downloading official standalone engine...';
+        toast(S.lang === 'ar' ? 'بدأ تحميل محرك الفيديو yt-dlp الرسمي' : 'Starting yt-dlp standalone engine download');
+        try {
+          const r = await window.tayyar.ytdlpInstall();
+          if (r && r.ok) {
+            toast(S.lang === 'ar' ? 'تم تثبيت محرك الفيديو بنجاح!' : 'Media engine installed successfully!');
+            checkYtDlpStatus();
+          } else {
+            toast(S.lang === 'ar' ? 'فشل تحميل المحرك، سيتم الاعتماد على المحرك السحابي' : 'Engine download failed; using web engine');
+          }
+        } catch (e) {
+          toast(`Install error: ${e.message}`);
+        } finally {
+          bInstallYtDlp.disabled = false;
+        }
+      }
+    });
+  }
 
   // Copy CLI tool command
   const bCopyCli = $('#bCopyCli');
