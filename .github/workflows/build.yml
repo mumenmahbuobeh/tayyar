@@ -46,14 +46,20 @@ jobs:
       - name: Build & Package Desktop Binaries
         shell: bash
         run: |
+          mkdir -p bin
           if [ "${{ runner.os }}" = "Windows" ]; then
+            curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe -o bin/yt-dlp.exe
             npm run dist:win
             cp dist/Tayyar-Setup-*.exe dist/Tayyar.Setup.1.0.5.exe 2>/dev/null || true
             cp dist/Tayyar-1.0.5.exe dist/Tayyar.1.0.5.exe 2>/dev/null || true
           elif [ "${{ runner.os }}" = "macOS" ]; then
+            curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos -o bin/yt-dlp
+            chmod +x bin/yt-dlp
             npm run dist:mac
             cp dist/Tayyar-*.dmg dist/Tayyar-1.0.5.dmg 2>/dev/null || true
           else
+            curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o bin/yt-dlp
+            chmod +x bin/yt-dlp
             npm run dist:linux
             cp dist/*.deb dist/tayyar_1.0.5_amd64.deb 2>/dev/null || true
             cp dist/*.AppImage dist/Tayyar-1.0.5.AppImage 2>/dev/null || true

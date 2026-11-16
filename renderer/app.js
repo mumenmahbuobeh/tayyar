@@ -2060,6 +2060,71 @@
       } catch (_) {}
     }
 
+    // D. TikTok via TikMate API
+    if (platform.id === 'tiktok') {
+      try {
+        const formData = new FormData();
+        formData.append('url', cleanUrl);
+        const r = await fetch('https://api.tikmate.app/api/lookup', {
+          method: 'POST',
+          body: formData
+        });
+        if (r.ok) {
+          const data = await r.json();
+          if (data && data.token && data.id) {
+            return {
+              ok: true,
+              platform: 'TikTok',
+              title: data.author_name ? `${data.author_name} TikTok` : 'TikTok_Video',
+              author: data.author_name || 'TikTok Creator',
+              thumbnail: '',
+              formats: [
+                {
+                  id: 'nowm',
+                  quality: '⚡ فيديو بدقة عالية بدون علامة مائية (MP4)',
+                  ext: 'mp4',
+                  url: `https://tikmate.app/download/${data.token}/${data.id}.mp4`
+                }
+              ]
+            };
+          }
+        }
+      } catch (_) {}
+    }
+
+    // E. Instagram / Facebook / Snapchat via OpenGraph
+    if (['instagram', 'facebook', 'snapchat'].includes(platform.id)) {
+      try {
+        const ogRes = await fetch(cleanUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1'
+          }
+        });
+        if (ogRes.ok) {
+          const html = await ogRes.text();
+          const videoMatch = html.match(/<meta[^>]+property=["'](?:og:video|og:video:url|og:video:secure_url)["'][^>]+content=["']([^"']+)["']/i) ||
+                             html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["'](?:og:video|og:video:url|og:video:secure_url)["']/i) ||
+                             html.match(/<video[^>]+src=["']([^"']+)["']/i);
+          if (videoMatch && videoMatch[1]) {
+            let vidUrl = videoMatch[1].replace(/&amp;/g, '&');
+            const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+            const title = titleMatch ? titleMatch[1].trim() : `${platform.name}_Video`;
+            return {
+              ok: true,
+              platform: platform.name,
+              title,
+              formats: [{
+                id: 'direct',
+                quality: '🎬 فيديو أصلي عالي الدقة (MP4)',
+                ext: 'mp4',
+                url: vidUrl
+              }]
+            };
+          }
+        }
+      } catch (_) {}
+    }
+
     return {
       ok: false,
       error: 'Could not resolve stream',
@@ -2178,7 +2243,7 @@
         if (isSocial) {
           // If social resolution is still in flight or not done, resolve now
           if (!activeSocialData || !activeSocialData.ok || !activeSocialData.formats?.length) {
-            toast(S.lang === 'ar' ? 'جاري استخراج رابط الفيديو المباشر...' : 'Resolving media stream...');
+            toast(S.lang === 'ar' ? 'جاري فحص واستخراج البث المباشر...' : 'Resolving media stream...');
             try {
               activeSocialData = await resolveSocialMedia(u, isSocial);
             } catch (_) {}
@@ -2196,13 +2261,10 @@
                 .slice(0, 60)
                 .trim();
               finalFilename = `${activeSocialData.platform || 'Tayyar'}_${cleanTitle}.${ext}`;
-            } else {
-              toast(S.lang === 'ar' ? 'تعذر استخراج البث المباشر لهذا الرابط. تأكد أن الحساب والرابط عام.' : 'Could not resolve media stream.');
-              return;
             }
           } else {
-            toast(S.lang === 'ar' ? 'تعذر استخراج البث المباشر لهذا الرابط. تأكد أن الحساب والرابط عام.' : 'Could not resolve media stream.');
-            return;
+            console.warn('Social resolution not pre-extracted, proceeding with direct download');
+            toast(S.lang === 'ar' ? 'جاري بدء التحميل المباشر...' : 'Starting direct download...');
           }
         }
 

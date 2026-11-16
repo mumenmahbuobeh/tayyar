@@ -38,15 +38,21 @@ function getBinDir() {
 function getYtDlpPath() {
   const exe = process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp';
   
-  // 1. Root local bin folder inside app directory
+  // 1. Packaged Electron app extraResources directory (resources/bin/yt-dlp.exe)
+  if (process.resourcesPath) {
+    const resBin = path.join(process.resourcesPath, 'bin', exe);
+    if (fs.existsSync(resBin)) return resBin;
+  }
+
+  // 2. Root local bin folder inside app directory
   const localBin = path.join(__dirname, '..', 'bin', exe);
   if (fs.existsSync(localBin)) return localBin;
 
-  // 2. AppData custom bin directory
+  // 3. AppData custom bin directory
   const custom = path.join(getBinDir(), exe);
   if (fs.existsSync(custom)) return custom;
 
-  // 3. Fallback to system PATH
+  // 4. Fallback to system PATH
   return exe;
 }
 
@@ -284,7 +290,14 @@ async function resolveSocialMedia(url) {
 
   // 2. General Desktop Resolution using yt-dlp
   try {
-    const bin = getYtDlpPath();
+    let bin = getYtDlpPath();
+    if (!fs.existsSync(bin)) {
+      try {
+        await downloadYtDlp();
+        bin = getYtDlpPath();
+      } catch (_) {}
+    }
+
     const args = ['--dump-single-json', '--no-warnings', '--prefer-free-formats', url.trim()];
 
     const res = await new Promise((resolve, reject) => {
@@ -402,8 +415,64 @@ async function resolveSocialMedia(url) {
       }
     }
 
+    // 4. OpenGraph video fallback (Instagram, Facebook, Twitter, TikTok, direct video)
+    try {
+      return await resolveOpenGraphVideo(url);
+    } catch (_) {}
+
     throw err;
   }
+}
+
+function resolveOpenGraphVideo(url) {
+  return new Promise((resolve, reject) => {
+    try {
+      const u = new URL(url);
+      const client = u.protocol === 'http:' ? http : https;
+      const req = client.get(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        },
+        timeout: 10000
+      }, (res) => {
+        if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
+          return resolve(resolveOpenGraphVideo(res.headers.location));
+        }
+        let html = '';
+        res.on('data', (c) => {
+          html += c;
+          if (html.length > 800000) res.destroy();
+        });
+        res.on('end', () => {
+          const videoMatch = html.match(/<meta[^>]+property=["'](?:og:video|og:video:url|og:video:secure_url)["'][^>]+content=["']([^"']+)["']/i) ||
+                             html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["'](?:og:video|og:video:url|og:video:secure_url)["']/i) ||
+                             html.match(/<video[^>]+src=["']([^"']+)["']/i);
+          if (videoMatch && videoMatch[1]) {
+            let vidUrl = videoMatch[1].replace(/&amp;/g, '&');
+            const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+            const title = titleMatch ? titleMatch[1].trim() : 'Media_Video';
+            return resolve({
+              ok: true,
+              platform: detectPlatform(url)?.name || 'Media',
+              title,
+              formats: [{
+                id: 'og-direct',
+                quality: '🎬 فيديو مباشر عالي الدقة (MP4)',
+                ext: 'mp4',
+                url: vidUrl
+              }]
+            });
+          }
+          reject(new Error('No OpenGraph video stream found'));
+        });
+      });
+      req.on('error', reject);
+      req.on('timeout', () => { req.destroy(); reject(new Error('Timeout')); });
+    } catch (e) {
+      reject(e);
+    }
+  });
 }
 
 module.exports = {

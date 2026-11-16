@@ -327,6 +327,55 @@ public class TayyarMobilePlugin extends Plugin {
                         }
                     }
 
+                    // 3. Instagram / Facebook / Snapchat / OpenGraph Native Scraper
+                    if (url.contains("instagram.com") || url.contains("facebook.com") || url.contains("fb.watch") || url.contains("snapchat.com")) {
+                        try {
+                            URL target = new URL(url);
+                            HttpURLConnection conn = (HttpURLConnection) target.openConnection();
+                            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1");
+                            conn.setConnectTimeout(8000);
+                            conn.setReadTimeout(10000);
+                            conn.setInstanceFollowRedirects(true);
+
+                            if (conn.getResponseCode() == 200) {
+                                StringBuilder htmlSb = new StringBuilder();
+                                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
+                                    String line;
+                                    while ((line = reader.readLine()) != null) {
+                                        htmlSb.append(line);
+                                        if (htmlSb.length() > 600000) break;
+                                    }
+                                }
+                                String html = htmlSb.toString();
+                                Pattern pVid = Pattern.compile("<meta[^>]+property=[\"'](?:og:video|og:video:url|og:video:secure_url)[\"'][^>]+content=[\"']([^\"']+)[\"']", Pattern.CASE_INSENSITIVE);
+                                Matcher mVid = pVid.matcher(html);
+                                if (!mVid.find()) {
+                                    pVid = Pattern.compile("<meta[^>]+content=[\"']([^\"']+)[\"'][^>]+property=[\"'](?:og:video|og:video:url|og:video:secure_url)[\"']", Pattern.CASE_INSENSITIVE);
+                                    mVid = pVid.matcher(html);
+                                }
+                                if (mVid.find()) {
+                                    String videoUrl = mVid.group(1).replace("&amp;", "&");
+                                    String platName = url.contains("instagram.com") ? "Instagram" : (url.contains("snapchat.com") ? "Snapchat" : "Facebook");
+                                    JSArray formats = new JSArray();
+                                    JSObject fmt = new JSObject();
+                                    fmt.put("id", "direct");
+                                    fmt.put("quality", "🎬 فيديو مباشر عالي الدقة (MP4)");
+                                    fmt.put("ext", "mp4");
+                                    fmt.put("url", videoUrl);
+                                    formats.put(fmt);
+
+                                    JSObject ret = new JSObject();
+                                    ret.put("ok", true);
+                                    ret.put("platform", platName);
+                                    ret.put("title", platName + " Video");
+                                    ret.put("formats", formats);
+                                    call.resolve(ret);
+                                    return;
+                                }
+                            }
+                        } catch (Exception ignored) {}
+                    }
+
                     JSObject fail = new JSObject();
                     fail.put("ok", false);
                     fail.put("error", "Direct stream not found");
