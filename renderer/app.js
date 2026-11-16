@@ -829,7 +829,12 @@
       const stored = JSON.parse(raw);
       return DEFAULT_PLUGINS.map((def) => {
         const found = stored.find((s) => s.id === def.id);
-        return found ? Object.assign({}, def, found) : def;
+        if (!found) return def;
+        return Object.assign({}, def, {
+          installed: typeof found.installed === 'boolean' ? found.installed : def.installed,
+          enabled: typeof found.enabled === 'boolean' ? found.enabled : def.enabled,
+          settings: Object.assign({}, def.settings, found.settings)
+        });
       }).concat(stored.filter((s) => !DEFAULT_PLUGINS.some((def) => def.id === s.id)));
     } catch (_) {
       return DEFAULT_PLUGINS;
@@ -2360,6 +2365,20 @@
 
   /* ================= MOBILE & WEB ENGINE (Android, iOS & Preview) ================= */
   function setupMobileAndWebEngine() {
+    const getMobileCapEngine = () => {
+      try {
+        if (window.Capacitor) {
+          if (typeof window.Capacitor.registerPlugin === 'function') {
+            try { return window.Capacitor.registerPlugin('TayyarMobileEngine'); } catch (_) {}
+          }
+          if (window.Capacitor.Plugins?.TayyarMobileEngine) {
+            return window.Capacitor.Plugins.TayyarMobileEngine;
+          }
+        }
+      } catch (_) {}
+      return null;
+    };
+
     const listeners = new Map();
     const emit = (ch, data) => {
       const cbs = listeners.get(ch) || [];
@@ -2393,7 +2412,7 @@
 
       const timer = setInterval(async () => {
         try {
-          const cap = window.Capacitor?.Plugins?.TayyarMobileEngine;
+          const cap = getMobileCapEngine();
           if (!cap) { clearInterval(timer); activePolling.delete(id); return; }
 
           const res = await cap.queryDownload({ downloadId });
@@ -2602,7 +2621,7 @@
         emit('dl:update', d);
 
         // Native Android DownloadManager check
-        const cap = window.Capacitor?.Plugins?.TayyarMobileEngine;
+        const cap = getMobileCapEngine();
         if (cap && typeof cap.startDownload === 'function') {
           try {
             const res = await cap.startDownload({ url: opts.url, filename, referer: opts.referer || '' });
@@ -2660,7 +2679,7 @@
         (ids || []).forEach((id) => {
           const d = mobileDownloads.get(id);
           if (d && d.nativeDownloadId) {
-            const cap = window.Capacitor?.Plugins?.TayyarMobileEngine;
+            const cap = getMobileCapEngine();
             if (cap) cap.cancelDownload({ downloadId: d.nativeDownloadId }).catch(() => {});
           }
           if (activePolling.has(id)) {

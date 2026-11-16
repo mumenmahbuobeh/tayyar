@@ -35,13 +35,23 @@ public class TayyarMobilePlugin extends Plugin {
                 }
             }
 
+            if (url.startsWith("magnet:") || url.contains(".torrent")) {
+                call.reject("BitTorrent magnet links require torrent client support");
+                return;
+            }
+
             Context context = getContext();
             DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url.trim()));
 
             request.setTitle(filename);
             request.setDescription("Tayyar Download");
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            try {
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            } catch (Exception ignored) {}
+
+            request.setAllowedOverMetered(true);
+            request.setAllowedOverRoaming(true);
 
             try {
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
@@ -56,7 +66,7 @@ public class TayyarMobilePlugin extends Plugin {
             if (referer != null && !referer.isEmpty()) {
                 request.addRequestHeader("Referer", referer);
             }
-            request.addRequestHeader("User-Agent", "Tayyar/1.0.0 (Android)");
+            request.addRequestHeader("User-Agent", "Tayyar/1.0.5 (Android)");
 
             long downloadId = dm.enqueue(request);
 

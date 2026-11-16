@@ -538,7 +538,7 @@
                 stroke-width="2.5">
                 <path d="M12 5v14M5 12h14" />
               </svg></button>
-            <button class="icon-btn-ghost" id="bBrowseMotrixPlugins" title="Browse Motrix Official Plugins (motrix.app/plugins)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <button class="icon-btn-ghost" id="bBrowseMotrixPlugins" title="Browse Official Plugins (motrix.app/plugins)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path
                   d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
@@ -919,7 +919,7 @@
       <div class="modal-body">
         <label class="field-label"><span data-i="theme">Theme</span>
           <select id="cfgTheme" class="styled-select">
-            <option value="dark" selected>Dark Slate (Motrix Next)</option>
+            <option value="dark" selected>Dark Slate (Tayyar Next)</option>
             <option value="light">Light Theme</option>
           </select>
         </label>
@@ -1341,7 +1341,7 @@
         <div class="settings-group-title" style="margin-top:20px;">Migration</div>
         <div class="setting-toggle-row" style="align-items:center;">
           <div>
-            <span>Import your downloads from Motrix v1.</span>
+            <span>Import downloads from previous Motrix / Tayyar versions.</span>
           </div>
           <button type="button" class="pill-btn outline sm" id="bOpenMigration">Open migration</button>
         </div>
@@ -1537,7 +1537,7 @@
               <span class="plugin-avatar avatar-blue" id="pluginDetailAvatar">MF</span>
               <div class="plugin-meta">
                 <div class="plugin-title" id="pluginDetailTitle">Tayyar Filename Template</div>
-                <div class="plugin-ver" id="pluginDetailVer">v1.1.1 · motrix.filename-template</div>
+                <div class="plugin-ver" id="pluginDetailVer">v1.1.1 · tayyar.filename-template</div>
               </div>
               <span class="plugin-status-pill ready" id="pluginDetailBadge">Ready</span>
             </div>
@@ -1640,6 +1640,7 @@
   <!-- TOAST -->
   <div class="toast-popup" id="toastPopup" hidden></div>
 
+  <script src="capacitor.js"></script>
   <script src="app.js"></script>
 </body>
 
