@@ -130,7 +130,7 @@ jobs:
           mkdir -p build-apk
           APK_FILE=$(find android/app/build/outputs/apk -type f -name "*.apk" | head -n 1)
           if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
-            cp "$APK_FILE" build-apk/Tayyar-Android-v1.0.0.apk
+            cp "$APK_FILE" build-apk/Tayyar-Android-v1.0.5.apk
           else
             echo "Error: APK file not found!" && exit 1
           fi
@@ -170,7 +170,7 @@ jobs:
           APP_PATH=$(find build/Build/Products -name "*.app" -type d | head -n 1)
           if [ -n "$APP_PATH" ] && [ -d "$APP_PATH" ]; then
             cp -r "$APP_PATH" build/Payload/
-            cd build && zip -r ../../../Tayyar-iOS-v1.0.0.ipa Payload
+            cd build && zip -r ../../../Tayyar-iOS-v1.0.5.ipa Payload
           else
             echo "Error: iOS .app bundle not found!" && exit 1
           fi
@@ -179,7 +179,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-ios-ipa
-          path: Tayyar-iOS-v1.0.0.ipa
+          path: Tayyar-iOS-v1.0.5.ipa
 
   publish-release:
     name: Create GitHub Release
@@ -206,26 +206,26 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: "Tayyar v1.0.0 — Multiplatform Release (Windows, Linux, macOS, Android, iOS)"
+          tag_name: v1.0.5
+          name: "Tayyar v1.0.5 — Multiplatform Release (Windows, Linux, macOS, Android, iOS)"
           body: |
-            ## 🚀 Tayyar Download Manager v1.0.0
+            ## 🚀 Tayyar Download Manager v1.0.5
 
             Universal high-speed multi-connection download manager designed and developed by **Mu'men Mahbuobeh**.
 
             ### 📦 Download Packages
             * **Windows:**
-              * [Tayyar Setup 1.0.0.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar.Setup.1.0.0.exe) (Installer)
-              * [Tayyar 1.0.0.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar.1.0.0.exe) (Portable)
+              * [Tayyar Setup 1.0.5.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar.Setup.1.0.5.exe) (Installer)
+              * [Tayyar 1.0.5.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar.1.0.5.exe) (Portable)
             * **Android:**
-              * [Tayyar-Android-v1.0.0.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar-Android-v1.0.0.apk) (Android 7.0+)
+              * [Tayyar-Android-v1.0.5.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-Android-v1.0.5.apk) (Android 7.0+)
             * **iOS (Apple iPhone/iPad):**
-              * [Tayyar-iOS-v1.0.0.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar-iOS-v1.0.0.ipa) (Sideload / AltStore / TrollStore)
+              * [Tayyar-iOS-v1.0.5.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-iOS-v1.0.5.ipa) (Sideload / AltStore / TrollStore)
             * **macOS:**
-              * [Tayyar-1.0.0.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar-1.0.0.dmg) (Apple Silicon & Intel)
+              * [Tayyar-1.0.5.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-1.0.5.dmg) (Apple Silicon & Intel)
             * **Linux:**
-              * [Tayyar-1.0.0.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/Tayyar-1.0.0.AppImage)
-              * [tayyar_1.0.0_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.0/tayyar_1.0.0_amd64.deb)
+              * [Tayyar-1.0.5.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-1.0.5.AppImage)
+              * [tayyar_1.0.5_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/tayyar_1.0.5_amd64.deb)
 
             ### ✨ Key Features
             * Dynamic Multi-Threaded Chunking (up to 64 connections per file)

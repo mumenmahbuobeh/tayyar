@@ -232,7 +232,7 @@
             </div>
             <div class="card-main-val" id="engineStatusVal" data-i="ready">Ready</div>
             <div class="card-footer">
-              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.0</span>
+              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.5</span>
               <span class="status-indicator online" id="engineStatusDot"></span>
             </div>
           </div>
@@ -1376,7 +1376,7 @@
             </svg>
           </div>
           <div class="about-hero-details">
-            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.0</span></h2>
+            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.5</span></h2>
             <p class="about-tagline" data-i="aboutTagline">Before content collapses, preserve what truly matters, let
               beauty enter your orbit of preservation.</p>
             <div class="about-dev-by">
@@ -1411,7 +1411,7 @@
           <div class="updates-status-row">
             <div>
               <h4 class="update-title" id="updateTitleText" data-i="upToDate">Tayyar is up to date</h4>
-              <div class="update-desc" data-i="upToDateDesc">Version 1.0.0 is the latest available release.</div>
+              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.5 is the latest available release.</div>
             </div>
             <div class="update-actions">
               <button class="pill-btn light sm" id="bCheckUpdate">
@@ -1421,10 +1421,29 @@
                 </svg>
                 <span data-i="check">Check</span>
               </button>
+              <button class="pill-btn primary sm" id="bInstallUpdate" style="display:none;">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" style="width:13px;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span id="bInstallUpdateText">Update Now</span>
+              </button>
               <select class="styled-select sm" id="cfgChannel">
                 <option value="stable">Stable</option>
                 <option value="beta" selected>Beta ▾</option>
               </select>
+            </div>
+          </div>
+
+          <!-- Direct In-App Update Progress & Actions -->
+          <div id="updateProgressWrap" class="update-progress-card" style="display:none;margin-top:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:14px 16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span id="updateProgressStatus" style="font-size:13px;font-weight:600;color:#fff;">Downloading update directly...</span>
+              <span id="updateProgressPct" style="font-size:13px;font-family:monospace;font-weight:700;color:var(--color-cyan);">0%</span>
+            </div>
+            <div class="progress-bar-bg" style="height:7px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden;">
+              <div id="updateProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg, #06b6d4, #10b981);box-shadow:0 0 10px rgba(6,182,212,0.5);transition:width 0.15s ease;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11.5px;color:var(--text-muted);">
+              <span id="updateProgressSpeed">0 KB/s</span>
+              <span id="updateProgressSize">0 MB / 0 MB</span>
             </div>
           </div>
 

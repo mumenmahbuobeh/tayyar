@@ -25,6 +25,7 @@ const bridge = {
   chooseDir: inv('chooseDir'),
   openExtensionFolder: inv('openExtensionFolder'),
   openUrl: inv('openUrl'),
+  installUpdate: inv('installUpdate'),
   on(channel, cb) {
     if (!EVENTS.includes(channel)) return;
     ipcRenderer.on(channel, (_e, payload) => cb(payload));
