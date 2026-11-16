@@ -3169,3 +3169,15 @@ html[dir="rtl"] .glass-island-player {
   }
 }
 
+.dl-progress-bar-fill.indeterminate {
+  background: linear-gradient(90deg, #0ea5e9, #00f2fe, #38bdf8, #0ea5e9) !important;
+  background-size: 200% 100% !important;
+  animation: indeterminateShimmer 1.5s infinite linear !important;
+}
+
+@keyframes indeterminateShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+

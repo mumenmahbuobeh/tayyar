@@ -157,7 +157,7 @@ function wireIpc() {
   h('social:detect', (url) => social.detectPlatform(url));
   h('social:resolve', async (url) => {
     try {
-      return await social.resolveWithYtDlp(url);
+      return await social.resolveSocialMedia(url);
     } catch (e) {
       return { ok: false, error: e.message };
     }

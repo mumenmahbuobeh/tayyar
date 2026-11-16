@@ -1687,9 +1687,12 @@
 
     listEl.innerHTML = filtered.map((d) => {
       const isSelected = S.sel.has(d.id);
-      const progress = pct(d);
       const isDownloading = d.status === 'downloading';
       const isCompleted = d.status === 'completed';
+      const isIndeterminate = isDownloading && (!d.size || d.size <= 0);
+      const progress = isCompleted ? 100 : (isIndeterminate ? 100 : pct(d));
+      const sizeText = d.size > 0 ? `${fmtSize(d.downloaded)} / ${fmtSize(d.size)}` : (d.downloaded > 0 ? fmtSize(d.downloaded) : (isDownloading ? '...' : '0 B'));
+      const pctText = isCompleted ? '100%' : (isIndeterminate ? '⚡' : `${progress}%`);
 
       return `
         <div class="dl-item-row ${isSelected ? 'selected' : ''}" data-id="${d.id}">
@@ -1698,14 +1701,14 @@
             <div class="dl-item-meta">
               <span>${isDownloading ? fmtSpeed(d.speed) : d.status}</span>
               ${isDownloading && d.eta >= 0 ? `<span>ETA: ${fmtEta(d.eta)}</span>` : ''}
-              <span style="font-weight:700;color:#fff;">${progress}%</span>
+              <span style="font-weight:700;color:#fff;">${pctText}</span>
             </div>
           </div>
           <div class="dl-progress-bar-wrap">
-            <div class="dl-progress-bar-fill" style="width: ${progress}%;"></div>
+            <div class="dl-progress-bar-fill ${isIndeterminate ? 'indeterminate' : ''}" style="width: ${progress}%;"></div>
           </div>
           <div class="dl-item-bottom">
-            <span>${fmtSize(d.downloaded)} / ${fmtSize(d.size)}</span>
+            <span>${sizeText}</span>
             <div class="dl-actions">
               ${isDownloading ? `
                 <button class="icon-btn-ghost sm" data-act="pause" data-id="${d.id}" title="Pause">
@@ -1845,6 +1848,21 @@
     });
   }
 
+  /* ================= MOBILE & CAPACITOR ENGINE HELPER ================= */
+  const getMobileCapEngine = () => {
+    try {
+      if (window.Capacitor) {
+        if (typeof window.Capacitor.registerPlugin === 'function') {
+          try { return window.Capacitor.registerPlugin('TayyarMobileEngine'); } catch (_) {}
+        }
+        if (window.Capacitor.Plugins?.TayyarMobileEngine) {
+          return window.Capacitor.Plugins.TayyarMobileEngine;
+        }
+      }
+    } catch (_) {}
+    return null;
+  };
+
   /* ================= SOCIAL MEDIA & VIDEO ENGINE (Multi-Platform) ================= */
   const SOCIAL_PLATFORMS = [
     { id: 'youtube', name: 'YouTube', icon: '🎬', color: '#ff0000', pattern: /(?:youtube\.com\/(?:watch\?|shorts\/|live\/|embed\/)|youtu\.be\/)/i },
@@ -1869,7 +1887,7 @@
   let activeSocialData = null;
 
   async function resolveSocialMedia(url, platform) {
-    // 1. Desktop local yt-dlp first
+    // 1. Desktop local yt-dlp / Node.js resolver (highest fidelity)
     if (window.tayyar?.socialResolve) {
       try {
         const desktopRes = await window.tayyar.socialResolve(url);
@@ -1877,80 +1895,75 @@
           return desktopRes;
         }
       } catch (e) {
-        console.warn('Desktop yt-dlp resolve failed, trying universal web resolver:', e);
+        console.warn('Desktop social resolver failed:', e);
       }
     }
 
-    // 2. Universal Web & Mobile API Resolvers (Android, iOS, Web & Desktop Fallback)
+    // 2. Mobile Native Plugin (Android & iOS background thread - zero CORS)
+    try {
+      const cap = getMobileCapEngine();
+      if (cap && typeof cap.resolveSocialUrl === 'function') {
+        const mobileRes = await cap.resolveSocialUrl({ url });
+        if (mobileRes && mobileRes.ok && mobileRes.formats?.length) {
+          return mobileRes;
+        }
+      }
+    } catch (e) {
+      console.warn('Mobile native resolve error:', e);
+    }
+
+    // 3. Universal Web & Browser Fallbacks
     const cleanUrl = url.trim();
 
-    // A. TikTok No-Watermark direct API
-    if (platform.id === 'tiktok') {
-      try {
-        const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`);
-        if (res.ok) {
-          const json = await res.json();
-          if (json.data) {
-            const d = json.data;
-            const formats = [];
-            if (d.play) {
-              formats.push({
-                id: 'nowm',
-                quality: S.lang === 'ar' ? '⚡ فيديو أصلي بدون علامة مائية (MP4)' : '⚡ Video (No Watermark - MP4)',
-                ext: 'mp4',
-                url: d.play
-              });
+    // A. YouTube via Piped instances
+    if (platform.id === 'youtube') {
+      const m = cleanUrl.match(/(?:watch\?v=|shorts\/|live\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      if (m) {
+        const id = m[1];
+        const pipedHosts = [
+          'https://api.piped.private.coffee/streams/',
+          'https://pipedapi.ducks.party/streams/'
+        ];
+        for (const host of pipedHosts) {
+          try {
+            const res = await fetch(host + id);
+            if (res.ok) {
+              const data = await res.json();
+              const formats = [];
+              const vStreams = data.videoStreams || [];
+              for (const v of vStreams) {
+                if (v.url && v.format === 'MP4') {
+                  formats.push({
+                    id: v.quality || 'hd',
+                    quality: S.lang === 'ar' ? `🎬 فيديو بدقة ${v.quality || 'HD'} (MP4)` : `🎬 Video ${v.quality || 'HD'} (MP4)`,
+                    ext: 'mp4',
+                    url: v.url
+                  });
+                }
+              }
+              const aStreams = data.audioStreams || [];
+              if (aStreams.length > 0 && aStreams[0].url) {
+                formats.push({
+                  id: 'audio',
+                  quality: S.lang === 'ar' ? '🎵 ملف صوتي فقط (Audio Stream)' : '🎵 Audio Only Stream (M4A)',
+                  ext: 'm4a',
+                  url: aStreams[0].url
+                });
+              }
+              if (formats.length > 0) {
+                return {
+                  ok: true,
+                  platform: 'YouTube',
+                  title: data.title || 'YouTube_Video',
+                  author: data.uploader || 'YouTube Channel',
+                  thumbnail: data.thumbnailUrl || '',
+                  formats
+                };
+              }
             }
-            if (d.hdplay) {
-              formats.push({
-                id: 'hd',
-                quality: S.lang === 'ar' ? '🎬 جودة فائقة HD بدون علامة مائية (MP4)' : '🎬 HD Quality (No Watermark - MP4)',
-                ext: 'mp4',
-                url: d.hdplay
-              });
-            }
-            if (d.music) {
-              formats.push({
-                id: 'audio',
-                quality: S.lang === 'ar' ? '🎵 الصوت والموسيقى فقط (MP3)' : '🎵 Audio Only (MP3)',
-                ext: 'mp3',
-                url: d.music
-              });
-            }
-            return {
-              ok: true,
-              platform: 'TikTok',
-              title: d.title || 'TikTok_Video',
-              author: d.author?.nickname || d.author?.unique_id || 'TikTok Creator',
-              thumbnail: d.cover || d.origin_cover || '',
-              formats
-            };
-          }
+          } catch (_) {}
         }
-      } catch (err) {
-        console.warn('TikWM API error:', err);
       }
-
-      try {
-        const res2 = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(cleanUrl)}`);
-        if (res2.ok) {
-          const j2 = await res2.json();
-          const vUrl = j2.video?.noWatermark || j2.video?.watermark;
-          if (vUrl) {
-            return {
-              ok: true,
-              platform: 'TikTok',
-              title: j2.title || 'TikTok_Video',
-              author: j2.author?.name || 'TikTok Creator',
-              thumbnail: j2.video?.cover || '',
-              formats: [
-                { id: 'nowm', quality: S.lang === 'ar' ? '⚡ فيديو أصلي بدون علامة مائية' : '⚡ Video (No Watermark - MP4)', ext: 'mp4', url: vUrl },
-                ...(j2.music?.play_url ? [{ id: 'audio', quality: S.lang === 'ar' ? '🎵 ملف صوتي فقط (MP3)' : '🎵 Audio Only (MP3)', ext: 'mp3', url: j2.music.play_url }] : [])
-              ]
-            };
-          }
-        }
-      } catch (_) {}
     }
 
     // B. Twitter / X Video direct API
@@ -2006,46 +2019,13 @@
       } catch (_) {}
     }
 
-    // D. Generic Multi-Platform Fallback (YouTube, Facebook, Instagram, Snapchat)
-    const publicResolvers = [
-      'https://cobalt.api.sc-sc.org',
-      'https://cobalt-api.kwiatekm.tokyo',
-      'https://api.cobalt.tools'
-    ];
-
-    for (const host of publicResolvers) {
-      try {
-        const cRes = await fetch(host, {
-          method: 'POST',
-          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: cleanUrl, videoQuality: '1080', youtubeVideoCodec: 'h264' })
-        });
-        if (cRes.ok) {
-          const cData = await cRes.json();
-          if (cData.url) {
-            return {
-              ok: true,
-              platform: platform.name,
-              title: cData.filename ? cData.filename.replace(/\.[^.]+$/, '') : `${platform.name}_Video`,
-              author: platform.name,
-              thumbnail: '',
-              formats: [
-                { id: 'best', quality: S.lang === 'ar' ? '🎬 أعلى جودة متاحة (MP4)' : '🎬 Best Video (MP4)', ext: 'mp4', url: cData.url }
-              ]
-            };
-          }
-        }
-      } catch (_) {}
-    }
-
     return {
       ok: false,
+      error: 'Could not resolve stream',
       platform: platform.name,
       title: `${platform.name}_Media`,
       author: platform.name,
-      formats: [
-        { id: 'direct', quality: 'Original Stream', ext: 'mp4', url: cleanUrl }
-      ]
+      formats: []
     };
   }
 
@@ -2151,18 +2131,37 @@
       for (const u of urls) {
         let finalDownloadUrl = u;
         let finalFilename = '';
+        let referer = '';
 
-        if (activeSocialData && activeSocialData.formats?.length) {
-          const selectedIdx = parseInt($('#socialQualitySelect')?.value || '0', 10);
-          const fmt = activeSocialData.formats[selectedIdx] || activeSocialData.formats[0];
-          if (fmt && fmt.url) {
-            finalDownloadUrl = fmt.url;
-            const ext = fmt.ext || 'mp4';
-            const cleanTitle = (activeSocialData.title || 'video')
-              .replace(/[\/\\:*?"<>|]/g, '_')
-              .slice(0, 60)
-              .trim();
-            finalFilename = `${activeSocialData.platform || 'Tayyar'}_${cleanTitle}.${ext}`;
+        const isSocial = detectSocialPlatform(u);
+        if (isSocial) {
+          // If social resolution is still in flight or not done, resolve now
+          if (!activeSocialData || !activeSocialData.ok || !activeSocialData.formats?.length) {
+            toast(S.lang === 'ar' ? 'جاري استخراج رابط الفيديو المباشر...' : 'Resolving media stream...');
+            try {
+              activeSocialData = await resolveSocialMedia(u, isSocial);
+            } catch (_) {}
+          }
+
+          if (activeSocialData && activeSocialData.ok && activeSocialData.formats?.length) {
+            const selectedIdx = parseInt($('#socialQualitySelect')?.value || '0', 10);
+            const fmt = activeSocialData.formats[selectedIdx] || activeSocialData.formats[0];
+            if (fmt && fmt.url && fmt.url !== u) {
+              finalDownloadUrl = fmt.url;
+              referer = fmt.referer || '';
+              const ext = fmt.ext || 'mp4';
+              const cleanTitle = (activeSocialData.title || 'video')
+                .replace(/[\/\\:*?"<>|]/g, '_')
+                .slice(0, 60)
+                .trim();
+              finalFilename = `${activeSocialData.platform || 'Tayyar'}_${cleanTitle}.${ext}`;
+            } else {
+              toast(S.lang === 'ar' ? 'تعذر استخراج البث المباشر لهذا الرابط. تأكد أن الحساب والرابط عام.' : 'Could not resolve media stream.');
+              return;
+            }
+          } else {
+            toast(S.lang === 'ar' ? 'تعذر استخراج البث المباشر لهذا الرابط. تأكد أن الحساب والرابط عام.' : 'Could not resolve media stream.');
+            return;
           }
         }
 
@@ -2171,6 +2170,7 @@
             url: finalDownloadUrl,
             filename: finalFilename || undefined,
             userFileName: finalFilename || undefined,
+            referer: referer || undefined,
             dir: dir || undefined,
             connections: conns,
           });
