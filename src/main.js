@@ -162,6 +162,31 @@ function wireIpc() {
     }
     return { ok: false };
   });
+  h('trackers:fetch', async () => {
+    const urls = [
+      'https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/trackers_best.txt',
+      'https://cdn.jsdelivr.net/gh/XIU2/TrackersListCollection@master/best.txt',
+      'https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt',
+      'https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/best.txt'
+    ];
+    const fetchOne = (u) => new Promise((resolve) => {
+      const client = u.startsWith('https:') ? https : http;
+      client.get(u, { timeout: 6000 }, (res) => {
+        if (res.statusCode !== 200) return resolve([]);
+        let b = '';
+        res.on('data', (c) => b += c);
+        res.on('end', () => {
+          const lines = b.split('\n').map((l) => l.trim()).filter((l) => l.startsWith('http') || l.startsWith('udp') || l.startsWith('wss'));
+          resolve(lines);
+        });
+      }).on('error', () => resolve([])).on('timeout', () => resolve([]));
+    });
+
+    const results = await Promise.all(urls.map(fetchOne));
+    const set = new Set();
+    results.flat().forEach((t) => set.add(t));
+    return Array.from(set);
+  });
   h('social:detect', (url) => social.detectPlatform(url));
   h('social:resolve', async (url) => {
     try {

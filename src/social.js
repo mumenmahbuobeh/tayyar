@@ -56,6 +56,34 @@ function getYtDlpPath() {
   return exe;
 }
 
+function getFfmpegDir() {
+  const exe = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
+
+  // 1. Packaged Electron app extraResources directory
+  if (process.resourcesPath) {
+    const resBin = path.join(process.resourcesPath, 'bin');
+    if (fs.existsSync(path.join(resBin, exe))) return resBin;
+  }
+
+  // 2. Root local bin folder inside app directory
+  const localBin = path.join(__dirname, '..', 'bin');
+  if (fs.existsSync(path.join(localBin, exe))) return localBin;
+
+  // 3. AppData custom bin directory
+  const custom = getBinDir();
+  if (fs.existsSync(path.join(custom, exe))) return custom;
+
+  return localBin;
+}
+
+function getFfmpegPath() {
+  const exe = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
+  const dir = getFfmpegDir();
+  const full = path.join(dir, exe);
+  if (fs.existsSync(full)) return full;
+  return exe;
+}
+
 function isYtDlpAvailable() {
   return new Promise((resolve) => {
     const bin = getYtDlpPath();
@@ -320,69 +348,64 @@ async function resolveSocialMedia(url) {
 
           // Multi-format streams (YouTube, Facebook, etc.)
           if (Array.isArray(info.formats)) {
-            // Progressive video streams (contain both audio and video)
-            const progressiveStreams = info.formats
-              .filter(f => f.vcodec && f.vcodec !== 'none' && f.acodec && f.acodec !== 'none' && f.url)
-              .sort((a, b) => (b.height || 0) - (a.height || 0));
-
-            for (const f of progressiveStreams) {
-              const h = f.height || 720;
-              formats.push({
-                id: f.format_id,
-                quality: `🎬 جودة ${h}p عالية متكاملة (فيديو + صوت MP4)`,
-                ext: f.ext || 'mp4',
-                url: f.url,
-                filesize: f.filesize || -1
-              });
-            }
-
-            // High resolution adaptive streams (1080p, 1440p, 2160p 4K)
-            const adaptiveStreams = info.formats
-              .filter(f => f.vcodec && f.vcodec !== 'none' && (!f.acodec || f.acodec === 'none') && f.url && (f.height || 0) >= 1080)
+            // 1. High resolution streams (4K, 2K, 1080p, 720p)
+            const videoStreams = info.formats
+              .filter(f => f.vcodec && f.vcodec !== 'none' && f.height)
               .sort((a, b) => (b.height || 0) - (a.height || 0));
 
             const seenHeights = new Set();
-            for (const f of adaptiveStreams) {
-              const h = f.height || 1080;
+            for (const f of videoStreams) {
+              const h = f.height || 720;
               if (!seenHeights.has(h)) {
                 seenHeights.add(h);
                 const qLabel = h >= 2160 ? '4K Ultra HD (2160p)' :
                                h >= 1440 ? '2K Quad HD (1440p)' :
-                               'Full HD (1080p)';
+                               h >= 1080 ? 'Full HD (1080p)' :
+                               h >= 720  ? 'HD (720p)' : `${h}p`;
+                const isProgressive = f.acodec && f.acodec !== 'none';
                 formats.push({
-                  id: f.format_id,
+                  id: f.format_id || String(h),
+                  formatId: f.format_id || `bestvideo[height<=${h}]+bestaudio/best`,
                   quality: `🌟 فائقة الوضوح ${qLabel} (MP4)`,
-                  ext: f.ext || 'mp4',
-                  url: f.url,
+                  ext: 'mp4',
+                  url: url.trim(), // Source URL so yt-dlp downloads & merges losslessly
+                  directUrl: (isProgressive && f.url && !f.url.includes('.m3u8')) ? f.url : '',
+                  isSocial: true,
                   filesize: f.filesize || f.filesize_approx || -1
                 });
               }
             }
 
-            // Audio-only streams
+            // 2. Audio-only stream
             const audioStreams = info.formats
-              .filter(f => f.acodec && f.acodec !== 'none' && (!f.vcodec || f.vcodec === 'none') && f.url)
+              .filter(f => f.acodec && f.acodec !== 'none' && (!f.vcodec || f.vcodec === 'none'))
               .sort((a, b) => (b.abr || 0) - (a.abr || 0));
 
             if (audioStreams.length > 0) {
               const a = audioStreams[0];
               formats.push({
                 id: a.format_id || 'audio',
-                quality: '🎵 ملف صوتي فقط نقي (MP3 / M4A Audio)',
+                formatId: a.format_id || 'bestaudio/best',
+                quality: '🎵 ملف صوتي نقي بدون فيديو (MP3 Audio)',
                 ext: 'mp3',
-                url: a.url,
+                url: url.trim(),
+                directUrl: (a.url && !a.url.includes('.m3u8')) ? a.url : '',
+                isSocial: true,
                 filesize: a.filesize || -1
               });
             }
           }
 
           // Fallback format if formats array is empty
-          if (formats.length === 0 && info.url) {
+          if (formats.length === 0) {
             formats.push({
               id: 'best',
+              formatId: 'bestvideo+bestaudio/best',
               quality: '🎬 أعلى جودة متاحة (MP4)',
-              ext: info.ext || 'mp4',
-              url: info.url,
+              ext: 'mp4',
+              url: info.url || url.trim(),
+              directUrl: info.url || '',
+              isSocial: true,
               filesize: info.filesize || -1
             });
           }
@@ -483,5 +506,7 @@ module.exports = {
   resolveTikTokSsstik,
   resolveYouTubePiped,
   getYtDlpPath,
+  getFfmpegDir,
+  getFfmpegPath,
   PLATFORMS
 };

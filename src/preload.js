@@ -27,6 +27,7 @@ const bridge = {
   openExtensionFolder: inv('openExtensionFolder'),
   openUrl: inv('openUrl'),
   installUpdate: inv('installUpdate'),
+  fetchTrackers: inv('trackers:fetch'),
   socialDetect: inv('social:detect'),
   socialResolve: inv('social:resolve'),
   ytdlpCheck: inv('ytdlp:check'),

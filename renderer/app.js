@@ -616,22 +616,31 @@
     try {
       // 1. Fetch fresh trackers with fast timeout and multi-mirror failover
       let freshUrls = [];
-      const ctrl = new AbortController();
-      const tid = setTimeout(() => ctrl.abort(), 2500);
-      try {
-        const fetchText = (url) => fetch(url, { signal: ctrl.signal }).then((r) => r.ok ? r.text() : '').catch(() => '');
-        const results = await Promise.all([
-          fetchText('https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/trackers_best.txt'),
-          fetchText('https://cdn.jsdelivr.net/gh/XIU2/TrackersListCollection@master/best.txt'),
-          fetchText('https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt'),
-          fetchText('https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/best.txt')
-        ]);
-        clearTimeout(tid);
-        const set = new Set();
-        results.join('\n').split('\n').map((s) => s.trim()).filter((s) => s.startsWith('http') || s.startsWith('udp') || s.startsWith('wss')).forEach((u) => set.add(u));
-        freshUrls = Array.from(set);
-      } catch (_) {
-        clearTimeout(tid);
+      if (window.tayyar?.fetchTrackers) {
+        try {
+          const list = await window.tayyar.fetchTrackers();
+          if (Array.isArray(list) && list.length > 0) freshUrls = list;
+        } catch (_) {}
+      }
+
+      if (freshUrls.length === 0) {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), 2500);
+        try {
+          const fetchText = (url) => fetch(url, { signal: ctrl.signal }).then((r) => r.ok ? r.text() : '').catch(() => '');
+          const results = await Promise.all([
+            fetchText('https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/trackers_best.txt'),
+            fetchText('https://cdn.jsdelivr.net/gh/XIU2/TrackersListCollection@master/best.txt'),
+            fetchText('https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt'),
+            fetchText('https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/best.txt')
+          ]);
+          clearTimeout(tid);
+          const set = new Set();
+          results.join('\n').split('\n').map((s) => s.trim()).filter((s) => s.startsWith('http') || s.startsWith('udp') || s.startsWith('wss')).forEach((u) => set.add(u));
+          freshUrls = Array.from(set);
+        } catch (_) {
+          clearTimeout(tid);
+        }
       }
 
       // High-speed fallback if offline or mirrors blocked
@@ -2238,9 +2247,15 @@
         let finalDownloadUrl = u;
         let finalFilename = '';
         let referer = '';
+        let isSocialDownload = false;
+        let socialUrl = '';
+        let socialFormatId = '';
 
         const isSocial = detectSocialPlatform(u);
         if (isSocial) {
+          isSocialDownload = true;
+          socialUrl = u;
+
           // If social resolution is still in flight or not done, resolve now
           if (!activeSocialData || !activeSocialData.ok || !activeSocialData.formats?.length) {
             toast(S.lang === 'ar' ? 'جاري فحص واستخراج البث المباشر...' : 'Resolving media stream...');
@@ -2252,15 +2267,20 @@
           if (activeSocialData && activeSocialData.ok && activeSocialData.formats?.length) {
             const selectedIdx = parseInt($('#socialQualitySelect')?.value || '0', 10);
             const fmt = activeSocialData.formats[selectedIdx] || activeSocialData.formats[0];
-            if (fmt && fmt.url && fmt.url !== u) {
-              finalDownloadUrl = fmt.url;
+            const ext = fmt.ext || 'mp4';
+            socialFormatId = fmt.formatId || fmt.id || 'best';
+            const cleanTitle = (activeSocialData.title || 'video')
+              .replace(/[\/\\:*?"<>|]/g, '_')
+              .slice(0, 60)
+              .trim();
+            finalFilename = `${activeSocialData.platform || 'Tayyar'}_${cleanTitle}.${ext}`;
+
+            if (window.tayyar?.isMobile || !window.tayyar?.socialResolve) {
+              finalDownloadUrl = fmt.directUrl || (fmt.url && !fmt.url.includes('.m3u8') ? fmt.url : u);
               referer = fmt.referer || '';
-              const ext = fmt.ext || 'mp4';
-              const cleanTitle = (activeSocialData.title || 'video')
-                .replace(/[\/\\:*?"<>|]/g, '_')
-                .slice(0, 60)
-                .trim();
-              finalFilename = `${activeSocialData.platform || 'Tayyar'}_${cleanTitle}.${ext}`;
+            } else {
+              finalDownloadUrl = fmt.directUrl || u;
+              referer = fmt.referer || '';
             }
           } else {
             console.warn('Social resolution not pre-extracted, proceeding with direct download');
@@ -2276,6 +2296,9 @@
             referer: referer || undefined,
             dir: dir || undefined,
             connections: conns,
+            isSocial: isSocialDownload,
+            socialUrl: socialUrl || u,
+            formatId: socialFormatId || 'best',
           });
           if (res?.item) {
             S.items.set(res.item.id, res.item);

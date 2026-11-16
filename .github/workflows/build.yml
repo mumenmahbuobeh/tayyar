@@ -49,6 +49,9 @@ jobs:
           mkdir -p bin
           if [ "${{ runner.os }}" = "Windows" ]; then
             curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe -o bin/yt-dlp.exe
+            curl -L -s https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip -o ffmpeg.zip
+            tar -xf ffmpeg.zip -C bin --strip-components=2 "ffmpeg-master-latest-win64-gpl/bin/ffmpeg.exe" "ffmpeg-master-latest-win64-gpl/bin/ffprobe.exe" || true
+            rm -f ffmpeg.zip
             npm run dist:win
             cp dist/Tayyar-Setup-*.exe dist/Tayyar.Setup.1.0.5.exe 2>/dev/null || true
             cp dist/Tayyar-1.0.5.exe dist/Tayyar.1.0.5.exe 2>/dev/null || true
@@ -60,6 +63,10 @@ jobs:
           else
             curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o bin/yt-dlp
             chmod +x bin/yt-dlp
+            curl -L -s https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz -o ffmpeg.tar.xz
+            tar -xf ffmpeg.tar.xz -C bin --strip-components=2 "ffmpeg-master-latest-linux64-gpl/bin/ffmpeg" "ffmpeg-master-latest-linux64-gpl/bin/ffprobe" || true
+            chmod +x bin/ffmpeg bin/ffprobe 2>/dev/null || true
+            rm -f ffmpeg.tar.xz
             npm run dist:linux
             cp dist/*.deb dist/tayyar_1.0.5_amd64.deb 2>/dev/null || true
             cp dist/*.AppImage dist/Tayyar-1.0.5.AppImage 2>/dev/null || true

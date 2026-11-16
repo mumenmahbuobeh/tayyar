@@ -368,19 +368,27 @@ class DownloadManager extends EventEmitter {
     return { finalUrl: res.finalUrl, size, resumable, filename: filenameFrom(h, res.finalUrl), mime: h['content-type'] || '' };
   }
 
-  add({ url, referer = '', filename = '', saveDir = '', connections, startNow = true, startAt = 0 }) {
+  add({ url, referer = '', filename = '', saveDir = '', connections, startNow = true, startAt = 0, isSocial = false, socialUrl = '', formatId = '' }) {
     const u = new URL(url);
     if (!/^https?:$/.test(u.protocol)) throw new Error('Only http/https links are supported');
     const name = filename ? sanitizeName(filename) : '';
+    let isSocialDownload = !!isSocial;
+    try {
+      const social = require('./social');
+      if (social.detectPlatform(url)) isSocialDownload = true;
+    } catch (_) {}
     const d = {
       id: crypto.randomUUID(),
       url: u.toString(), finalUrl: '', referer,
       filename: name, saveDir, path: '',
-      category: name ? categoryOf(name) : categoryOf(path.basename(u.pathname)),
+      category: isSocialDownload ? (name.endsWith('.mp3') || name.endsWith('.m4a') ? 'audio' : 'video') : (name ? categoryOf(name) : categoryOf(path.basename(u.pathname))),
       connections: clamp(+connections || this.settings.connections, 1, 32),
-      size: -1, downloaded: 0, resumable: false, segments: [],
+      size: -1, downloaded: 0, resumable: isSocialDownload ? true : false, segments: [],
       status: startAt > Date.now() ? 'scheduled' : (startNow ? 'queued' : 'paused'),
       startAt: startAt || 0, error: null, addedAt: Date.now(), completedAt: 0,
+      isSocial: isSocialDownload,
+      socialUrl: socialUrl || url,
+      formatId: formatId || 'best',
     };
     this.downloads.push(d);
     this.emit('update', this._pub(d));
@@ -437,13 +445,14 @@ class DownloadManager extends EventEmitter {
   _pub(d) {
     const job = this.active.get(d.id);
     const speed = job ? job.speed : 0;
-    const eta = speed > 1 && d.size > 0 ? (d.size - d.downloaded) / speed : -1;
+    const eta = speed > 1 && d.size > 0 ? (d.size - d.downloaded) / speed : (d.eta != null ? d.eta : -1);
     return {
       id: d.id, url: d.url, filename: d.filename, path: d.path, category: d.category,
       size: d.size, downloaded: d.downloaded, status: d.status, error: d.error,
       resumable: d.resumable, connections: d.connections, addedAt: d.addedAt,
-      completedAt: d.completedAt, startAt: d.startAt, speed, eta,
-      segments: d.segments.map((s) => [s.start, s.end, s.pos]),
+      completedAt: d.completedAt, startAt: d.startAt, speed, eta: Math.round(eta),
+      isSocial: !!d.isSocial,
+      segments: (d.segments || []).map((s) => [s.start, s.end, s.pos]),
     };
   }
 
@@ -490,9 +499,145 @@ class DownloadManager extends EventEmitter {
 
   _stop(job) {
     job.stopped = true;
-    for (const r of job.reqs) r.destroy();
-    job.reqs.clear();
+    if (job.proc) {
+      try { job.proc.kill('SIGTERM'); } catch (_) {}
+      job.proc = null;
+    }
+    if (job.reqs) {
+      for (const r of job.reqs) r.destroy();
+      job.reqs.clear();
+    }
     if (job.fd != null) { try { fs.closeSync(job.fd); } catch (_) { /* ignore */ } job.fd = null; }
+  }
+
+  async _startSocial(d) {
+    const job = { d, proc: null, reqs: new Set(), stopped: false, fd: null, speed: 0, lastBytes: 0, lastT: Date.now() };
+    this.active.set(d.id, job);
+    d.status = 'downloading';
+    d.error = null;
+    this.emit('update', this._pub(d));
+
+    try {
+      const social = require('./social');
+      const bin = social.getYtDlpPath();
+      const ffmpegDir = social.getFfmpegDir();
+
+      const base = d.saveDir || this.settings.downloadDir;
+      const dir = !d.saveDir && this.settings.autoCategorize ? path.join(base, CATEGORY_DIR[d.category] || 'Video') : base;
+      fs.mkdirSync(dir, { recursive: true });
+
+      if (!d.filename) {
+        d.filename = `Tayyar_Media_${Date.now()}.mp4`;
+      }
+      if (!path.extname(d.filename)) d.filename += '.mp4';
+      if (!d.path) {
+        d.path = uniquePath(dir, d.filename);
+      }
+
+      const args = [
+        '--newline',
+        '--no-colors',
+        '--no-playlist',
+        '--continue',
+        '--progress-template', 'progress:%(progress.downloaded_bytes)s/%(progress.total_bytes)s|%(progress.speed)s|%(progress.eta)s',
+      ];
+
+      if (ffmpegDir && fs.existsSync(ffmpegDir)) {
+        args.push('--ffmpeg-location', ffmpegDir);
+      }
+
+      if (d.formatId && d.formatId !== 'best' && d.formatId !== 'direct') {
+        args.push('-f', `${d.formatId}+bestaudio/bestvideo+bestaudio/best`);
+      } else {
+        args.push('-f', 'bestvideo+bestaudio/best');
+      }
+
+      if (d.filename.endsWith('.mp3') || d.filename.endsWith('.m4a')) {
+        args.push('-x', '--audio-format', 'mp3');
+      } else {
+        args.push('--merge-output-format', 'mp4');
+      }
+
+      args.push('-o', d.path);
+      args.push(d.socialUrl || d.url);
+
+      await new Promise((resolve, reject) => {
+        let stderrBuf = '';
+        const cp = require('child_process');
+        const proc = cp.spawn(bin, args, { windowsHide: true });
+        job.proc = proc;
+
+        proc.stdout.on('data', (chunk) => {
+          if (job.stopped) return;
+          const text = chunk.toString();
+          const match = text.match(/progress:(\d+)\/(\d+)\|(\d+\.?\d*)\|(\d+)/);
+          if (match) {
+            d.downloaded = parseInt(match[1], 10);
+            d.size = parseInt(match[2], 10);
+            const spd = parseFloat(match[3]);
+            d.speed = Number.isFinite(spd) ? spd : 0;
+            job.speed = d.speed;
+            d.eta = parseInt(match[4], 10) || -1;
+            this.emit('update', this._pub(d));
+            this.emit('progress', [this._pub(d)]);
+          }
+        });
+
+        proc.stderr.on('data', (c) => {
+          stderrBuf += c.toString();
+        });
+
+        proc.on('error', (err) => {
+          if (job.stopped) return resolve();
+          reject(err);
+        });
+
+        proc.on('close', (code) => {
+          job.proc = null;
+          if (job.stopped) return resolve();
+          if (code === 0) {
+            let finalPath = d.path;
+            if (!fs.existsSync(finalPath)) {
+              const dirName = path.dirname(d.path);
+              const baseName = path.basename(d.path, path.extname(d.path));
+              try {
+                const candidates = fs.readdirSync(dirName).filter((f) => f.startsWith(baseName) && !f.endsWith('.part') && !f.endsWith('.ytdl'));
+                if (candidates.length > 0) {
+                  finalPath = path.join(dirName, candidates[0]);
+                  d.path = finalPath;
+                  d.filename = path.basename(finalPath);
+                }
+              } catch (_) {}
+            }
+
+            if (fs.existsSync(finalPath)) {
+              const stat = fs.statSync(finalPath);
+              d.size = stat.size;
+              d.downloaded = stat.size;
+              d.speed = 0;
+              d.eta = -1;
+              d.status = 'completed';
+              d.completedAt = Date.now();
+              this.emit('update', this._pub(d));
+              this.emit('complete', this._pub(d));
+              return resolve();
+            }
+          }
+          reject(new Error(stderrBuf.trim() || `Download process exited with code ${code}`));
+        });
+      });
+    } catch (e) {
+      if (job.stopped) return;
+      this._stop(job);
+      d.status = 'error';
+      d.error = e.message || String(e);
+      this.emit('update', this._pub(d));
+      this.emit('error-download', this._pub(d));
+    } finally {
+      if (this.active.get(d.id) === job) this.active.delete(d.id);
+      this._saveSoon();
+      this._schedule();
+    }
   }
 
   async _prepare(d) {
@@ -524,6 +669,9 @@ class DownloadManager extends EventEmitter {
   }
 
   async _start(d) {
+    if (d.isSocial) {
+      return this._startSocial(d);
+    }
     const job = { d, reqs: new Set(), stopped: false, fd: null, bytes: 0, lastBytes: 0, lastT: Date.now(), speed: 0 };
     this.active.set(d.id, job);
     d.status = 'downloading';
@@ -633,6 +781,13 @@ class DownloadManager extends EventEmitter {
           if (d.finalUrl && d.finalUrl !== d.url) d.finalUrl = d.url; // signed URL may have expired
           res.resume(); req.destroy();
           return done(reject, new Error(`HTTP ${res.statusCode}`));
+        }
+        const ct = (res.headers['content-type'] || '').toLowerCase();
+        if (d.filename && /\.(mp4|mkv|avi|mov|mp3|zip|rar|iso|exe|dmg|apk)$/i.test(d.filename)) {
+          if (ct.includes('text/html') || ct.includes('text/xml') || ct.includes('application/xml') || ct.includes('application/vnd.apple.mpegurl')) {
+            res.resume(); req.destroy();
+            return done(reject, new Error(`Server returned error response (${ct || 'text/html'}) instead of media file`));
+          }
         }
         res.on('data', (chunk) => {
           if (job.stopped) return;

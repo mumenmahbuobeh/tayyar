@@ -78,6 +78,19 @@ public class TayyarMobilePlugin extends Plugin {
             }
             request.addRequestHeader("User-Agent", "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36");
 
+            String lower = filename.toLowerCase();
+            if (lower.endsWith(".mp4")) {
+                request.setMimeType("video/mp4");
+            } else if (lower.endsWith(".mp3")) {
+                request.setMimeType("audio/mpeg");
+            } else if (lower.endsWith(".m4a")) {
+                request.setMimeType("audio/mp4");
+            } else if (lower.endsWith(".apk")) {
+                request.setMimeType("application/vnd.android.package-archive");
+            } else if (lower.endsWith(".zip")) {
+                request.setMimeType("application/zip");
+            }
+
             long downloadId = dm.enqueue(request);
 
             JSObject ret = new JSObject();
@@ -162,6 +175,35 @@ public class TayyarMobilePlugin extends Plugin {
         }
     }
 
+    private String resolveRedirects(String initialUrl) {
+        try {
+            String current = initialUrl;
+            for (int i = 0; i < 5; i++) {
+                URL u = new URL(current);
+                HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+                conn.setInstanceFollowRedirects(false);
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+                conn.setConnectTimeout(6000);
+                conn.setReadTimeout(6000);
+                int code = conn.getResponseCode();
+                if (code >= 300 && code < 400) {
+                    String loc = conn.getHeaderField("Location");
+                    if (loc != null && !loc.isEmpty()) {
+                        if (loc.startsWith("/")) {
+                            loc = u.getProtocol() + "://" + u.getHost() + loc;
+                        }
+                        current = loc;
+                        continue;
+                    }
+                }
+                break;
+            }
+            return current;
+        } catch (Exception e) {
+            return initialUrl;
+        }
+    }
+
     @PluginMethod
     public void resolveSocialUrl(PluginCall call) {
         final String rawUrl = call.getString("url");
@@ -169,12 +211,13 @@ public class TayyarMobilePlugin extends Plugin {
             call.reject("URL cannot be empty");
             return;
         }
-        final String url = rawUrl.trim();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    final String url = resolveRedirects(rawUrl.trim());
+
                     // 1. TikTok No-Watermark Resolution (SSSTik mirror via native HTTP - zero CORS)
                     if (url.contains("tiktok.com")) {
                         try {
@@ -212,6 +255,7 @@ public class TayyarMobilePlugin extends Plugin {
                                 f1.put("quality", "⚡ فيديو أصلي فائق الدقة بدون علامة مائية (MP4)");
                                 f1.put("ext", "mp4");
                                 f1.put("url", m.group(1));
+                                f1.put("directUrl", m.group(1));
                                 f1.put("referer", "https://ssstik.io/");
                                 formats.put(f1);
                             }
@@ -221,6 +265,7 @@ public class TayyarMobilePlugin extends Plugin {
                                 f2.put("quality", "🎬 جودة فائقة HD بدون علامة مائية (MP4)");
                                 f2.put("ext", "mp4");
                                 f2.put("url", m.group(1));
+                                f2.put("directUrl", m.group(1));
                                 f2.put("referer", "https://ssstik.io/");
                                 formats.put(f2);
                             }
@@ -233,6 +278,7 @@ public class TayyarMobilePlugin extends Plugin {
                                 fAudio.put("quality", "🎵 ملف صوتي فقط (MP3)");
                                 fAudio.put("ext", "mp3");
                                 fAudio.put("url", mAudio.group(1));
+                                fAudio.put("directUrl", mAudio.group(1));
                                 fAudio.put("referer", "https://ssstik.io/");
                                 formats.put(fAudio);
                             }
@@ -258,7 +304,7 @@ public class TayyarMobilePlugin extends Plugin {
                         }
                     }
 
-                    // 2. YouTube Resolution via Piped APIs
+                    // 2. YouTube Resolution via Piped & Invidious APIs
                     if (url.contains("youtube.com") || url.contains("youtu.be")) {
                         Pattern pYt = Pattern.compile("(?:watch\\?v=|shorts/|live/|youtu\\.be/)([a-zA-Z0-9_-]{11})");
                         Matcher mYt = pYt.matcher(url);
@@ -289,12 +335,16 @@ public class TayyarMobilePlugin extends Plugin {
                                         if (vStreams != null) {
                                             for (int i = 0; i < vStreams.length(); i++) {
                                                 org.json.JSONObject v = vStreams.getJSONObject(i);
-                                                if ("MP4".equalsIgnoreCase(v.optString("format")) && v.has("url")) {
+                                                String fmtStr = v.optString("format", "");
+                                                boolean isMp4 = "MP4".equalsIgnoreCase(fmtStr) || "MPEG_4".equalsIgnoreCase(fmtStr);
+                                                if (isMp4 && v.has("url")) {
                                                     JSObject fmt = new JSObject();
-                                                    fmt.put("id", v.optString("quality", "hd"));
-                                                    fmt.put("quality", "🎬 فيديو بدقة " + v.optString("quality", "HD") + " (MP4)");
+                                                    String q = v.optString("quality", "HD");
+                                                    fmt.put("id", q);
+                                                    fmt.put("quality", "🎬 فيديو بدقة " + q + " (MP4)");
                                                     fmt.put("ext", "mp4");
                                                     fmt.put("url", v.getString("url"));
+                                                    fmt.put("directUrl", v.getString("url"));
                                                     formats.put(fmt);
                                                 }
                                             }
@@ -308,6 +358,7 @@ public class TayyarMobilePlugin extends Plugin {
                                                 fmt.put("quality", "🎵 ملف صوتي فقط (Audio Stream)");
                                                 fmt.put("ext", "m4a");
                                                 fmt.put("url", a.getString("url"));
+                                                fmt.put("directUrl", a.getString("url"));
                                                 formats.put(fmt);
                                             }
                                         }
