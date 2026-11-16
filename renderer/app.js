@@ -465,6 +465,12 @@
     }
     const mc = $('#mainContent');
     if (mc) mc.scrollTop = 0;
+
+    if (viewName === 'plugins') {
+      renderPluginsView();
+    } else if (viewName === 'downloads') {
+      renderDownloadsList();
+    }
   }
 
   $$('.nav-item').forEach((btn) => {
@@ -506,21 +512,21 @@
           day: 'numeric',
         });
 
-        // More activity in recent weeks (October and November)
-        const recentBonus = c > 18 ? 0.35 : (c > 10 ? 0.15 : 0);
+        // Strong activity in recent weeks, especially November (columns 22-25)
+        const recentBonus = c >= 22 ? 0.45 : (c >= 18 ? 0.35 : (c > 10 ? 0.15 : 0));
         const rand = prng() + recentBonus;
 
         let count = 0;
         if (rand > 1.05) {
           cell.classList.add('lvl-4');
           count = Math.floor(prng() * 6) + 10;
-        } else if (rand > 0.85) {
+        } else if (rand > 0.82) {
           cell.classList.add('lvl-3');
           count = Math.floor(prng() * 4) + 5;
-        } else if (rand > 0.65) {
+        } else if (rand > 0.58) {
           cell.classList.add('lvl-2');
           count = Math.floor(prng() * 3) + 2;
-        } else if (rand > 0.45) {
+        } else if (rand > 0.36) {
           cell.classList.add('lvl-1');
           count = 1;
         } else {
@@ -568,6 +574,675 @@
         bSyncTrackers.innerHTML = `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" style="width:14px;margin-right:6px;"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> <span>Sync Now</span>`;
         toast('Trackers updated successfully (50 active)');
       }, 900);
+    });
+  }
+
+  /* ================= PLUGINS MANAGEMENT SYSTEM (motrix.app/plugins) ================= */
+  const DEFAULT_PLUGINS = [
+    {
+      id: 'motrix.filename-template',
+      name: 'Tayyar Filename Template',
+      author: 'tayyar.filename-template',
+      short: 'MF',
+      color: 'avatar-blue',
+      version: 'v1.1.1',
+      desc: 'Renames downloads with safe, composable templates while preserving their extensions.',
+      installed: true,
+      enabled: true,
+      badge: 'Review access',
+      notice: 'This plugin can read any website. Keep it on only if you trust it.',
+      purpose: 'Renames downloads with safe, composable templates while preserving their extensions.',
+      access: 'Can read any website',
+      health: 'All good',
+      settings: {
+        template: '{date}-{title}.{ext}',
+        preserveExt: true,
+        sanitize: true
+      }
+    },
+    {
+      id: 'motrix.url-resolver',
+      name: 'Tayyar URL Resolver',
+      author: 'tayyar.url-resolver',
+      short: 'MU',
+      color: 'avatar-green',
+      version: 'v1.0.0',
+      desc: 'URL-resolver framework for Tayyar. Ships no site-specific extractors; includes only a Wikimedia Commons demo resolver. Site resolution is provided by separately installed site-resolver plugins.',
+      installed: true,
+      enabled: true,
+      badge: 'Ready',
+      notice: 'This plugin is enabled and ready. It only saves its own settings and does not read any websites.',
+      purpose: 'URL-resolver framework for Tayyar multi-source stream handling.',
+      access: 'Can read 1 website',
+      health: 'All good',
+      settings: {
+        autoResolve: true,
+        timeout: 10,
+        defaultResolver: 'wikimedia'
+      }
+    },
+    {
+      id: 'motrix.page-scraper',
+      name: 'Tayyar Page Scraper',
+      author: 'tayyar.page-scraper',
+      short: 'PS',
+      color: 'avatar-blue',
+      version: 'v1.0.3',
+      desc: 'Inspects HTML landing pages when you add an HTTP download and automatically extracts/switches the target URL to the underlying archive or installer link (.zip, .tar.gz, .dmg, .exe).',
+      installed: true,
+      enabled: true,
+      badge: 'Ready',
+      notice: 'Inspects web pages to detect direct download streams (.zip, .iso, .exe, .dmg).',
+      purpose: 'Extracts underlying direct downloadable links from download landing pages.',
+      access: 'Can read any website',
+      health: 'All good',
+      settings: {
+        extensions: '.zip, .tar.gz, .iso, .exe, .dmg, .apk, .7z, .rar',
+        autoDownload: false
+      }
+    },
+    {
+      id: 'ashkan4472.folder-categories',
+      name: 'Folder Categories',
+      author: 'Ashkan4472',
+      short: 'FC',
+      color: 'avatar-blue',
+      version: 'v1.0.0',
+      desc: 'Sorts finished downloads into category folders (Compressed, Documents, Music, Programs, Video).',
+      installed: false,
+      enabled: false,
+      badge: 'Looks safe',
+      notice: 'Automatically moves downloaded files into subdirectories based on format.',
+      purpose: 'Sorts finished downloads into category folders (Compressed, Documents, Music, Programs, Video).',
+      access: 'Local storage only',
+      health: 'All good',
+      settings: {
+        autoCreateFolders: true,
+        defaultFolder: 'Downloads'
+      }
+    },
+    {
+      id: 'dontarken.alldebrid-resolver',
+      name: 'AllDebrid Resolver',
+      author: 'DonTarken',
+      short: 'AR',
+      color: 'avatar-green',
+      version: 'v1.2.0',
+      desc: 'Automatically unlocks and debrids supported download links using your premium account.',
+      installed: false,
+      enabled: false,
+      badge: 'Looks safe',
+      notice: 'Connects with AllDebrid API to generate accelerated high-speed download links.',
+      purpose: 'Unlocks premium file hosting downloads automatically.',
+      access: 'Can read supported file hosts',
+      health: 'All good',
+      settings: {
+        apiKey: '',
+        enableAcceleration: true
+      }
+    },
+    {
+      id: 'griciaisl12.smart-link',
+      name: 'Tayyar Smart Link',
+      author: 'griciaisl12',
+      short: 'MS',
+      color: 'avatar-blue',
+      version: 'v1.0.5',
+      desc: 'Resolves GitHub repository release, file links, Google Drive/Docs into real downloads with mirror acceleration.',
+      installed: false,
+      enabled: false,
+      badge: 'Looks safe',
+      notice: 'Provides mirror acceleration for GitHub and cloud repositories.',
+      purpose: 'Accelerates repository releases and resolves cloud file links.',
+      access: 'Can read GitHub & cloud storage',
+      health: 'All good',
+      settings: {
+        mirrorProvider: 'fastgit',
+        bypassGoogleVirusWarning: true
+      }
+    },
+    {
+      id: 'motrix.media-merge',
+      name: 'Tayyar Media Merge',
+      author: 'Tayyar Team',
+      short: 'MM',
+      color: 'avatar-blue',
+      version: 'v0.1.0',
+      desc: 'Combine separate video and audio files into one MP4 or MKV without re-encoding.',
+      installed: false,
+      enabled: false,
+      badge: 'Looks safe',
+      notice: 'Merges separate DASH audio and video streams into single playback media.',
+      purpose: 'Merges video and audio stream chunks into a single file.',
+      access: 'Local storage only',
+      health: 'All good',
+      settings: {
+        outputFormat: 'mp4',
+        autoCleanParts: true
+      }
+    },
+    {
+      id: 'motrix.cloud-resolver',
+      name: 'Cloud & Mirror Accelerator',
+      author: 'Motrix Team',
+      short: 'CR',
+      color: 'avatar-green',
+      version: 'v1.0.2',
+      desc: 'High-speed multi-mirror acceleration for cloud drive links, Baidu Pan, and multi-source CDNs.',
+      installed: false,
+      enabled: false,
+      badge: 'Looks safe',
+      notice: 'Connects to multi-source CDN mirrors for accelerated chunk downloading.',
+      purpose: 'Resolves cloud drive mirrors and splits streams across multiple CDNs.',
+      access: 'Can read cloud mirrors',
+      health: 'All good',
+      settings: {
+        maxMirrors: 4,
+        timeout: 8
+      }
+    }
+  ];
+
+  function getStoredPlugins() {
+    try {
+      const raw = localStorage.getItem('tayyar_plugins_state');
+      if (!raw) return DEFAULT_PLUGINS;
+      const stored = JSON.parse(raw);
+      return DEFAULT_PLUGINS.map((def) => {
+        const found = stored.find((s) => s.id === def.id);
+        return found ? Object.assign({}, def, found) : def;
+      }).concat(stored.filter((s) => !DEFAULT_PLUGINS.some((def) => def.id === s.id)));
+    } catch (_) {
+      return DEFAULT_PLUGINS;
+    }
+  }
+
+  function saveStoredPlugins(plugins) {
+    try {
+      localStorage.setItem('tayyar_plugins_state', JSON.stringify(plugins));
+    } catch (_) {}
+  }
+
+  let activePluginDetailId = null;
+  let pluginSearchQuery = '';
+
+  function renderPluginsView() {
+    const installedGrid = $('#installedPluginsGrid');
+    const availableGrid = $('#availablePluginsGrid');
+    if (!installedGrid || !availableGrid) return;
+
+    const plugins = getStoredPlugins();
+    const q = pluginSearchQuery.toLowerCase().trim();
+
+    const matchesQuery = (p) => {
+      if (!q) return true;
+      return (p.name && p.name.toLowerCase().includes(q)) ||
+             (p.desc && p.desc.toLowerCase().includes(q)) ||
+             (p.author && p.author.toLowerCase().includes(q));
+    };
+
+    const installed = plugins.filter((p) => p.installed && matchesQuery(p));
+    const available = plugins.filter((p) => !p.installed && matchesQuery(p));
+
+    // Render Installed Plugins
+    if (!installed.length) {
+      installedGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 24px; text-align: center; color: var(--text-dim); background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
+          ${S.lang === 'ar' ? 'لا توجد إضافات تطابق البحث' : 'No installed plugins match your filter'}
+        </div>
+      `;
+    } else {
+      installedGrid.innerHTML = installed.map((p) => `
+        <div class="plugin-card" data-plugin-id="${p.id}">
+          <div class="plugin-card-top">
+            <span class="plugin-avatar ${p.color || 'avatar-blue'}">${p.short || 'PL'}</span>
+            <div class="plugin-meta">
+              <div class="plugin-title">${p.name} <span class="status-dot-blue" style="display:${p.enabled ? 'inline-block' : 'none'};"></span></div>
+              <div class="plugin-ver">${p.version} · ${p.author || p.id}</div>
+            </div>
+            <label class="switch-toggle" title="${p.enabled ? 'Enabled' : 'Disabled'}">
+              <input type="checkbox" class="plugin-toggle-chk" data-id="${p.id}" ${p.enabled ? 'checked' : ''}>
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+          <p class="plugin-desc">${p.desc || ''}</p>
+          <div class="plugin-card-foot">
+            <button type="button" class="pill-btn light sm btn-open-plugin" data-id="${p.id}">Open</button>
+            <span class="badge-safe">${p.badge || 'Looks safe'}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Render Available Plugins
+    if (!available.length) {
+      availableGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 24px; text-align: center; color: var(--text-dim); background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
+          ${S.lang === 'ar' ? 'جميع الإضافات مثبتة بالفعل' : 'All available plugins are currently installed'}
+        </div>
+      `;
+    } else {
+      availableGrid.innerHTML = available.map((p) => `
+        <div class="plugin-card" data-plugin-id="${p.id}">
+          <div class="plugin-card-top">
+            <span class="plugin-avatar ${p.color || 'avatar-blue'}">${p.short || 'PL'}</span>
+            <div class="plugin-meta">
+              <div class="plugin-title">${p.name}</div>
+              <div class="plugin-ver">by ${p.author || 'Community'} · ${p.version}</div>
+            </div>
+          </div>
+          <p class="plugin-desc">${p.desc || ''}</p>
+          <div class="plugin-card-foot">
+            <button type="button" class="pill-btn primary sm btn-install-plugin" data-id="${p.id}">Install</button>
+            <span class="badge-safe">${p.badge || 'Looks safe'}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Attach listeners
+    $$('.btn-open-plugin', installedGrid).forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openPluginDetail(btn.dataset.id);
+      });
+    });
+
+    $$('.plugin-toggle-chk', installedGrid).forEach((chk) => {
+      chk.addEventListener('change', (e) => {
+        e.stopPropagation();
+        togglePlugin(chk.dataset.id, chk.checked);
+      });
+    });
+
+    $$('.btn-install-plugin', availableGrid).forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        installPlugin(btn.dataset.id);
+      });
+    });
+  }
+
+  function togglePlugin(pluginId, isEnabled) {
+    const plugins = getStoredPlugins();
+    const p = plugins.find((x) => x.id === pluginId);
+    if (p) {
+      p.enabled = isEnabled;
+      saveStoredPlugins(plugins);
+      renderPluginsView();
+      toast(isEnabled ? `${p.name} enabled` : `${p.name} disabled`);
+      if (activePluginDetailId === pluginId) {
+        const detailToggle = $('#pluginDetailToggle');
+        if (detailToggle) detailToggle.checked = isEnabled;
+      }
+    }
+  }
+
+  function installPlugin(pluginId) {
+    const plugins = getStoredPlugins();
+    const p = plugins.find((x) => x.id === pluginId);
+    if (p) {
+      p.installed = true;
+      p.enabled = true;
+      saveStoredPlugins(plugins);
+      renderPluginsView();
+      toast(S.lang === 'ar' ? `تم تثبيت ${p.name} بنجاح` : `Installed ${p.name} successfully`);
+    }
+  }
+
+  function uninstallPlugin(pluginId) {
+    const plugins = getStoredPlugins();
+    const p = plugins.find((x) => x.id === pluginId);
+    if (p) {
+      p.installed = false;
+      p.enabled = false;
+      saveStoredPlugins(plugins);
+      renderPluginsView();
+      const modal = $('#pluginDetailModal');
+      if (modal) modal.close();
+      toast(S.lang === 'ar' ? `تم إلغاء تثبيت ${p.name}` : `Uninstalled ${p.name}`);
+    }
+  }
+
+  function openPluginDetail(pluginId) {
+    const plugins = getStoredPlugins();
+    const p = plugins.find((x) => x.id === pluginId);
+    if (!p) return;
+
+    activePluginDetailId = pluginId;
+    const modal = $('#pluginDetailModal');
+    if (!modal) return;
+
+    // Header & Meta
+    $('#pluginDetailName').textContent = `${p.name} •`;
+    const toggle = $('#pluginDetailToggle');
+    if (toggle) toggle.checked = !!p.enabled;
+
+    // Overview Tab (Matching Images 2 & 3)
+    $('#pluginDetailAvatar').textContent = p.short || 'PL';
+    $('#pluginDetailAvatar').className = `plugin-avatar ${p.color || 'avatar-blue'}`;
+    $('#pluginDetailTitle').textContent = p.name;
+    $('#pluginDetailVer').textContent = `${p.version} · ${p.author || p.id}`;
+    $('#pluginDetailBadge').textContent = p.badge || (p.enabled ? 'Ready' : 'Disabled');
+    $('#pluginDetailDesc').textContent = p.desc || '';
+    const rawNotice = p.notice || (p.enabled ? 'This plugin is enabled and ready.' : 'This plugin is currently disabled.');
+    const hostSummaryText = (p.access || 'any website').toLowerCase();
+    $('#pluginDetailNoticeText').textContent = rawNotice.replace('{{hostSummary}}', hostSummaryText);
+    $('#pluginDetailPurpose').textContent = p.purpose || p.desc || '';
+    $('#pluginDetailAccess').textContent = p.access || 'Can read any website';
+    $('#pluginDetailHealth').textContent = p.health || 'All good';
+
+    // Settings Tab
+    renderPluginSettingsTab(p);
+
+    // Reset Tab navigation to Overview
+    $$('.plugin-tab-btn').forEach((b) => b.classList.remove('active'));
+    $$('.plugin-tab-content').forEach((c) => c.classList.remove('active'));
+    const firstTabBtn = $('.plugin-tab-btn[data-tab="overview"]');
+    const firstTabContent = $('#tabPluginOverview');
+    if (firstTabBtn) firstTabBtn.classList.add('active');
+    if (firstTabContent) firstTabContent.classList.add('active');
+
+    modal.showModal();
+  }
+
+  function renderPluginSettingsTab(p) {
+    const container = $('#pluginSettingsContainer');
+    if (!container) return;
+
+    if (p.id === 'motrix.filename-template') {
+      const templateVal = p.settings?.template || '{date}-{title}.{ext}';
+      const preserveVal = p.settings?.preserveExt !== false;
+      const sanitizeVal = p.settings?.sanitize !== false;
+
+      container.innerHTML = `
+        <label class="field-label">
+          <span>Filename Template Pattern / نمط إعادة التسمية</span>
+          <input type="text" id="cfgFnTemplateInput" class="probe-input" value="${templateVal}">
+        </label>
+        <div class="plugin-tag-chips">
+          <span class="plugin-chip" data-tag="{title}">{{title}}</span>
+          <span class="plugin-chip" data-tag="{ext}">{{ext}}</span>
+          <span class="plugin-chip" data-tag="{date}">{{date}}</span>
+          <span class="plugin-chip" data-tag="{domain}">{{domain}}</span>
+          <span class="plugin-chip" data-tag="{category}">{{category}}</span>
+        </div>
+        <div class="setting-toggle-row" style="margin-top:14px;">
+          <span>Preserve original extension</span>
+          <label class="switch-toggle"><input type="checkbox" id="cfgFnPreserveExt" ${preserveVal ? 'checked' : ''}><span class="switch-slider"></span></label>
+        </div>
+        <div class="setting-toggle-row">
+          <span>Sanitize illegal filesystem characters</span>
+          <label class="switch-toggle"><input type="checkbox" id="cfgFnSanitize" ${sanitizeVal ? 'checked' : ''}><span class="switch-slider"></span></label>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+          <button type="button" class="pill-btn primary" id="bSavePluginSettings">Save Settings</button>
+        </div>
+      `;
+
+      $$('.plugin-chip', container).forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const input = $('#cfgFnTemplateInput');
+          if (input) input.value += chip.dataset.tag;
+        });
+      });
+    } else if (p.id === 'motrix.url-resolver') {
+      container.innerHTML = `
+        <label class="field-label">
+          <span>Default Resolver Service</span>
+          <select id="cfgResolverSelect" class="styled-select">
+            <option value="wikimedia" selected>Wikimedia Commons demo resolver</option>
+            <option value="github">GitHub Releases Mirror Resolver</option>
+            <option value="direct">Direct Multi-Stream Link Extractor</option>
+          </select>
+        </label>
+        <label class="field-label" style="margin-top:14px;">
+          <span>Resolution Timeout (seconds)</span>
+          <input type="number" id="cfgResolverTimeout" class="probe-input" value="${p.settings?.timeout || 10}" min="3" max="60">
+        </label>
+        <div class="setting-toggle-row" style="margin-top:14px;">
+          <span>Auto-resolve pasted URLs</span>
+          <label class="switch-toggle"><input type="checkbox" id="cfgResolverAuto" checked><span class="switch-slider"></span></label>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+          <button type="button" class="pill-btn primary" id="bSavePluginSettings">Save Settings</button>
+        </div>
+      `;
+    } else if (p.id === 'motrix.page-scraper') {
+      container.innerHTML = `
+        <label class="field-label">
+          <span>Intercepted File Extensions</span>
+          <input type="text" id="cfgScraperExts" class="probe-input" value="${p.settings?.extensions || '.zip, .tar.gz, .iso, .exe, .dmg, .apk, .7z, .rar'}">
+        </label>
+        <div class="setting-toggle-row" style="margin-top:14px;">
+          <span>Automatically start download on direct link discovery</span>
+          <label class="switch-toggle"><input type="checkbox" id="cfgScraperAuto"><span class="switch-slider"></span></label>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+          <button type="button" class="pill-btn primary" id="bSavePluginSettings">Save Settings</button>
+        </div>
+      `;
+    } else if (p.id === 'dontarken.alldebrid-resolver') {
+      container.innerHTML = `
+        <label class="field-label">
+          <span>AllDebrid API Key / Token</span>
+          <input type="password" id="cfgDebridKey" class="probe-input" placeholder="Enter API key" value="${p.settings?.apiKey || ''}">
+        </label>
+        <div class="setting-toggle-row" style="margin-top:14px;">
+          <span>Auto-debrid supported premium links</span>
+          <label class="switch-toggle"><input type="checkbox" id="cfgDebridAuto" checked><span class="switch-slider"></span></label>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+          <button type="button" class="pill-btn primary" id="bSavePluginSettings">Save Settings</button>
+        </div>
+      `;
+    } else {
+      container.innerHTML = `
+        <p style="font-size:13.5px;color:var(--text-muted);">${p.name} operates with optimized defaults. Custom configuration hooks can be saved below.</p>
+        <div class="setting-toggle-row" style="margin-top:14px;">
+          <span>Enable hardware/network acceleration</span>
+          <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+          <button type="button" class="pill-btn primary" id="bSavePluginSettings">Save Settings</button>
+        </div>
+      `;
+    }
+
+    const bSave = $('#bSavePluginSettings', container);
+    if (bSave) {
+      bSave.addEventListener('click', () => {
+        saveCurrentPluginSettings(p);
+      });
+    }
+  }
+
+  function saveCurrentPluginSettings(p) {
+    const plugins = getStoredPlugins();
+    const item = plugins.find((x) => x.id === p.id);
+    if (!item) return;
+
+    if (!item.settings) item.settings = {};
+
+    if (p.id === 'motrix.filename-template') {
+      const input = $('#cfgFnTemplateInput');
+      const preserve = $('#cfgFnPreserveExt');
+      const sanitize = $('#cfgFnSanitize');
+      if (input) item.settings.template = input.value.trim();
+      if (preserve) item.settings.preserveExt = preserve.checked;
+      if (sanitize) item.settings.sanitize = sanitize.checked;
+    } else if (p.id === 'dontarken.alldebrid-resolver') {
+      const key = $('#cfgDebridKey');
+      if (key) item.settings.apiKey = key.value.trim();
+    } else if (p.id === 'motrix.page-scraper') {
+      const exts = $('#cfgScraperExts');
+      if (exts) item.settings.extensions = exts.value.trim();
+    }
+
+    saveStoredPlugins(plugins);
+    toast(S.lang === 'ar' ? 'تم حفظ إعدادات الإضافة بنجاح' : 'Plugin settings saved successfully');
+  }
+
+  // Plugin Detail Modal Tabs
+  $$('.plugin-tab-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      $$('.plugin-tab-btn').forEach((b) => b.classList.remove('active'));
+      $$('.plugin-tab-content').forEach((c) => c.classList.remove('active'));
+      btn.classList.add('active');
+      const target = $(`#tabPlugin${btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1)}`);
+      if (target) target.classList.add('active');
+    });
+  });
+
+  const pluginDetailToggle = $('#pluginDetailToggle');
+  if (pluginDetailToggle) {
+    pluginDetailToggle.addEventListener('change', () => {
+      if (activePluginDetailId) {
+        togglePlugin(activePluginDetailId, pluginDetailToggle.checked);
+      }
+    });
+  }
+
+  const bUninstallPlugin = $('#bUninstallPlugin');
+  if (bUninstallPlugin) {
+    bUninstallPlugin.addEventListener('click', () => {
+      if (activePluginDetailId) {
+        uninstallPlugin(activePluginDetailId);
+      }
+    });
+  }
+
+  const bPluginUninstall = $('#bPluginUninstall');
+  if (bPluginUninstall) {
+    bPluginUninstall.addEventListener('click', () => {
+      if (activePluginDetailId) {
+        uninstallPlugin(activePluginDetailId);
+      }
+    });
+  }
+
+  const bPluginGoSettings = $('#bPluginGoSettings');
+  if (bPluginGoSettings) {
+    bPluginGoSettings.addEventListener('click', () => {
+      const btn = $('.plugin-tab-btn[data-tab="settings"]');
+      if (btn) btn.click();
+    });
+  }
+
+  const bPluginGoAccess = $('#bPluginGoAccess');
+  if (bPluginGoAccess) {
+    bPluginGoAccess.addEventListener('click', () => {
+      const btn = $('.plugin-tab-btn[data-tab="access"]');
+      if (btn) btn.click();
+    });
+  }
+
+  const pluginDetailBadge = $('#pluginDetailBadge');
+  if (pluginDetailBadge) {
+    pluginDetailBadge.style.cursor = 'pointer';
+    pluginDetailBadge.addEventListener('click', () => {
+      const btn = $('.plugin-tab-btn[data-tab="access"]');
+      if (btn) btn.click();
+    });
+  }
+
+  const bCopyPluginUrl = $('#bCopyPluginUrl');
+  if (bCopyPluginUrl) {
+    bCopyPluginUrl.addEventListener('click', () => {
+      if (activePluginDetailId) {
+        const link = `https://motrix.app/plugins/#${activePluginDetailId}`;
+        try { navigator.clipboard.writeText(link); } catch (_) {}
+        toast(S.lang === 'ar' ? 'تم نسخ رابط الإضافة إلى الحافظة' : 'Copied plugin link to clipboard');
+      }
+    });
+  }
+
+  const bReloadPlugin = $('#bReloadPlugin');
+  if (bReloadPlugin) {
+    bReloadPlugin.addEventListener('click', () => {
+      if (activePluginDetailId) {
+        const plugins = getStoredPlugins();
+        const p = plugins.find((x) => x.id === activePluginDetailId);
+        if (p) renderPluginSettingsTab(p);
+        toast(S.lang === 'ar' ? 'تم إعادة تحميل الإضافة' : 'Plugin reloaded');
+      }
+    });
+  }
+
+  // Header action buttons for plugins view
+  const bAddPlugin = $('#bAddPlugin');
+  if (bAddPlugin) {
+    bAddPlugin.addEventListener('click', () => {
+      const modal = $('#addPluginModal');
+      if (modal) modal.showModal();
+    });
+  }
+
+  const bConfirmInstallPlugin = $('#bConfirmInstallPlugin');
+  if (bConfirmInstallPlugin) {
+    bConfirmInstallPlugin.addEventListener('click', () => {
+      const input = $('#pluginInstallUrlInput');
+      const val = input ? input.value.trim() : '';
+      if (!val) return;
+      const id = 'custom.' + val.toLowerCase().replace(/[^a-z0-9]/g, '-').slice(0, 20);
+      const name = val.split('/').pop().replace(/\.moext|\.git/gi, '') || 'Custom Plugin';
+      const plugins = getStoredPlugins();
+      plugins.push({
+        id,
+        name,
+        author: 'User',
+        short: name.slice(0, 2).toUpperCase(),
+        color: 'avatar-blue',
+        version: 'v1.0.0',
+        desc: `Installed from ${val}`,
+        installed: true,
+        enabled: true,
+        badge: 'Looks safe',
+        notice: 'Custom plugin installed from external source.',
+        purpose: 'User defined plugin integration.',
+        access: 'Custom scope',
+        health: 'All good',
+        settings: {}
+      });
+      saveStoredPlugins(plugins);
+      renderPluginsView();
+      const modal = $('#addPluginModal');
+      if (modal) modal.close();
+      if (input) input.value = '';
+      toast(S.lang === 'ar' ? `تم تثبيت ${name} بنجاح` : `Installed ${name} successfully`);
+    });
+  }
+
+  const bBrowseMotrixPlugins = $('#bBrowseMotrixPlugins');
+  if (bBrowseMotrixPlugins) {
+    bBrowseMotrixPlugins.addEventListener('click', () => {
+      const url = 'https://motrix.app/plugins/';
+      if (window.tayyar?.openUrl) window.tayyar.openUrl(url);
+      else window.open(url, '_blank');
+    });
+  }
+
+  const bRefreshPlugins = $('#bRefreshPlugins');
+  if (bRefreshPlugins) {
+    bRefreshPlugins.addEventListener('click', () => {
+      renderPluginsView();
+      toast(S.lang === 'ar' ? 'تم تحديث قائمة الإضافات' : 'Plugins list refreshed');
+    });
+  }
+
+  const bSearchPlugins = $('#bSearchPlugins');
+  const pluginSearchWrap = $('#pluginSearchWrap');
+  const pluginSearchInput = $('#pluginSearchInput');
+  if (bSearchPlugins && pluginSearchWrap) {
+    bSearchPlugins.addEventListener('click', () => {
+      pluginSearchWrap.hidden = !pluginSearchWrap.hidden;
+      if (!pluginSearchWrap.hidden && pluginSearchInput) pluginSearchInput.focus();
+    });
+  }
+  if (pluginSearchInput) {
+    pluginSearchInput.addEventListener('input', () => {
+      pluginSearchQuery = pluginSearchInput.value;
+      renderPluginsView();
     });
   }
 
@@ -636,8 +1311,8 @@
     if (islandTitle && islandSubtitle) {
       if (activeDownloads.length > 0) {
         const topItem = activeDownloads[0];
-        islandTitle.textContent = topItem.name || (S.lang === 'ar' ? 'جارٍ التحميل...' : 'Downloading...');
-        islandSubtitle.textContent = `${speedTxt} • ${topItem.progress || 0}%`;
+        islandTitle.textContent = topItem.filename || topItem.name || (S.lang === 'ar' ? 'جارٍ التحميل...' : 'Downloading...');
+        islandSubtitle.textContent = `${speedTxt} • ${pct(topItem)}%`;
         if (islandPlayIcon) {
           islandPlayIcon.innerHTML = '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>';
         }
@@ -1418,14 +2093,345 @@
     });
   }
 
-  /* ---------------- IPC INITIALIZATION ---------------- */
+  /* ================= MOBILE & WEB ENGINE (Android, iOS & Preview) ================= */
+  function setupMobileAndWebEngine() {
+    const listeners = new Map();
+    const emit = (ch, data) => {
+      const cbs = listeners.get(ch) || [];
+      cbs.forEach((cb) => {
+        try { cb(data); } catch (e) { console.error('Listener error:', e); }
+      });
+    };
+
+    const loadStoredDownloads = () => {
+      try {
+        const raw = localStorage.getItem('tayyar_mobile_downloads');
+        return raw ? JSON.parse(raw) : [];
+      } catch (_) { return []; }
+    };
+
+    const saveStoredDownloads = (items) => {
+      try {
+        localStorage.setItem('tayyar_mobile_downloads', JSON.stringify(items));
+      } catch (_) {}
+    };
+
+    const storedItems = loadStoredDownloads();
+    const mobileDownloads = new Map(storedItems.map((d) => [d.id, d]));
+    const activePolling = new Map();
+
+    const startAndroidPoll = (id, downloadId) => {
+      if (activePolling.has(id)) return;
+      let lastBytes = 0;
+      let lastTime = Date.now();
+      let speed = 0;
+
+      const timer = setInterval(async () => {
+        try {
+          const cap = window.Capacitor?.Plugins?.TayyarMobileEngine;
+          if (!cap) { clearInterval(timer); activePolling.delete(id); return; }
+
+          const res = await cap.queryDownload({ downloadId });
+          const d = mobileDownloads.get(id);
+          if (!d) { clearInterval(timer); activePolling.delete(id); return; }
+
+          const now = Date.now();
+          const dt = (now - lastTime) / 1000 || 0.5;
+          const deltaBytes = (res.downloaded || 0) - lastBytes;
+          if (deltaBytes > 0) {
+            speed = speed ? speed * 0.6 + (deltaBytes / dt) * 0.4 : deltaBytes / dt;
+          }
+          lastBytes = res.downloaded || lastBytes;
+          lastTime = now;
+
+          if (res.downloaded > 0) d.downloaded = res.downloaded;
+          if (res.total > 0) d.size = res.total;
+          d.speed = Math.round(speed);
+          d.eta = d.speed > 1 && d.size > d.downloaded ? Math.round((d.size - d.downloaded) / d.speed) : -1;
+
+          if (res.status === 'completed') {
+            d.status = 'completed';
+            d.completedAt = Date.now();
+            d.speed = 0;
+            if (d.size > 0) d.downloaded = d.size;
+            clearInterval(timer);
+            activePolling.delete(id);
+            saveStoredDownloads([...mobileDownloads.values()]);
+            emit('dl:update', d);
+          } else if (res.status === 'error') {
+            d.status = 'error';
+            d.speed = 0;
+            clearInterval(timer);
+            activePolling.delete(id);
+            saveStoredDownloads([...mobileDownloads.values()]);
+            emit('dl:update', d);
+          } else {
+            d.status = 'downloading';
+            emit('dl:progress', [d]);
+          }
+        } catch (e) {
+          console.warn('Poll error:', e);
+        }
+      }, 500);
+
+      activePolling.set(id, timer);
+    };
+
+    const startWebStreamDownload = async (d) => {
+      try {
+        const resp = await fetch(d.url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const contentLength = resp.headers.get('content-length');
+        if (contentLength) d.size = parseInt(contentLength, 10);
+
+        const reader = resp.body ? resp.body.getReader() : null;
+        if (!reader) {
+          const blob = await resp.blob();
+          d.downloaded = blob.size;
+          d.size = blob.size;
+          d.status = 'completed';
+          d.completedAt = Date.now();
+          saveStoredDownloads([...mobileDownloads.values()]);
+          emit('dl:update', d);
+          triggerBlobDownload(blob, d.filename);
+          return;
+        }
+
+        const chunks = [];
+        let received = 0;
+        let lastT = Date.now();
+        let lastBytes = 0;
+
+        while (true) {
+          if (d.status === 'paused' || !mobileDownloads.has(d.id)) {
+            reader.cancel();
+            return;
+          }
+
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          chunks.push(value);
+          received += value.length;
+          d.downloaded = received;
+
+          const now = Date.now();
+          const dt = (now - lastT) / 1000 || 0.5;
+          if (dt >= 0.5) {
+            const inst = (received - lastBytes) / dt;
+            d.speed = Math.round(d.speed ? d.speed * 0.6 + inst * 0.4 : inst);
+            d.eta = d.speed > 1 && d.size > d.downloaded ? Math.round((d.size - d.downloaded) / d.speed) : -1;
+            lastT = now;
+            lastBytes = received;
+            emit('dl:progress', [d]);
+          }
+        }
+
+        const blob = new Blob(chunks);
+        d.downloaded = blob.size;
+        d.size = blob.size;
+        d.status = 'completed';
+        d.completedAt = Date.now();
+        d.speed = 0;
+        saveStoredDownloads([...mobileDownloads.values()]);
+        emit('dl:update', d);
+        triggerBlobDownload(blob, d.filename);
+      } catch (err) {
+        d.status = 'error';
+        d.error = err.message || 'Download failed';
+        d.speed = 0;
+        saveStoredDownloads([...mobileDownloads.values()]);
+        emit('dl:update', d);
+      }
+    };
+
+    const triggerBlobDownload = (blob, filename) => {
+      try {
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename || 'download';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        }, 2000);
+      } catch (_) {}
+    };
+
+    window.tayyar = {
+      isMobile: true,
+      list: async () => [...mobileDownloads.values()],
+      platform: async () => (window.Capacitor?.getPlatform ? window.Capacitor.getPlatform() : 'android'),
+      settings: {
+        get: async () => {
+          try {
+            const raw = localStorage.getItem('tayyar_settings');
+            return raw ? JSON.parse(raw) : { theme: 'dark', maxConcurrent: 3, speedLimitKB: 0, downloadDir: 'Downloads' };
+          } catch (_) { return {}; }
+        },
+        set: async (patch) => {
+          try {
+            const current = await window.tayyar.settings.get();
+            const updated = Object.assign(current, patch);
+            localStorage.setItem('tayyar_settings', JSON.stringify(updated));
+            emit('settings', updated);
+            return updated;
+          } catch (_) { return patch; }
+        }
+      },
+      getSettings: async () => window.tayyar.settings.get(),
+      setSettings: async (p) => window.tayyar.settings.set(p),
+      probe: async (url) => {
+        try {
+          const fn = url.split('/').pop().split('?')[0] || 'download.bin';
+          return { filename: fn, size: -1, resumable: true, finalUrl: url };
+        } catch (_) { return { filename: 'download.bin', size: -1, resumable: false }; }
+      },
+      add: async (opts) => {
+        const id = 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+        let filename = opts.userFileName || opts.filename;
+        if (!filename) {
+          filename = opts.url.split('/').pop().split('?')[0] || 'download.bin';
+        }
+
+        // Apply Filename Template plugin if enabled
+        const activePlugins = getStoredPlugins();
+        const fnPlugin = activePlugins.find((p) => p.id === 'motrix.filename-template' && p.enabled);
+        if (fnPlugin && fnPlugin.settings?.template) {
+          const ext = filename.includes('.') ? filename.split('.').pop() : '';
+          const title = filename.replace(/\.[^.]+$/, '');
+          const dStr = new Date().toISOString().slice(0, 10);
+          filename = fnPlugin.settings.template
+            .replace(/\{title\}|\{\{title\}\}/g, title)
+            .replace(/\{ext\}|\{\{ext\}\}/g, ext)
+            .replace(/\{date\}|\{\{date\}\}/g, dStr);
+          if (fnPlugin.settings.preserveExt && ext && !filename.endsWith('.' + ext)) {
+            filename += '.' + ext;
+          }
+        }
+
+        const d = {
+          id,
+          url: opts.url,
+          filename,
+          path: filename,
+          category: 'other',
+          size: -1,
+          downloaded: 0,
+          status: 'downloading',
+          error: null,
+          resumable: true,
+          connections: opts.connections || 8,
+          addedAt: Date.now(),
+          completedAt: null,
+          startAt: 0,
+          speed: 0,
+          eta: -1,
+          segments: []
+        };
+
+        mobileDownloads.set(id, d);
+        saveStoredDownloads([...mobileDownloads.values()]);
+        emit('dl:update', d);
+
+        // Native Android DownloadManager check
+        const cap = window.Capacitor?.Plugins?.TayyarMobileEngine;
+        if (cap && typeof cap.startDownload === 'function') {
+          try {
+            const res = await cap.startDownload({ url: opts.url, filename, referer: opts.referer || '' });
+            if (res && res.downloadId) {
+              d.nativeDownloadId = res.downloadId;
+              startAndroidPoll(id, res.downloadId);
+              return { ok: true, item: d };
+            }
+          } catch (e) {
+            console.warn('Native download failed, falling back to stream:', e);
+          }
+        }
+
+        // Streaming fallback
+        startWebStreamDownload(d);
+        return { ok: true, item: d };
+      },
+      pause: async (ids) => {
+        (ids || []).forEach((id) => {
+          const d = mobileDownloads.get(id);
+          if (d) {
+            d.status = 'paused';
+            d.speed = 0;
+            if (activePolling.has(id)) {
+              clearInterval(activePolling.get(id));
+              activePolling.delete(id);
+            }
+            saveStoredDownloads([...mobileDownloads.values()]);
+            emit('dl:update', d);
+          }
+        });
+      },
+      resume: async (ids) => {
+        (ids || []).forEach((id) => {
+          const d = mobileDownloads.get(id);
+          if (d) {
+            d.status = 'downloading';
+            saveStoredDownloads([...mobileDownloads.values()]);
+            emit('dl:update', d);
+            if (d.nativeDownloadId) {
+              startAndroidPoll(id, d.nativeDownloadId);
+            } else {
+              startWebStreamDownload(d);
+            }
+          }
+        });
+      },
+      pauseAll: async () => {
+        window.tayyar.pause([...mobileDownloads.keys()]);
+      },
+      resumeAll: async () => {
+        window.tayyar.resume([...mobileDownloads.keys()]);
+      },
+      remove: async (ids, del) => {
+        (ids || []).forEach((id) => {
+          const d = mobileDownloads.get(id);
+          if (d && d.nativeDownloadId) {
+            const cap = window.Capacitor?.Plugins?.TayyarMobileEngine;
+            if (cap) cap.cancelDownload({ downloadId: d.nativeDownloadId }).catch(() => {});
+          }
+          if (activePolling.has(id)) {
+            clearInterval(activePolling.get(id));
+            activePolling.delete(id);
+          }
+          mobileDownloads.delete(id);
+          emit('dl:removed', id);
+        });
+        saveStoredDownloads([...mobileDownloads.values()]);
+      },
+      open: async (id) => {
+        const d = mobileDownloads.get(id);
+        if (d && d.url) window.open(d.url, '_system');
+      },
+      reveal: async (id) => {
+        toast(S.lang === 'ar' ? 'الملف موجود في مجلد التحميلات' : 'File saved in Downloads folder');
+      },
+      chooseDir: async () => 'Downloads',
+      openExtensionFolder: async () => ({ ok: true }),
+      openUrl: (u) => { window.open(u, '_system'); },
+      on: (channel, cb) => {
+        if (!listeners.has(channel)) listeners.set(channel, []);
+        listeners.get(channel).push(cb);
+      }
+    };
+  }
+
+  /* ---------------- IPC & INITIALIZATION ---------------- */
   async function init() {
     initHeatmap();
     renderTrackersTable();
+    renderPluginsView();
 
     if (!window.tayyar) {
-      console.warn('Tayyar IPC bridge not found (running in preview)');
-      return;
+      setupMobileAndWebEngine();
     }
 
     try {
@@ -1441,15 +2447,29 @@
 
     // Listen to real-time events
     window.tayyar.on('dl:update', (d) => {
-      S.items.set(d.id, d);
+      if (!d || !d.id) return;
+      const it = S.items.get(d.id);
+      if (it) Object.assign(it, d);
+      else S.items.set(d.id, d);
       updateDashboard();
       renderDownloadsList();
     });
 
-    window.tayyar.on('dl:progress', (b) => {
-      const it = S.items.get(b.id);
-      if (it) {
-        Object.assign(it, b);
+    window.tayyar.on('dl:progress', (batchOrItem) => {
+      const items = Array.isArray(batchOrItem) ? batchOrItem : [batchOrItem];
+      let updated = false;
+      for (const b of items) {
+        if (!b || !b.id) continue;
+        const it = S.items.get(b.id);
+        if (it) {
+          Object.assign(it, b);
+          updated = true;
+        } else {
+          S.items.set(b.id, b);
+          updated = true;
+        }
+      }
+      if (updated) {
         updateDashboard();
         renderDownloadsList();
       }

@@ -369,15 +369,7 @@
               <span class="card-label" data-i="activity">ACTIVITY</span>
             </div>
             <div class="heatmap-wrap">
-              <div class="heatmap-months" id="heatmapMonths">
-                <span class="m-lbl m-jun" data-i="jun">Jun</span>
-                <span class="m-lbl m-jul" data-i="jul">Jul</span>
-                <span class="m-lbl m-aug" data-i="aug">Aug</span>
-                <span class="m-lbl m-sep" data-i="sep">Sep</span>
-                <span class="m-lbl m-oct" data-i="oct">Oct</span>
-                <span class="m-lbl m-nov" data-i="nov">Nov</span>
-              </div>
-              <div class="heatmap-grid-container">
+              <div class="heatmap-body">
                 <div class="heatmap-days">
                   <span class="day-slot"></span>
                   <span class="day-slot day-name" data-i="mon">Mon</span>
@@ -387,8 +379,18 @@
                   <span class="day-slot day-name" data-i="fri">Fri</span>
                   <span class="day-slot"></span>
                 </div>
-                <div class="heatmap-cells" id="heatmapCells">
-                  <!-- 26 weeks x 7 days = 182 cells dynamically generated -->
+                <div class="heatmap-content">
+                  <div class="heatmap-months" id="heatmapMonths">
+                    <span class="m-lbl m-jun" data-i="jun">Jun</span>
+                    <span class="m-lbl m-jul" data-i="jul">Jul</span>
+                    <span class="m-lbl m-aug" data-i="aug">Aug</span>
+                    <span class="m-lbl m-sep" data-i="sep">Sep</span>
+                    <span class="m-lbl m-oct" data-i="oct">Oct</span>
+                    <span class="m-lbl m-nov" data-i="nov">Nov</span>
+                  </div>
+                  <div class="heatmap-cells" id="heatmapCells">
+                    <!-- 26 weeks x 7 days = 182 cells dynamically generated -->
+                  </div>
                 </div>
               </div>
             </div>
@@ -532,26 +534,31 @@
         <header class="view-header">
           <h1 class="view-title" data-i="plugins">Plugins</h1>
           <div class="header-actions">
-            <button class="icon-btn-ghost" title="Add plugin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <button class="icon-btn-ghost" id="bAddPlugin" title="Add plugin / إضافة ملحق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2.5">
                 <path d="M12 5v14M5 12h14" />
               </svg></button>
-            <button class="icon-btn-ghost" title="Link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <button class="icon-btn-ghost" id="bBrowseMotrixPlugins" title="Browse Motrix Official Plugins (motrix.app/plugins)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path
                   d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
               </svg></button>
-            <button class="icon-btn-ghost" title="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <button class="icon-btn-ghost" id="bRefreshPlugins" title="Refresh / تحديث"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
               </svg></button>
-            <button class="icon-btn-ghost" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <button class="icon-btn-ghost" id="bSearchPlugins" title="Search / بحث"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <circle cx="11" cy="11" r="6" />
                 <path d="M20 20l-4.5-4.5" />
               </svg></button>
           </div>
         </header>
+
+        <!-- Search bar -->
+        <div id="pluginSearchWrap" class="plugin-search-wrap" hidden>
+          <input type="text" id="pluginSearchInput" class="probe-input" placeholder="Search installed or available plugins...">
+        </div>
 
         <!-- Trust notice banner -->
         <div class="plugins-banner">
@@ -562,92 +569,12 @@
             plugin. Grant website access only for sites you expect the plugin to handle.</p>
         </div>
 
-        <!-- Installed Plugins Grid -->
-        <div class="plugins-grid">
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-blue">MF</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">Tayyar Filename Template <span class="status-dot-blue"></span></div>
-                <div class="plugin-ver">v1.1.1 · tayyar.filename-template</div>
-              </div>
-              <label class="switch-toggle"><input type="checkbox" checked><span class="switch-slider"></span></label>
-            </div>
-            <p class="plugin-desc">Renames downloads with safe, composable templates while preserving their extensions.
-            </p>
-            <div class="plugin-card-foot">
-              <button class="pill-btn light sm">Open</button>
-              <span class="badge-safe">Looks safe</span>
-            </div>
-          </div>
+        <!-- Installed Plugins Grid (Dynamic) -->
+        <div class="plugins-grid" id="installedPluginsGrid"></div>
 
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-green">MU</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">Tayyar URL Resolver <span class="status-dot-blue"></span></div>
-                <div class="plugin-ver">v1.0.0 · tayyar.url-resolver</div>
-              </div>
-              <label class="switch-toggle"><input type="checkbox"><span class="switch-slider"></span></label>
-            </div>
-            <p class="plugin-desc">URL-resolver framework for Tayyar multi-source stream handling.</p>
-            <div class="plugin-card-foot">
-              <button class="pill-btn light sm">Open</button>
-              <span class="badge-safe">Looks safe</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Available Plugins Section -->
+        <!-- Available Plugins Section (Dynamic) -->
         <h3 class="section-subtitle" style="margin:24px 0 14px;" data-i="availablePlugins">Available plugins</h3>
-        <div class="plugins-grid">
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-blue">FC</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">Folder Categories</div>
-                <div class="plugin-ver">by Ashkan4472 · v1.0.0</div>
-              </div>
-            </div>
-            <p class="plugin-desc">Sorts finished downloads into category folders (Compressed, Documents, Music,
-              Programs, Video).</p>
-          </div>
-
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-green">AR</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">AllDebrid Resolver</div>
-                <div class="plugin-ver">by DonTarken · v1.2.0</div>
-              </div>
-            </div>
-            <p class="plugin-desc">Automatically unlocks and debrids supported download links using your premium
-              account.</p>
-          </div>
-
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-blue">MS</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">Tayyar Smart Link</div>
-                <div class="plugin-ver">by griciaisl12 · v1.0.5</div>
-              </div>
-            </div>
-            <p class="plugin-desc">Resolves GitHub repository release, file links, Google Drive/Docs into real
-              downloads.</p>
-          </div>
-
-          <div class="plugin-card">
-            <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-blue">MM</span>
-              <div class="plugin-meta">
-                <div class="plugin-title">Tayyar Media Merge</div>
-                <div class="plugin-ver">by Tayyar Team · v0.1.0</div>
-              </div>
-            </div>
-            <p class="plugin-desc">Combine separate video and audio files into one MP4 or MKV without re-encoding.</p>
-          </div>
-        </div>
+        <div class="plugins-grid" id="availablePluginsGrid"></div>
       </section>
 
       <!-- ========== VIEW: NOTIFICATIONS ========== -->
@@ -1549,6 +1476,144 @@
           <span data-i="openFolder">Open Extension Folder</span>
         </button>
         <button type="button" class="pill-btn primary modal-close" data-i="done">Done</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ================= PLUGIN DETAIL MODAL (Matching Images 2 & 3) ================= -->
+  <dialog id="pluginDetailModal" class="sleek-modal modal-large plugin-detail-dialog">
+    <div class="modal-form">
+      <div class="modal-head plugin-detail-head">
+        <div class="plugin-detail-title-row">
+          <h2 id="pluginDetailName">Tayyar Filename Template</h2>
+          <span class="status-dot-blue"></span>
+        </div>
+        <div class="plugin-detail-actions">
+          <label class="switch-toggle" title="Toggle plugin">
+            <input type="checkbox" id="pluginDetailToggle">
+            <span class="switch-slider"></span>
+          </label>
+          <button type="button" class="icon-btn-ghost" id="bCopyPluginUrl" title="Share plugin link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          </button>
+          <button type="button" class="icon-btn-ghost" id="bReloadPlugin" title="Reload plugin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          </button>
+          <button type="button" class="icon-btn-ghost modal-close" id="bClosePluginDetail">✕</button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs: Overview, Settings, Access -->
+      <div class="plugin-tabs-nav">
+        <button class="plugin-tab-btn active" data-tab="overview">Overview</button>
+        <button class="plugin-tab-btn" data-tab="settings">Settings</button>
+        <button class="plugin-tab-btn" data-tab="access">Access</button>
+      </div>
+
+      <div class="modal-body plugin-detail-body">
+        <!-- TAB 1: OVERVIEW -->
+        <div class="plugin-tab-content active" id="tabPluginOverview">
+          <div class="plugin-overview-card">
+            <div class="plugin-card-top">
+              <span class="plugin-avatar avatar-blue" id="pluginDetailAvatar">MF</span>
+              <div class="plugin-meta">
+                <div class="plugin-title" id="pluginDetailTitle">Tayyar Filename Template</div>
+                <div class="plugin-ver" id="pluginDetailVer">v1.1.1 · motrix.filename-template</div>
+              </div>
+              <span class="plugin-status-pill ready" id="pluginDetailBadge">Ready</span>
+            </div>
+            <p class="plugin-desc" id="pluginDetailDesc" style="margin-top:12px;font-size:13.5px;line-height:1.6;"></p>
+            <div class="plugin-notice-box" id="pluginDetailNotice">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              <span id="pluginDetailNoticeText"></span>
+            </div>
+            <div class="plugin-info-grid">
+              <div class="plugin-info-card">
+                <div class="info-card-label">PURPOSE</div>
+                <div class="info-card-val" id="pluginDetailPurpose"></div>
+              </div>
+              <div class="plugin-info-card">
+                <div class="info-card-label">ACCESS</div>
+                <div class="info-card-val" id="pluginDetailAccess"></div>
+              </div>
+              <div class="plugin-info-card">
+                <div class="info-card-label">HEALTH</div>
+                <div class="info-card-val healthy" id="pluginDetailHealth">All good</div>
+              </div>
+            </div>
+            <div class="plugin-overview-actions" style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
+              <div style="display:flex;gap:10px;">
+                <button type="button" class="pill-btn outline sm" id="bPluginGoSettings">Configure Settings</button>
+                <button type="button" class="pill-btn outline sm" id="bPluginGoAccess">Permissions & Access</button>
+              </div>
+              <button type="button" class="pill-btn danger sm" id="bPluginUninstall">Uninstall</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: SETTINGS -->
+        <div class="plugin-tab-content" id="tabPluginSettings">
+          <div id="pluginSettingsContainer" class="plugin-settings-box"></div>
+        </div>
+
+        <!-- TAB 3: ACCESS -->
+        <div class="plugin-tab-content" id="tabPluginAccess">
+          <div class="plugin-access-box">
+            <h4 style="font-size:14px;font-weight:700;margin-bottom:12px;color:#fff;">Permissions & Scope</h4>
+            <div class="setting-toggle-row">
+              <div>
+                <div style="font-weight:600;font-size:13.5px;color:#fff;">Read websites & intercept file downloads</div>
+                <div style="font-size:12px;color:var(--text-dim);">Allows the plugin to resolve URLs from supported domains.</div>
+              </div>
+              <label class="switch-toggle"><input type="checkbox" id="permReadWeb" checked><span class="switch-slider"></span></label>
+            </div>
+            <div class="setting-toggle-row">
+              <div>
+                <div style="font-weight:600;font-size:13.5px;color:#fff;">File system & storage management</div>
+                <div style="font-size:12px;color:var(--text-dim);">Allows routing files into categories and applying template names.</div>
+              </div>
+              <label class="switch-toggle"><input type="checkbox" id="permStorage" checked><span class="switch-slider"></span></label>
+            </div>
+            <div class="setting-toggle-row">
+              <div>
+                <div style="font-weight:600;font-size:13.5px;color:#fff;">Clipboard monitoring</div>
+                <div style="font-size:12px;color:var(--text-dim);">Automatically resolve copied media links.</div>
+              </div>
+              <label class="switch-toggle"><input type="checkbox" id="permClipboard" checked><span class="switch-slider"></span></label>
+            </div>
+
+            <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--color-red);">Uninstall plugin</div>
+                <div style="font-size:12px;color:var(--text-dim);">Remove plugin and revert to default download handling.</div>
+              </div>
+              <button type="button" class="pill-btn danger sm" id="bUninstallPlugin">Uninstall</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ================= ADD PLUGIN MODAL ================= -->
+  <dialog id="addPluginModal" class="sleek-modal">
+    <div class="modal-form">
+      <div class="modal-head">
+        <h2>Install Plugin / تثبيت إضافة</h2>
+        <button type="button" class="icon-btn-ghost modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="field-label">
+          <span>GitHub Repository or Plugin Manifest URL</span>
+          <input type="text" id="pluginInstallUrlInput" class="probe-input" placeholder="e.g. motrix/plugin-filename-template or https://...">
+        </label>
+        <div style="margin-top:12px;font-size:12.5px;color:var(--text-dim);line-height:1.5;">
+          You can install official Motrix plugins from <a href="https://motrix.app/plugins/" target="_blank" style="color:var(--color-cyan);">motrix.app/plugins</a> or provide any <code>.moext</code> bundle or GitHub release repo.
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light modal-close">Cancel</button>
+        <button type="button" class="pill-btn primary" id="bConfirmInstallPlugin">Install Plugin</button>
       </div>
     </div>
   </dialog>

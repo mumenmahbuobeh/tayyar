@@ -177,10 +177,6 @@ html[dir="rtl"] .nav-badge {
 html[dir="rtl"] .trackers-table {
   text-align: right;
 }
-html[dir="rtl"] .heatmap-months {
-  padding-left: 0;
-  padding-right: 28px;
-}
 html[dir="rtl"] .modal-foot {
   justify-content: flex-start;
 }
@@ -948,33 +944,63 @@ html[dir="rtl"] .select-pill-wrap .chevron-ic {
 /* ACTIVITY (HEATMAP) CARD (Span 2) */
 .card-activity { 
   grid-column: span 2; 
-  min-height: 160px;
+  min-height: 155px;
 }
 
 .heatmap-wrap {
   display: flex;
   flex-direction: column;
-  gap: 8px;
   margin-top: 4px;
   width: 100%;
   min-width: 0;
   overflow-x: auto;
 }
 
+.heatmap-body {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 320px;
+}
+
+.heatmap-days {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3.5px;
+  width: 22px;
+  flex-shrink: 0;
+  margin-top: 18px; /* Aligns with cells below the month header */
+}
+
+.heatmap-days .day-slot {
+  display: flex;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-dim);
+  line-height: 1;
+}
+
+.heatmap-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
 .heatmap-months {
   display: grid;
   grid-template-columns: repeat(26, 1fr);
-  gap: 4px;
-  font-size: 11px;
+  gap: 3.5px;
+  font-size: 10.5px;
   font-weight: 500;
   color: var(--text-dim);
-  padding-left: 28px;
   margin-bottom: 2px;
-}
-
-html[dir="rtl"] .heatmap-months {
-  padding-left: 0;
-  padding-right: 28px;
+  height: 14px;
+  line-height: 14px;
+  width: 100%;
 }
 
 .heatmap-months .m-lbl {
@@ -992,45 +1018,20 @@ html[dir="rtl"] .heatmap-months .m-lbl {
 .heatmap-months .m-oct { grid-column: 18 / span 5; }
 .heatmap-months .m-nov { grid-column: 23 / span 4; }
 
-.heatmap-grid-container {
-  display: flex;
-  gap: 8px;
-  align-items: stretch;
-  width: 100%;
-}
-
-.heatmap-days {
-  display: grid;
-  grid-template-rows: repeat(7, 1fr);
-  gap: 4px;
-  width: 20px;
-  flex-shrink: 0;
-}
-
-.heatmap-days .day-slot {
-  display: flex;
-  align-items: center;
-  font-size: 9.5px;
-  font-weight: 500;
-  color: var(--text-dim);
-  line-height: 1;
-}
-
 .heatmap-cells {
   display: grid;
   grid-template-rows: repeat(7, 1fr);
   grid-template-columns: repeat(26, 1fr);
   grid-auto-flow: column;
-  gap: 4px;
-  flex: 1;
+  gap: 3.5px;
   width: 100%;
 }
 
 .hm-cell {
   aspect-ratio: 1;
-  border-radius: 2.5px;
+  border-radius: 3px;
   background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   transition: transform 0.15s ease, background-color 0.15s ease;
   cursor: pointer;
   position: relative;
@@ -1672,6 +1673,229 @@ html[dir="rtl"] .heatmap-months .m-lbl {
   font-size: 11px;
   font-weight: 600;
 }
+
+/* ================= PLUGIN DETAIL MODAL (Matching Images 2 & 3) ================= */
+.plugin-search-wrap {
+  margin-bottom: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.plugin-detail-dialog {
+  width: 92%;
+  max-width: 680px !important;
+  max-height: 85vh;
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.plugin-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.plugin-detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plugin-detail-title-row h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.plugin-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.plugin-tabs-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(15, 20, 26, 0.4);
+}
+
+.plugin-tab-btn {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.plugin-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.plugin-tab-btn.active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.plugin-detail-body {
+  padding: 20px 24px 28px;
+  overflow-y: auto;
+  max-height: calc(88vh - 130px);
+}
+
+.plugin-tab-content {
+  display: none;
+}
+
+.plugin-tab-content.active {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+.plugin-overview-card {
+  background: rgba(20, 26, 33, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.plugin-status-pill {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  margin-left: auto;
+}
+
+[dir="rtl"] .plugin-status-pill {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.plugin-status-pill.ready {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--color-green);
+}
+
+.plugin-notice-box {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  border-left: 3px solid var(--color-cyan);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+[dir="rtl"] .plugin-notice-box {
+  border-left: none;
+  border-right: 3px solid var(--color-cyan);
+}
+
+.plugin-notice-box svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-cyan);
+  flex-shrink: 0;
+}
+
+.plugin-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.plugin-info-card {
+  background: rgba(15, 20, 26, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-card-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.info-card-val {
+  font-size: 12.5px;
+  color: #ffffff;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info-card-val.healthy {
+  color: #34d399;
+  font-weight: 600;
+}
+
+.plugin-settings-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.plugin-tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.plugin-chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--color-cyan);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: monospace;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.plugin-chip:hover {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: var(--color-cyan);
+  color: #ffffff;
+}
+
+.plugin-access-box {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 
 /* ================= APPLE LIQUID GLASS SWITCH TOGGLE ================= */
 .switch-toggle {
@@ -2530,12 +2754,7 @@ html[dir="rtl"] .glass-island-player {
   }
   .heatmap-months {
     gap: 2.5px !important;
-    padding-left: 22px !important;
     font-size: 9.5px !important;
-  }
-  html[dir="rtl"] .heatmap-months {
-    padding-left: 0 !important;
-    padding-right: 22px !important;
   }
   .heatmap-days {
     gap: 2.5px !important;
@@ -2558,17 +2777,17 @@ html[dir="rtl"] .glass-island-player {
     grid-column: span 2 !important;
   }
   .bento-grid .card-active-tasks {
-    grid-column: span 1 !important;
+    grid-column: span 2 !important;
   }
   .bento-grid .card-activity {
-    grid-column: span 1 !important;
+    grid-column: span 2 !important;
   }
   .bento-card {
-    padding: 10px 12px !important;
-    min-height: 100px !important;
+    padding: 12px 14px !important;
+    min-height: 105px !important;
   }
   .view-panel {
-    padding: 10px 12px 18px !important;
+    padding: 10px 14px 18px !important;
   }
 }
 
@@ -2581,212 +2800,8 @@ html[dir="rtl"] .glass-island-player {
   }
 }
 
-/* ================= MOBILE OPTIMIZATIONS (CAPACITOR/APP) ================= */
-@media (max-width: 768px) {
-  .mobile-nav-only {
-    display: flex !important;
-  }
-  .desktop-nav-only {
-    display: none !important;
-  }
-
-  .glass-island-player {
-    bottom: calc(env(safe-area-inset-bottom) + 84px) !important;
-    left: 14px !important;
-    right: 14px !important;
-    margin: 0 auto !important;
-    width: auto !important;
-    max-width: 440px !important;
-    z-index: 1001 !important;
-  }
-  /* 1. Stack the layout vertically */
-  .app-layout {
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-  }
-
-  html[dir=rtl] .app-layout {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* 2. Turn the Sidebar into a Bottom Navigation Bar */
-  .sidebar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100% !important;
-    height: 65px !important;
-    order: 3;
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-around !important;
-    padding: 0 !important;
-    z-index: 1000;
-    border-right: none !important;
-    border-left: none !important;
-    border-top: 1px solid var(--border-subtle) !important;
-    background-color: var(--bg-sidebar) !important;
-    -webkit-app-region: no-drag;
-    padding-bottom: env(safe-area-inset-bottom) !important; /* iPhone Notch/Bar support */
-  }
-
-  /* Hide the top actions and branding in the sidebar since it's a bottom nav now */
-  .sidebar-top, .sidebar-bottom, .storage-widget {
-    display: none !important;
-  }
-
-  /* Make the nav list horizontal */
-  .sidebar-nav {
-    display: flex !important;
-    flex-direction: row !important;
-    width: 100% !important;
-    margin: 0 !important;
-    justify-content: space-around !important;
-    align-items: center !important;
-    padding: 0 !important;
-  }
-
-  .nav-list {
-    flex-direction: row !important;
-    width: 100% !important;
-    justify-content: space-around !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .nav-item {
-    flex-direction: column !important;
-    padding: 8px 4px !important;
-    margin: 0 !important;
-    font-size: 10px !important;
-    gap: 4px !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 0 !important;
-    width: auto !important;
-    height: 100% !important;
-    background: transparent !important;
-  }
-
-  .nav-item svg {
-    margin: 0 !important;
-    width: 22px !important;
-    height: 22px !important;
-  }
-
-  .nav-item .nav-label {
-    display: block !important; /* Show small text below icon */
-    font-size: 10px !important;
-    line-height: 1 !important;
-  }
-
-  .nav-badge {
-    position: absolute !important;
-    top: 2px !important;
-    right: 50% !important;
-    transform: translateX(15px);
-  }
-
-  /* 3. Main Content - Takes remaining space above bottom nav */
-  .main-content {
-    order: 1 !important;
-    width: 100% !important;
-    height: calc(100vh - 65px - env(safe-area-inset-bottom)) !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 10px !important;
-    padding-top: env(safe-area-inset-top) !important; /* iPhone Notch/Bar support */
-  }
-
-  /* 4. Dashboard & Cards Layout fixes */
-  .bento-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
-  }
-
-  .bento-card, .chart-card {
-    width: 100% !important;
-    grid-column: auto !important;
-  }
-
-  /* 5. Header and view titles */
-  .view-header {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 10px !important;
-    padding: 10px !important;
-    height: auto !important;
-  }
-
-  .view-actions {
-    width: 100% !important;
-    justify-content: space-between !important;
-  }
-
-  .search-wrapper {
-    width: 100% !important;
-  }
-  .search-wrapper input {
-    width: 100% !important;
-  }
-
-  /* 6. Modals and Overlays */
-  .modal-content {
-    width: 95% !important;
-    max-width: 95% !important;
-    margin: 20px auto !important;
-    max-height: 90vh !important;
-    overflow-y: auto !important;
-  }
-
-  /* 7. Settings Page */
-  .settings-layout {
-    flex-direction: column !important;
-  }
-
-  .settings-nav {
-    width: 100% !important;
-    border-right: none !important;
-    border-left: none !important;
-    border-bottom: 1px solid var(--border-subtle) !important;
-    flex-direction: row !important;
-    overflow-x: auto !important;
-    padding-bottom: 10px !important;
-    white-space: nowrap !important;
-  }
-
-  /* 8. Table and List fixes (Tasks) */
-  .downloads-table {
-    display: block !important;
-    overflow-x: auto !important;
-    white-space: nowrap !important;
-  }
-}
-
 /* ================= APPLE LIQUID GLASS (MOBILE & TABLET ADAPTATION) ================= */
 @media (max-width: 768px) {
-  .mobile-nav-only {
-    display: flex !important;
-  }
-  .desktop-nav-only {
-    display: none !important;
-  }
-
-  .glass-island-player {
-    bottom: calc(env(safe-area-inset-bottom) + 84px) !important;
-    left: 14px !important;
-    right: 14px !important;
-    margin: 0 auto !important;
-    width: auto !important;
-    max-width: 440px !important;
-    z-index: 1001 !important;
-  }
-  /* OVERRIDE EARLIER MEDIA QUERIES BY USING HIGHER SPECIFICITY OR !IMPORTANT */
-
   :root {
     --bg-app: #000000 !important;
     --bg-card: rgba(255, 255, 255, 0.05) !important;
@@ -2796,105 +2811,17 @@ html[dir="rtl"] .glass-island-player {
   body, .app-layout {
     background-color: #000000 !important;
     color: #ffffff !important;
-  }
-
-  /* --- FLOATING PILL BOTTOM NAVIGATION (Like Image) --- */
-  .sidebar {
-    background: rgba(30, 30, 30, 0.4) !important; /* Lighter glass */
-    backdrop-filter: blur(40px) saturate(200%) !important; /* Stronger blur like iOS */
-    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important; /* Slightly brighter border */
-    border-radius: 999px !important; /* Perfect circular edges for pill */
-    height: 70px !important;
-    width: 90% !important;
-    position: fixed !important;
-    bottom: calc(env(safe-area-inset-bottom) + 15px) !important;
-    left: 5% !important;
-    z-index: 9999 !important;
-    padding: 5px !important; /* Add padding to contain icons nicely */
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.15) !important;
     display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-evenly !important;
-    align-items: center !important;
+    flex-direction: column !important;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
   }
 
-  .nav-item.active, .nav-item:active {
-    opacity: 1 !important;
-    background: rgba(255, 255, 255, 0.2) !important; /* Brighter active highlight */
-    border-radius: 50% !important; /* Perfect circle behind active icon */
-    width: 60px !important;
-    height: 60px !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; /* Slight drop shadow for active button */
+  html[dir="rtl"] .app-layout {
+    grid-template-columns: 1fr !important;
   }
 
-  .nav-item svg {
-    width: 24px !important;
-    height: 24px !important;
-    stroke: #ffffff !important;
-    fill: none !important;
-    margin: 0 !important;
-  }
-
-  .nav-label {
-    font-size: 10px !important;
-    font-weight: 500 !important;
-    color: #ffffff !important;
-    display: block !important;
-  }
-
-  /* Hide Desktop specific elements */
-  .sidebar-top, .sidebar-bottom, .storage-widget { display: none !important; }
-
-  /* --- MAIN CONTENT & CARDS --- */
-  .main-content {
-    background-color: #000000 !important;
-    padding: 15px !important;
-    padding-top: max(20px, env(safe-area-inset-top)) !important;
-    padding-bottom: 120px !important; /* Space for the floating nav pill */
-    width: 100% !important;
-    height: 100vh !important;
-  }
-
-  .bento-card, .chart-card, .stats-row, .task-item {
-    background: rgba(255, 255, 255, 0.05) !important; /* Glass card */
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 28px !important; /* Large apple corners */
-    padding: 20px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-    margin-bottom: 15px !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-  }
-
-  /* Text and Headers */
-  .view-header {
-    background: transparent !important;
-    border: none !important;
-    padding: 10px 5px 20px !important;
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-  }
-
-  .view-title {
-    font-size: 26px !important;
-    font-weight: 700 !important;
-    color: #ffffff !important;
-  }
-
-  .card-title {
-    font-size: 14px !important;
-    color: rgba(255,255,255,0.6) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    font-weight: 600 !important;
-  }
-}
-
-/* ================= APPLE BACKGROUND GLOW ================= */
-@media (max-width: 768px) {
   .mobile-nav-only {
     display: flex !important;
   }
@@ -2902,15 +2829,7 @@ html[dir="rtl"] .glass-island-player {
     display: none !important;
   }
 
-  .glass-island-player {
-    bottom: calc(env(safe-area-inset-bottom) + 84px) !important;
-    left: 14px !important;
-    right: 14px !important;
-    margin: 0 auto !important;
-    width: auto !important;
-    max-width: 440px !important;
-    z-index: 1001 !important;
-  }
+  /* --- AMBIENT APPLE BACKDROP GLOW --- */
   .app-layout::before {
     content: '';
     position: fixed;
@@ -2937,15 +2856,161 @@ html[dir="rtl"] .glass-island-player {
 
   .view-panel {
     position: relative;
-    z-index: 1; /* Keep above glow */
+    z-index: 1;
+    padding: 12px 14px 110px !important;
   }
-}
+
+  /* --- FLOATING PILL BOTTOM NAVIGATION (Matching Image 6) --- */
+  .sidebar {
+    background: rgba(22, 22, 28, 0.65) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    border-radius: 999px !important;
+    height: 64px !important;
+    width: min(92%, 460px) !important;
+    position: fixed !important;
+    bottom: calc(env(safe-area-inset-bottom) + 16px) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+    padding: 4px 10px !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65), inset 0 1px 1.5px rgba(255, 255, 255, 0.25) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    -webkit-app-region: no-drag;
+  }
+
+  /* Hide Desktop specific sidebar elements */
+  .sidebar-top, .sidebar-bottom, .storage-widget { 
+    display: none !important; 
+  }
+
+  .sidebar-nav, .nav-list {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .nav-item {
+    flex-direction: column !important;
+    padding: 6px 12px !important;
+    margin: 0 !important;
+    font-size: 10px !important;
+    gap: 3px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 999px !important;
+    width: auto !important;
+    height: 52px !important;
+    background: transparent !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .nav-item.active, .nav-item:active {
+    opacity: 1 !important;
+    background: rgba(255, 255, 255, 0.16) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .nav-item svg {
+    margin: 0 !important;
+    width: 20px !important;
+    height: 20px !important;
+    stroke: #ffffff !important;
+  }
+
+  .nav-item .nav-label {
+    display: block !important;
+    font-size: 9.5px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+  }
+
+  .nav-badge {
+    position: absolute !important;
+    top: 3px !important;
+    right: 50% !important;
+    transform: translateX(14px);
+  }
+
+  /* --- DYNAMIC ISLAND MINI-PLAYER (Floating above pill) --- */
+  .glass-island-player {
+    bottom: calc(env(safe-area-inset-bottom) + 88px) !important;
+    left: 14px !important;
+    right: 14px !important;
+    margin: 0 auto !important;
+    width: auto !important;
+    max-width: 440px !important;
+    z-index: 1001 !important;
+  }
+
+  /* --- MAIN SCROLL CONTENT --- */
+  .main-content {
+    order: 1 !important;
+    width: 100% !important;
+    height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 12px !important;
+    padding-top: max(16px, env(safe-area-inset-top)) !important;
+    padding-bottom: 120px !important;
+  }
+
+  /* --- BENTO CARDS (Apple Frosted Acrylic) --- */
+  .bento-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .bento-card, .chart-card, .stats-row, .task-item {
+    width: 100% !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    border-radius: 20px !important;
+    padding: 16px 18px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+    margin-bottom: 0 !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+  }
+
+  .view-header {
+    background: transparent !important;
+    border: none !important;
+    padding: 6px 4px 14px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .view-title {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+  }
+
+  .card-title {
+    font-size: 13px !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.8px !important;
+    font-weight: 600 !important;
+  }
 
   /* Modals on mobile devices */
   .sleek-modal {
     width: 92vw !important;
     max-width: 92vw !important;
-    border-radius: 28px !important;
+    border-radius: 24px !important;
     margin: auto !important;
     margin-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
   }
@@ -2953,4 +3018,11 @@ html[dir="rtl"] .glass-island-player {
   .modal-body {
     max-height: 60vh !important;
   }
+
+  .downloads-table {
+    display: block !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+  }
+}
 
