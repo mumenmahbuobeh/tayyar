@@ -101,6 +101,62 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
+// Network Media Sniffer (inspired by AB Download Manager MediaRegistry & HLS sniffer)
+const tabMediaRegistry = new Map();
+
+if (chrome.webRequest?.onHeadersReceived) {
+  try {
+    chrome.webRequest.onHeadersReceived.addListener(
+      (details) => {
+        if (!details.tabId || details.tabId < 0) return;
+        const url = details.url;
+        if (!url || !/^https?:\/\//i.test(url)) return;
+
+        const headers = details.responseHeaders || [];
+        const ctHeader = headers.find((h) => h.name.toLowerCase() === 'content-type');
+        const clHeader = headers.find((h) => h.name.toLowerCase() === 'content-length');
+        const mime = ctHeader?.value?.toLowerCase() || '';
+        const size = clHeader ? parseInt(clHeader.value, 10) : 0;
+
+        const isVideoAudio = mime.startsWith('video/') || mime.startsWith('audio/') ||
+          mime.includes('mpegurl') || mime.includes('x-mpegurl');
+        const isMediaExt = /\.(m3u8|mp4|webm|m4s|ts|m4a|mp3|flv|mkv)(\?|$)/i.test(url);
+
+        if (isVideoAudio || isMediaExt) {
+          if (!tabMediaRegistry.has(details.tabId)) {
+            tabMediaRegistry.set(details.tabId, []);
+          }
+          const list = tabMediaRegistry.get(details.tabId);
+          if (!list.some((m) => m.url === url)) {
+            const item = {
+              url,
+              mime,
+              size,
+              isHLS: mime.includes('mpegurl') || url.includes('.m3u8'),
+              title: url.split('/').pop().split('?')[0] || 'media_stream'
+            };
+            list.push(item);
+            if (list.length > 30) list.shift();
+
+            try {
+              chrome.tabs.sendMessage(details.tabId, {
+                type: 'TAYYAR_STREAM_DETECTED',
+                media: item
+              }).catch(() => {});
+            } catch (_) {}
+          }
+        }
+      },
+      { urls: ['<all_urls>'] },
+      ['responseHeaders']
+    );
+  } catch (_) {}
+}
+
+chrome.tabs?.onRemoved?.addListener((tabId) => {
+  tabMediaRegistry.delete(tabId);
+});
+
 // Automatic browser download interception (like IDM)
 chrome.downloads.onCreated.addListener(async (downloadItem) => {
   const cfg = await getSettings();
@@ -130,6 +186,11 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
   if (req.type === 'SEND_URL') {
     sendToTayyar(req.url, req.referer || sender?.tab?.url).then((ok) => sendResponse({ ok }));
     return true;
+  }
+  if (req.type === 'GET_TAB_MEDIA') {
+    const list = tabMediaRegistry.get(sender?.tab?.id) || [];
+    sendResponse({ media: list });
+    return false;
   }
   if (req.type === 'UPDATE_BADGE') {
     updateBadge();

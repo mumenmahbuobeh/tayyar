@@ -538,7 +538,7 @@
                 stroke-width="2.5">
                 <path d="M12 5v14M5 12h14" />
               </svg></button>
-            <button class="icon-btn-ghost" id="bBrowseMotrixPlugins" title="Browse Official Plugins (motrix.app/plugins)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <button class="icon-btn-ghost" id="bBrowseOfficialPlugins" title="Browse Verified Plugins (Tayyar Ecosystem)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <path
                   d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
@@ -1403,6 +1403,7 @@
   <!-- 8. ABOUT MODAL (IMAGE 13 - Customized with User Name & Credits!) -->
   <dialog id="aboutModal" class="sleek-modal modal-about">
     <div class="modal-form">
+      <button type="button" class="icon-btn-ghost modal-close about-top-close" title="Close">✕</button>
       <div class="modal-body" style="padding: 28px 24px 20px;">
         <!-- About Card Top -->
         <div class="about-card-hero">
@@ -1549,13 +1550,16 @@
   <!-- ================= PLUGIN DETAIL MODAL (Matching Images 2 & 3) ================= -->
   <dialog id="pluginDetailModal" class="sleek-modal modal-large plugin-detail-dialog">
     <div class="modal-form">
-      <div class="modal-head plugin-detail-head">
-        <div class="plugin-detail-title-row">
-          <h2 id="pluginDetailName">Tayyar Filename Template</h2>
-          <span class="status-dot-blue"></span>
+      <div class="modal-head">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <h2 id="pluginDetailName">Tayyar Filename Template</h2>
+            <span class="status-dot-blue"></span>
+          </div>
+          <p class="modal-subhead" id="pluginDetailSubhead">Plugin configuration and permissions</p>
         </div>
-        <div class="plugin-detail-actions">
-          <label class="switch-toggle" title="Toggle plugin">
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+          <label class="switch-toggle" title="Toggle plugin" style="margin:0 4px;">
             <input type="checkbox" id="pluginDetailToggle">
             <span class="switch-slider"></span>
           </label>
@@ -1565,7 +1569,7 @@
           <button type="button" class="icon-btn-ghost" id="bReloadPlugin" title="Reload plugin">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
           </button>
-          <button type="button" class="icon-btn-ghost modal-close" id="bClosePluginDetail">✕</button>
+          <button type="button" class="icon-btn-ghost modal-close" id="bClosePluginDetail" title="Close">✕</button>
         </div>
       </div>
 
@@ -1581,7 +1585,7 @@
         <div class="plugin-tab-content active" id="tabPluginOverview">
           <div class="plugin-overview-card">
             <div class="plugin-card-top">
-              <span class="plugin-avatar avatar-blue" id="pluginDetailAvatar">MF</span>
+              <span class="plugin-avatar avatar-blue" id="pluginDetailAvatar">TF</span>
               <div class="plugin-meta">
                 <div class="plugin-title" id="pluginDetailTitle">Tayyar Filename Template</div>
                 <div class="plugin-ver" id="pluginDetailVer">v1.1.1 · tayyar.filename-template</div>
@@ -1594,17 +1598,19 @@
               <span id="pluginDetailNoticeText"></span>
             </div>
             <div class="plugin-info-grid">
-              <div class="plugin-info-card">
+              <div class="plugin-info-card plugin-purpose-card">
                 <div class="info-card-label">PURPOSE</div>
                 <div class="info-card-val" id="pluginDetailPurpose"></div>
               </div>
-              <div class="plugin-info-card">
-                <div class="info-card-label">ACCESS</div>
-                <div class="info-card-val" id="pluginDetailAccess"></div>
-              </div>
-              <div class="plugin-info-card">
-                <div class="info-card-label">HEALTH</div>
-                <div class="info-card-val healthy" id="pluginDetailHealth">All good</div>
+              <div class="plugin-meta-cards-col">
+                <div class="plugin-info-card">
+                  <div class="info-card-label">ACCESS</div>
+                  <div class="info-card-val" id="pluginDetailAccess"></div>
+                </div>
+                <div class="plugin-info-card">
+                  <div class="info-card-label">HEALTH</div>
+                  <div class="info-card-val healthy" id="pluginDetailHealth">All good</div>
+                </div>
               </div>
             </div>
             <div class="plugin-overview-actions" style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
@@ -1671,10 +1677,10 @@
       <div class="modal-body">
         <label class="field-label">
           <span>GitHub Repository or Plugin Manifest URL</span>
-          <input type="text" id="pluginInstallUrlInput" class="probe-input" placeholder="e.g. motrix/plugin-filename-template or https://...">
+          <input type="text" id="pluginInstallUrlInput" class="probe-input" placeholder="e.g. tayyar/plugin-filename-template or https://...">
         </label>
         <div style="margin-top:12px;font-size:12.5px;color:var(--text-dim);line-height:1.5;">
-          You can install official Motrix plugins from <a href="https://motrix.app/plugins/" target="_blank" style="color:var(--color-cyan);">motrix.app/plugins</a> or provide any <code>.moext</code> bundle or GitHub release repo.
+          You can install verified Tayyar extensions or provide any compatible <code>.moext</code> bundle or GitHub release repository.
         </div>
       </div>
       <div class="modal-foot">

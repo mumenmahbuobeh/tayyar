@@ -58,17 +58,26 @@ function createMediaBadge(mediaEl) {
     }, 800);
   });
 
+  let latestDetectedStream = null;
+
+  chrome.runtime.onMessage?.addListener((msg) => {
+    if (msg.type === 'TAYYAR_STREAM_DETECTED' && msg.media) {
+      latestDetectedStream = msg.media;
+    }
+  });
+
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const mediaSrc = mediaEl.currentSrc || mediaEl.src || (mediaEl.querySelector('source')?.src);
-    if (!mediaSrc) {
-      btn.innerHTML = `<span class="tayyar-badge-text">No direct stream</span>`;
-      setTimeout(() => {
-        btn.innerHTML = `<span class="tayyar-badge-icon">⚡</span><span class="tayyar-badge-text">Download with Tayyar</span>`;
-      }, 2000);
-      return;
+    let mediaSrc = mediaEl.currentSrc || mediaEl.src || (mediaEl.querySelector('source')?.src);
+    // If blob URL or no src on DOM, use intercepted stream URL or current page URL
+    if (!mediaSrc || mediaSrc.startsWith('blob:') || mediaSrc.startsWith('data:')) {
+      if (latestDetectedStream && latestDetectedStream.url) {
+        mediaSrc = latestDetectedStream.url;
+      } else {
+        mediaSrc = window.location.href;
+      }
     }
 
     btn.innerHTML = `<span class="tayyar-badge-text">Sending to Tayyar...</span>`;

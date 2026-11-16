@@ -669,10 +669,10 @@
   /* ================= PLUGINS MANAGEMENT SYSTEM (motrix.app/plugins) ================= */
   const DEFAULT_PLUGINS = [
     {
-      id: 'motrix.filename-template',
+      id: 'tayyar.filename-template',
       name: 'Tayyar Filename Template',
       author: 'tayyar.filename-template',
-      short: 'MF',
+      short: 'TF',
       color: 'avatar-blue',
       version: 'v1.1.1',
       desc: 'Renames downloads with safe, composable templates while preserving their extensions.',
@@ -690,13 +690,13 @@
       }
     },
     {
-      id: 'motrix.url-resolver',
+      id: 'tayyar.url-resolver',
       name: 'Tayyar URL Resolver',
       author: 'tayyar.url-resolver',
-      short: 'MU',
+      short: 'TU',
       color: 'avatar-green',
       version: 'v1.0.0',
-      desc: 'URL-resolver framework for Tayyar. Ships no site-specific extractors; includes only a Wikimedia Commons demo resolver. Site resolution is provided by separately installed site-resolver plugins.',
+      desc: 'URL-resolver framework for Tayyar multi-source stream handling. Ships site-specific extractors and universal demo resolver.',
       installed: true,
       enabled: true,
       badge: 'Ready',
@@ -711,10 +711,10 @@
       }
     },
     {
-      id: 'motrix.page-scraper',
+      id: 'tayyar.page-scraper',
       name: 'Tayyar Page Scraper',
       author: 'tayyar.page-scraper',
-      short: 'PS',
+      short: 'TS',
       color: 'avatar-blue',
       version: 'v1.0.3',
       desc: 'Inspects HTML landing pages when you add an HTTP download and automatically extracts/switches the target URL to the underlying archive or installer link (.zip, .tar.gz, .dmg, .exe).',
@@ -791,10 +791,10 @@
       }
     },
     {
-      id: 'motrix.media-merge',
+      id: 'tayyar.media-merge',
       name: 'Tayyar Media Merge',
       author: 'Tayyar Team',
-      short: 'MM',
+      short: 'TM',
       color: 'avatar-blue',
       version: 'v0.1.0',
       desc: 'Combine separate video and audio files into one MP4 or MKV without re-encoding.',
@@ -811,10 +811,10 @@
       }
     },
     {
-      id: 'motrix.cloud-resolver',
+      id: 'tayyar.cloud-resolver',
       name: 'Cloud & Mirror Accelerator',
-      author: 'Motrix Team',
-      short: 'CR',
+      author: 'Tayyar Team',
+      short: 'TC',
       color: 'avatar-green',
       version: 'v1.0.2',
       desc: 'High-speed multi-mirror acceleration for cloud drive links, Baidu Pan, and multi-source CDNs.',
@@ -836,9 +836,21 @@
     try {
       const raw = localStorage.getItem('tayyar_plugins_state');
       if (!raw) return DEFAULT_PLUGINS;
-      const stored = JSON.parse(raw);
+      let stored = JSON.parse(raw);
+      if (!Array.isArray(stored)) return DEFAULT_PLUGINS;
+      // Auto-migrate legacy motrix ids and names
+      stored = stored.map((p) => {
+        let id = (p.id || '').replace(/^motrix\./, 'tayyar.');
+        let name = (p.name || '').replace(/Motrix/g, 'Tayyar');
+        let author = (p.author || '').replace(/motrix\./, 'tayyar.').replace(/Motrix/, 'Tayyar');
+        let desc = (p.desc || '').replace(/Motrix/g, 'Tayyar');
+        let purpose = (p.purpose || '').replace(/Motrix/g, 'Tayyar');
+        let notice = (p.notice || '').replace('{{hostSummary}}', (p.access || 'any website').toLowerCase());
+        return Object.assign({}, p, { id, name, author, desc, purpose, notice });
+      });
+
       return DEFAULT_PLUGINS.map((def) => {
-        const found = stored.find((s) => s.id === def.id);
+        const found = stored.find((s) => s.id === def.id || s.id === def.id.replace('tayyar.', 'motrix.'));
         if (!found) return def;
         return Object.assign({}, def, {
           installed: typeof found.installed === 'boolean' ? found.installed : def.installed,
@@ -1000,19 +1012,21 @@
 
   function openPluginDetail(pluginId) {
     const plugins = getStoredPlugins();
-    const p = plugins.find((x) => x.id === pluginId);
+    const p = plugins.find((x) => x.id === pluginId || x.id.replace('tayyar.', 'motrix.') === pluginId || x.id.replace('motrix.', 'tayyar.') === pluginId);
     if (!p) return;
 
-    activePluginDetailId = pluginId;
+    activePluginDetailId = p.id;
     const modal = $('#pluginDetailModal');
     if (!modal) return;
 
     // Header & Meta
-    $('#pluginDetailName').textContent = `${p.name} •`;
+    $('#pluginDetailName').textContent = p.name;
+    const subhead = $('#pluginDetailSubhead');
+    if (subhead) subhead.textContent = `${p.version} · ${p.author || p.id}`;
     const toggle = $('#pluginDetailToggle');
     if (toggle) toggle.checked = !!p.enabled;
 
-    // Overview Tab (Matching Images 2 & 3)
+    // Overview Tab
     $('#pluginDetailAvatar').textContent = p.short || 'PL';
     $('#pluginDetailAvatar').className = `plugin-avatar ${p.color || 'avatar-blue'}`;
     $('#pluginDetailTitle').textContent = p.name;
@@ -1044,7 +1058,7 @@
     const container = $('#pluginSettingsContainer');
     if (!container) return;
 
-    if (p.id === 'motrix.filename-template') {
+    if (p.id === 'tayyar.filename-template' || p.id === 'motrix.filename-template') {
       const templateVal = p.settings?.template || '{date}-{title}.{ext}';
       const preserveVal = p.settings?.preserveExt !== false;
       const sanitizeVal = p.settings?.sanitize !== false;
@@ -1080,7 +1094,7 @@
           if (input) input.value += chip.dataset.tag;
         });
       });
-    } else if (p.id === 'motrix.url-resolver') {
+    } else if (p.id === 'tayyar.url-resolver' || p.id === 'motrix.url-resolver') {
       container.innerHTML = `
         <label class="field-label">
           <span>Default Resolver Service</span>
@@ -1102,7 +1116,7 @@
           <button type="button" class="pill-btn primary" id="bSavePluginSettings">Save Settings</button>
         </div>
       `;
-    } else if (p.id === 'motrix.page-scraper') {
+    } else if (p.id === 'tayyar.page-scraper' || p.id === 'motrix.page-scraper') {
       container.innerHTML = `
         <label class="field-label">
           <span>Intercepted File Extensions</span>
@@ -1158,7 +1172,7 @@
 
     if (!item.settings) item.settings = {};
 
-    if (p.id === 'motrix.filename-template') {
+    if (p.id === 'tayyar.filename-template' || p.id === 'motrix.filename-template') {
       const input = $('#cfgFnTemplateInput');
       const preserve = $('#cfgFnPreserveExt');
       const sanitize = $('#cfgFnSanitize');
@@ -1168,7 +1182,7 @@
     } else if (p.id === 'dontarken.alldebrid-resolver') {
       const key = $('#cfgDebridKey');
       if (key) item.settings.apiKey = key.value.trim();
-    } else if (p.id === 'motrix.page-scraper') {
+    } else if (p.id === 'tayyar.page-scraper' || p.id === 'motrix.page-scraper') {
       const exts = $('#cfgScraperExts');
       if (exts) item.settings.extensions = exts.value.trim();
     }
@@ -1244,7 +1258,7 @@
   if (bCopyPluginUrl) {
     bCopyPluginUrl.addEventListener('click', () => {
       if (activePluginDetailId) {
-        const link = `https://motrix.app/plugins/#${activePluginDetailId}`;
+        const link = `https://github.com/mumenmahbuobeh/tayyar#plugins`;
         try { navigator.clipboard.writeText(link); } catch (_) {}
         toast(S.lang === 'ar' ? 'تم نسخ رابط الإضافة إلى الحافظة' : 'Copied plugin link to clipboard');
       }
@@ -1287,7 +1301,7 @@
         author: 'User',
         short: name.slice(0, 2).toUpperCase(),
         color: 'avatar-blue',
-        version: 'v1.0.0',
+        version: 'v1.0.5',
         desc: `Installed from ${val}`,
         installed: true,
         enabled: true,
@@ -1307,10 +1321,10 @@
     });
   }
 
-  const bBrowseMotrixPlugins = $('#bBrowseMotrixPlugins');
-  if (bBrowseMotrixPlugins) {
-    bBrowseMotrixPlugins.addEventListener('click', () => {
-      const url = 'https://motrix.app/plugins/';
+  const bBrowseOfficialPlugins = $('#bBrowseOfficialPlugins') || $('#bBrowseMotrixPlugins');
+  if (bBrowseOfficialPlugins) {
+    bBrowseOfficialPlugins.addEventListener('click', () => {
+      const url = 'https://github.com/mumenmahbuobeh/tayyar#plugins';
       if (window.tayyar?.openUrl) window.tayyar.openUrl(url);
       else window.open(url, '_blank');
     });
@@ -2931,7 +2945,7 @@
 
         // Apply Filename Template plugin if enabled
         const activePlugins = getStoredPlugins();
-        const fnPlugin = activePlugins.find((p) => p.id === 'motrix.filename-template' && p.enabled);
+        const fnPlugin = activePlugins.find((p) => (p.id === 'tayyar.filename-template' || p.id === 'motrix.filename-template') && p.enabled);
         if (fnPlugin && fnPlugin.settings?.template) {
           const ext = filename.includes('.') ? filename.split('.').pop() : '';
           const title = filename.replace(/\.[^.]+$/, '');
