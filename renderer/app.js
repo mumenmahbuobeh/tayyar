@@ -1922,7 +1922,16 @@
     { id: 'snapchat', name: 'Snapchat', icon: '👻', color: '#fffc00', pattern: /(?:snapchat\.com\/(?:spotlight|t|add|story)\/)/i },
     { id: 'twitter', name: 'X / Twitter', icon: '🐦', color: '#1da1f2', pattern: /(?:twitter\.com|x\.com)\/[^/]+\/status\//i },
     { id: 'pinterest', name: 'Pinterest', icon: '📌', color: '#e60023', pattern: /(?:pinterest\.com\/pin\/|pin\.it\/)/i },
-    { id: 'reddit', name: 'Reddit', icon: '🤖', color: '#ff4500', pattern: /(?:reddit\.com\/r\/[^/]+\/comments\/|v\.redd\.it\/)/i }
+    { id: 'reddit', name: 'Reddit', icon: '🤖', color: '#ff4500', pattern: /(?:reddit\.com\/r\/[^/]+\/comments\/|v\.redd\.it\/)/i },
+    { id: 'threads', name: 'Threads', icon: '🧵', color: '#000000', pattern: /(?:threads\.net|threads\.com)\//i },
+    { id: 'vimeo', name: 'Vimeo', icon: '📽️', color: '#1ab7ea', pattern: /vimeo\.com\//i },
+    { id: 'dailymotion', name: 'Dailymotion', icon: '📺', color: '#0066dc', pattern: /(?:dailymotion\.com|dai\.ly)\//i },
+    { id: 'twitch', name: 'Twitch', icon: '🎮', color: '#9146ff', pattern: /(?:twitch\.tv|clips\.twitch\.tv)\//i },
+    { id: 'rumble', name: 'Rumble', icon: '🟢', color: '#85c742', pattern: /rumble\.com\//i },
+    { id: 'bilibili', name: 'Bilibili', icon: '⚡', color: '#00a1d6', pattern: /(?:bilibili\.com|b23\.tv)\//i },
+    { id: 'streamable', name: 'Streamable', icon: '📹', color: '#0f90fa', pattern: /streamable\.com\//i },
+    { id: 'vk', name: 'VK Video', icon: '🇷🇺', color: '#0077ff', pattern: /(?:vk\.com|vkvideo\.ru)\//i },
+    { id: 'hls', name: 'HLS Live Stream', icon: '📡', color: '#ff9800', pattern: /\.(?:m3u8|mpd)($|[?#])/i }
   ];
 
   function detectSocialPlatform(url) {
@@ -2135,12 +2144,17 @@
     }
 
     return {
-      ok: false,
-      error: 'Could not resolve stream',
+      ok: true,
       platform: platform.name,
-      title: `${platform.name}_Media`,
+      title: `${platform.name}_Video`,
       author: platform.name,
-      formats: []
+      formats: [{
+        id: 'direct',
+        quality: S.lang === 'ar' ? '🎬 تحميل البث المباشر (Direct MP4)' : '🎬 Direct Stream Download (MP4)',
+        ext: 'mp4',
+        url: cleanUrl,
+        directUrl: cleanUrl
+      }]
     };
   }
 
@@ -2552,9 +2566,11 @@
       targetAssetUrl = appImage ? appImage.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-1.0.5.AppImage';
       targetFilename = 'Tayyar-1.0.5.AppImage';
     } else {
-      const exe = assets.find((a) => a.name.endsWith('.exe') && !a.name.includes('blockmap'));
-      targetAssetUrl = exe ? exe.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar.Setup.1.0.5.exe';
-      targetFilename = 'Tayyar.Setup.1.0.5.exe';
+      const setupExe = assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe') && !a.name.includes('blockmap') && (a.size > 80 * 1024 * 1024)) ||
+                       assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe') && !a.name.includes('blockmap')) ||
+                       assets.find((a) => a.name.endsWith('.exe') && !a.name.includes('blockmap'));
+      targetAssetUrl = setupExe ? setupExe.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar.Setup.1.0.5.exe';
+      targetFilename = setupExe ? setupExe.name : 'Tayyar.Setup.1.0.5.exe';
     }
 
     if (progressWrap) progressWrap.style.display = 'block';

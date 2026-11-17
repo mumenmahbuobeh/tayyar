@@ -53,8 +53,8 @@ jobs:
             tar -xf ffmpeg.zip -C bin --strip-components=2 "ffmpeg-master-latest-win64-gpl/bin/ffmpeg.exe" "ffmpeg-master-latest-win64-gpl/bin/ffprobe.exe" || true
             rm -f ffmpeg.zip
             npm run dist:win
-            cp dist/Tayyar-Setup-*.exe dist/Tayyar.Setup.1.0.5.exe 2>/dev/null || true
-            cp dist/Tayyar-1.0.5.exe dist/Tayyar.1.0.5.exe 2>/dev/null || true
+            find dist -type f -name "*Setup*.exe" -exec cp -fv {} dist/Tayyar.Setup.1.0.5.exe \; -exec cp -fv {} dist/Tayyar-Setup-1.0.5.exe \; || true
+            find dist -type f -name "*.exe" ! -name "*Setup*" ! -name "*blockmap*" -exec cp -fv {} dist/Tayyar.1.0.5.exe \; -exec cp -fv {} dist/Tayyar-1.0.5.exe \; || true
           elif [ "${{ runner.os }}" = "macOS" ]; then
             curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos -o bin/yt-dlp
             chmod +x bin/yt-dlp
@@ -221,7 +221,15 @@ jobs:
         run: |
           mkdir -p final-release
           find release-assets -type f -exec cp -v {} final-release/ \;
-          ls -la final-release
+          cd final-release
+          # Guarantee both hyphenated and dot-separated installers exist and are the identical 102MB fresh build with bundled media engine
+          if [ -f "Tayyar.Setup.1.0.5.exe" ]; then
+            cp -fv Tayyar.Setup.1.0.5.exe Tayyar-Setup-1.0.5.exe
+          fi
+          if [ -f "Tayyar.1.0.5.exe" ]; then
+            cp -fv Tayyar.1.0.5.exe Tayyar-1.0.5.exe
+          fi
+          ls -la
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2

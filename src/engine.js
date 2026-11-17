@@ -375,7 +375,9 @@ class DownloadManager extends EventEmitter {
     let isSocialDownload = !!isSocial;
     try {
       const social = require('./social');
-      if (social.detectPlatform(url)) isSocialDownload = true;
+      if (social.detectPlatform(url) || url.includes('.m3u8') || url.includes('.mpd')) {
+        isSocialDownload = true;
+      }
     } catch (_) {}
     const d = {
       id: crypto.randomUUID(),
@@ -628,6 +630,13 @@ class DownloadManager extends EventEmitter {
       });
     } catch (e) {
       if (job.stopped) return;
+      if (d.url && /^https?:\/\//i.test(d.url) && !d.url.includes('.m3u8') && !d.url.includes('.mpd')) {
+        try {
+          console.warn('yt-dlp exited with error, falling back to direct HTTP stream engine:', e.message);
+          d.isSocial = false;
+          return await this._start(d);
+        } catch (_) {}
+      }
       this._stop(job);
       d.status = 'error';
       d.error = e.message || String(e);
