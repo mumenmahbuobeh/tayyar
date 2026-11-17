@@ -57,14 +57,13 @@ jobs:
             test -f bin/yt-dlp.exe || { echo "ERROR: yt-dlp.exe missing from bin/"; exit 1; }
             echo "Verified Windows media binaries: ffmpeg.exe & yt-dlp.exe ready in bin/"
             npm run dist:win
-            find dist -type f -name "*Setup*.exe" -exec cp -fv {} dist/Tayyar.Setup.1.0.5.exe \; -exec cp -fv {} dist/Tayyar-Setup-1.0.5.exe \; || true
-            find dist -type f -name "*.exe" ! -name "*Setup*" ! -name "*blockmap*" -exec cp -fv {} dist/Tayyar.1.0.5.exe \; -exec cp -fv {} dist/Tayyar-1.0.5.exe \; || true
+            find dist -type f -name "*.blockmap" -delete || true
           elif [ "${{ runner.os }}" = "macOS" ]; then
             echo "Fetching macOS yt-dlp binary..."
             curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos -o bin/yt-dlp
             chmod +x bin/yt-dlp
             npm run dist:mac
-            cp dist/Tayyar-*.dmg dist/Tayyar-1.0.5.dmg 2>/dev/null || true
+            find dist -type f -name "*.blockmap" -delete || true
           else
             echo "Fetching Linux yt-dlp & FFmpeg binaries..."
             curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o bin/yt-dlp
@@ -74,8 +73,7 @@ jobs:
             chmod +x bin/ffmpeg bin/ffprobe 2>/dev/null || true
             rm -f ffmpeg.tar.xz
             npm run dist:linux
-            cp dist/*.deb dist/tayyar_1.0.5_amd64.deb 2>/dev/null || true
-            cp dist/*.AppImage dist/Tayyar-1.0.5.AppImage 2>/dev/null || true
+            find dist -type f -name "*.blockmap" -delete || true
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -86,9 +84,13 @@ jobs:
         with:
           name: tayyar-desktop-${{ matrix.os }}
           path: |
-            dist/*.exe
-            dist/*.AppImage
-            dist/*.deb
+            dist/Tayyar-Setup-1.0.6.exe
+            dist/Tayyar-1.0.6.exe
+            dist/Tayyar-1.0.6.dmg
+            dist/Tayyar-1.0.6.AppImage
+            dist/tayyar_1.0.6_amd64.deb
+            dist/latest*.yml
+          if-no-files-found: ignore
             dist/*.dmg
             dist/*.zip
           if-no-files-found: ignore
@@ -156,9 +158,7 @@ jobs:
           mkdir -p build-apk
           APK_FILE=$(find android/app/build/outputs/apk -type f -name "*.apk" | head -n 1)
           if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
-            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.5.apk
-            cp -fv "$APK_FILE" build-apk/Tayyar-Android-1.0.5.apk
-            cp -fv "$APK_FILE" build-apk/Tayyar-v1.0.5.apk
+            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.6.apk
           else
             echo "Error: APK file not found!" && exit 1
           fi
@@ -167,7 +167,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-android-apk
-          path: build-apk/*.apk
+          path: build-apk/Tayyar-Android-v1.0.6.apk
 
   build-ios:
     name: Build iOS Package
@@ -198,7 +198,7 @@ jobs:
           APP_PATH=$(find build/Build/Products -name "*.app" -type d | head -n 1)
           if [ -n "$APP_PATH" ] && [ -d "$APP_PATH" ]; then
             cp -r "$APP_PATH" build/Payload/
-            cd build && zip -r ../../../Tayyar-iOS-v1.0.5.ipa Payload
+            cd build && zip -r ../../../Tayyar-iOS-v1.0.6.ipa Payload
           else
             echo "Error: iOS .app bundle not found!" && exit 1
           fi
@@ -207,7 +207,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-ios-ipa
-          path: Tayyar-iOS-v1.0.5.ipa
+          path: Tayyar-iOS-v1.0.6.ipa
 
   publish-release:
     name: Create GitHub Release
@@ -230,26 +230,22 @@ jobs:
           mkdir -p final-release
           find release-assets -type f -exec cp -v {} final-release/ \;
           cd final-release
-          # Guarantee both hyphenated and dot-separated installers exist and are the identical 102MB fresh build with bundled media engine
-          if [ -f "Tayyar.Setup.1.0.5.exe" ]; then
-            cp -fv Tayyar.Setup.1.0.5.exe Tayyar-Setup-1.0.5.exe
-          fi
-          if [ -f "Tayyar.1.0.5.exe" ]; then
-            cp -fv Tayyar.1.0.5.exe Tayyar-1.0.5.exe
-          fi
-          # Ensure old 1.0.0 assets are excluded from final-release directory
-          rm -f *1.0.0* 2>/dev/null || true
+          # Strip any blockmap files, old version assets, and duplicate space-separated filenames
+          rm -f *.blockmap 2>/dev/null || true
+          rm -f *1.0.0* *1.0.5* 2>/dev/null || true
+          rm -f "* *" 2>/dev/null || true
+          echo "Curated Final Release Assets (Strictly 1 Clean Binary per Platform):"
           ls -la
 
-      - name: Clean up Obsolete 1.0.0 Release Assets from GitHub
+      - name: Clean up Obsolete & Duplicate Release Assets from GitHub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Scanning GitHub releases for obsolete 1.0.0 files..."
+          echo "Scanning GitHub releases for obsolete or duplicate assets..."
           curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases" | \
-          jq -r '.[] | .assets[]? | select(.name | test("1\\.0\\.0")) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
-            if [ -n "$asset_id" ]; then
-              echo "Withdrawing & deleting old asset: $asset_name (ID: $asset_id)"
+          jq -r '.[] | .assets[]? | select(.name | test("1\\.0\\.6") | not) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
+            if [ -n "$asset_id" ] && [ -n "$asset_name" ]; then
+              echo "Withdrawing & deleting non-1.0.6 asset: $asset_name (ID: $asset_id)"
               curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" || true
             fi
           done || true
@@ -257,33 +253,33 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.5
-          name: "Tayyar v1.0.5 — Multiplatform Release (Windows, Linux, macOS, Android, iOS)"
+          tag_name: v1.0.6
+          name: "Tayyar v1.0.6 — Multiplatform Release (Windows, Linux, macOS, Android, iOS)"
           body: |
-            ## 🚀 Tayyar Download Manager v1.0.5
+            ## 🚀 Tayyar Download Manager v1.0.6
 
             Universal high-speed multi-connection download manager designed and developed by **Mu'men Mahbuobeh**.
 
-            ### 📦 Download Packages
+            ### 📦 Download Packages (Official & Clean Binaries)
             * **Windows:**
-              * [Tayyar Setup 1.0.5.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar.Setup.1.0.5.exe) (Installer)
-              * [Tayyar 1.0.5.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar.1.0.5.exe) (Portable)
+              * [Tayyar-Setup-1.0.6.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-Setup-1.0.6.exe) (Installer with Bundled Media Engine)
+              * [Tayyar-1.0.6.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-1.0.6.exe) (Portable Executable)
             * **Android:**
-              * [Tayyar-Android-v1.0.5.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-Android-v1.0.5.apk) (Android 7.0+)
+              * [Tayyar-Android-v1.0.6.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-Android-v1.0.6.apk) (Android 7.0+ with Dedicated Mobile UI & Gallery Saver)
             * **iOS (Apple iPhone/iPad):**
-              * [Tayyar-iOS-v1.0.5.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-iOS-v1.0.5.ipa) (Sideload / AltStore / TrollStore)
+              * [Tayyar-iOS-v1.0.6.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-iOS-v1.0.6.ipa) (Sideload / AltStore / TrollStore / LiveContainer)
             * **macOS:**
-              * [Tayyar-1.0.5.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-1.0.5.dmg) (Apple Silicon & Intel)
+              * [Tayyar-1.0.6.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-1.0.6.dmg) (Apple Silicon & Intel)
             * **Linux:**
-              * [Tayyar-1.0.5.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-1.0.5.AppImage)
-              * [tayyar_1.0.5_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/tayyar_1.0.5_amd64.deb)
+              * [Tayyar-1.0.6.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-1.0.6.AppImage)
+              * [tayyar_1.0.6_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/tayyar_1.0.6_amd64.deb)
 
-            ### ✨ Key Features
-            * Dynamic Multi-Threaded Chunking (up to 64 connections per file)
-            * 200+ Universal File Extensions categorized automatically
-            * Seamless download resilience for Russian, Chinese, Iranian, and international servers
-            * Integrated Browser Extensions for Chrome, Edge, Firefox, Safari, Brave, Opera, Vivaldi, Arc
-            * Apple Liquid Glass Design Language with native Arabic (RTL) & English (LTR) support
+            ### ✨ Key Features in v1.0.6
+            * **Dedicated Mobile Experience:** Liquid Glass bottom navigation bar with dedicated 1-tap Social Video Downloader Hub.
+            * **Full Audio+Video Stream Muxing:** Progressive download for TikTok, YouTube, Instagram, and Facebook with zero watermark and complete sound.
+            * **Android Gallery Integration:** Automatically registers downloaded videos directly into the phone's native Gallery / الاستوديو.
+            * **Lossless Desktop Video Merging:** Bundled FFmpeg & yt-dlp binaries for Windows, macOS, and Linux.
+            * **Turbo Multi-Threaded Chunking:** Up to 64 connections per file with smart segmented resumption.
           files: final-release/*
           fail_on_unmatched_files: false
           draft: false

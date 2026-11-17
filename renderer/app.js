@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.5 is the latest available release.',
+      upToDateDesc: 'Version 1.0.6 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -292,7 +292,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.5 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.6 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -798,7 +798,7 @@
       author: 'griciaisl12',
       short: 'MS',
       color: 'avatar-blue',
-      version: 'v1.0.5',
+      version: 'v1.0.6',
       desc: 'Resolves GitHub repository release, file links, Google Drive/Docs into real downloads with mirror acceleration.',
       installed: false,
       enabled: false,
@@ -1342,7 +1342,7 @@
         author: 'User',
         short: name.slice(0, 2).toUpperCase(),
         color: 'avatar-blue',
-        version: 'v1.0.5',
+        version: 'v1.0.6',
         desc: `Installed from ${val}`,
         installed: true,
         enabled: true,
@@ -2492,7 +2492,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.5';
+  const CURRENT_APP_VERSION = '1.0.6';
   let availableUpdateRelease = null;
   let updateDownloadTaskId = null;
   let downloadedUpdatePath = null;
@@ -2528,7 +2528,7 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const rel = await res.json();
       availableUpdateRelease = rel;
-      const latestTag = (rel.tag_name || 'v1.0.5').replace(/^v/, '');
+      const latestTag = (rel.tag_name || 'v1.0.6').replace(/^v/, '');
 
       const isNewer = semverCompare(latestTag, CURRENT_APP_VERSION) > 0;
 
@@ -2557,7 +2557,7 @@
       }
     } catch (err) {
       console.warn('Update check failed:', err);
-      if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? 'برنامج تيّار (v1.0.5)' : 'Tayyar (v1.0.5)';
+      if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? 'برنامج تيّار (v1.0.6)' : 'Tayyar (v1.0.6)';
       if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? 'تعذّر الاتصال بخادم التحديثات حالياً.' : 'Could not reach update server at this moment.';
       if (bInstall) {
         bInstall.style.display = 'inline-flex';
@@ -2604,22 +2604,22 @@
 
     if (platform === 'android') {
       const apk = assets.find((a) => a.name.endsWith('.apk'));
-      targetAssetUrl = apk ? apk.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-Android-v1.0.5.apk';
-      targetFilename = 'Tayyar-Android-v1.0.5.apk';
+      targetAssetUrl = apk ? apk.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-Android-v1.0.6.apk';
+      targetFilename = 'Tayyar-Android-v1.0.6.apk';
     } else if (platform === 'darwin') {
       const dmg = assets.find((a) => a.name.endsWith('.dmg'));
-      targetAssetUrl = dmg ? dmg.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-1.0.5.dmg';
-      targetFilename = 'Tayyar-1.0.5.dmg';
+      targetAssetUrl = dmg ? dmg.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-1.0.6.dmg';
+      targetFilename = 'Tayyar-1.0.6.dmg';
     } else if (platform === 'linux') {
       const appImage = assets.find((a) => a.name.endsWith('.AppImage') || a.name.endsWith('.deb'));
-      targetAssetUrl = appImage ? appImage.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar-1.0.5.AppImage';
-      targetFilename = 'Tayyar-1.0.5.AppImage';
+      targetAssetUrl = appImage ? appImage.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-1.0.6.AppImage';
+      targetFilename = 'Tayyar-1.0.6.AppImage';
     } else {
       const setupExe = assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe') && !a.name.includes('blockmap') && (a.size > 80 * 1024 * 1024)) ||
                        assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe') && !a.name.includes('blockmap')) ||
                        assets.find((a) => a.name.endsWith('.exe') && !a.name.includes('blockmap'));
-      targetAssetUrl = setupExe ? setupExe.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.5/Tayyar.Setup.1.0.5.exe';
-      targetFilename = setupExe ? setupExe.name : 'Tayyar.Setup.1.0.5.exe';
+      targetAssetUrl = setupExe ? setupExe.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-Setup-1.0.6.exe';
+      targetFilename = setupExe ? setupExe.name : 'Tayyar-Setup-1.0.6.exe';
     }
 
     if (progressWrap) progressWrap.style.display = 'block';

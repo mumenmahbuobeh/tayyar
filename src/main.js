@@ -80,7 +80,7 @@ function startBridge() {
 
     if (req.method === 'GET' && (req.url === '/ping' || req.url === '/status')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: '1.0.5', bridge: true }));
+      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: '1.0.6', bridge: true }));
     }
 
     if (req.method !== 'POST' || req.url !== '/add' || !fromExtension || req.headers['x-tayyar'] !== '1') {

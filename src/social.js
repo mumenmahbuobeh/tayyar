@@ -114,7 +114,7 @@ function downloadYtDlp(onProgress) {
     function fetchUrl(targetUrl) {
       const u = new URL(targetUrl);
       const proto = u.protocol === 'https:' ? https : http;
-      proto.get(targetUrl, { headers: { 'User-Agent': 'Tayyar-Downloader/1.0.5' } }, (res) => {
+      proto.get(targetUrl, { headers: { 'User-Agent': 'Tayyar-Downloader/1.0.6' } }, (res) => {
         if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
           return fetchUrl(res.headers.location);
         }
