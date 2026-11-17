@@ -134,6 +134,19 @@ public class TayyarMobilePlugin extends Plugin {
                 String statusStr = "downloading";
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     statusStr = "completed";
+                    try {
+                        int uriIdx = c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI);
+                        if (uriIdx >= 0) {
+                            String localUri = c.getString(uriIdx);
+                            if (localUri != null) {
+                                Uri uri = Uri.parse(localUri);
+                                String filePath = uri.getPath();
+                                if (filePath != null) {
+                                    android.media.MediaScannerConnection.scanFile(context, new String[]{ filePath }, null, null);
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {}
                 } else if (status == DownloadManager.STATUS_FAILED) {
                     statusStr = "error";
                 } else if (status == DownloadManager.STATUS_PAUSED) {
@@ -384,9 +397,28 @@ public class TayyarMobilePlugin extends Plugin {
                                         }
                                         org.json.JSONObject obj = new org.json.JSONObject(jsonSb.toString());
                                         String title = obj.optString("title", "YouTube Video");
-                                        org.json.JSONArray vStreams = obj.optJSONArray("videoStreams");
                                         JSArray formats = new JSArray();
-                                        if (vStreams != null) {
+
+                                        // 1. Progressive streams with audio+video (formatStreams)
+                                        org.json.JSONArray fStreams = obj.optJSONArray("formatStreams");
+                                        if (fStreams != null && fStreams.length() > 0) {
+                                            for (int i = 0; i < fStreams.length(); i++) {
+                                                org.json.JSONObject fObj = fStreams.getJSONObject(i);
+                                                if (fObj.has("url")) {
+                                                    JSObject fmt = new JSObject();
+                                                    String q = fObj.optString("qualityLabel", "HD");
+                                                    fmt.put("id", q);
+                                                    fmt.put("quality", "🎬 فيديو بدقة عالية متكامل مع الصوت " + q + " (MP4)");
+                                                    fmt.put("ext", "mp4");
+                                                    fmt.put("url", fObj.getString("url"));
+                                                    fmt.put("directUrl", fObj.getString("url"));
+                                                    formats.put(fmt);
+                                                }
+                                            }
+                                        }
+
+                                        org.json.JSONArray vStreams = obj.optJSONArray("videoStreams");
+                                        if (formats.length() == 0 && vStreams != null) {
                                             for (int i = 0; i < vStreams.length(); i++) {
                                                 org.json.JSONObject v = vStreams.getJSONObject(i);
                                                 String fmtStr = v.optString("format", "");
@@ -458,8 +490,12 @@ public class TayyarMobilePlugin extends Plugin {
                                     pVid = Pattern.compile("<meta[^>]+content=[\"']([^\"']+)[\"'][^>]+property=[\"'](?:og:video|og:video:url|og:video:secure_url)[\"']", Pattern.CASE_INSENSITIVE);
                                     mVid = pVid.matcher(html);
                                 }
+                                if (!mVid.find()) {
+                                    pVid = Pattern.compile("\"(playable_url|playable_url_quality_hd|browser_native_hd_url|video_url)\":\"(https:[^\"\\\\]+)\"");
+                                    mVid = pVid.matcher(html);
+                                }
                                 if (mVid.find()) {
-                                    String videoUrl = mVid.group(1).replace("&amp;", "&");
+                                    String videoUrl = (mVid.groupCount() >= 2 ? mVid.group(2) : mVid.group(1)).replace("\\/", "/").replace("&amp;", "&");
                                     String platName = url.contains("instagram.com") ? "Instagram" : (url.contains("snapchat.com") ? "Snapchat" : "Facebook");
                                     JSArray formats = new JSArray();
                                     JSObject fmt = new JSObject();

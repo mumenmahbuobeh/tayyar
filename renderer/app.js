@@ -8,6 +8,7 @@
     en: {
       dashboard: 'Dashboard',
       downloads: 'Downloads',
+      socialVideoSaver: 'Video Downloader',
       trackers: 'Trackers',
       plugins: 'Plugins',
       notifications: 'Notifications',
@@ -165,6 +166,7 @@
     ar: {
       dashboard: 'لوحة التحكم',
       downloads: 'التحميلات',
+      socialVideoSaver: 'منزل الفيديوهات',
       trackers: 'خوادم التتبع',
       plugins: 'الإضافات',
       notifications: 'الإشعارات',
@@ -464,6 +466,9 @@
     $$('.nav-item').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.view === viewName);
     });
+    $$('.mobile-nav-btn, .mobile-nav-fab').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.view === viewName);
+    });
     $$('.view-panel').forEach((panel) => {
       panel.classList.remove('active');
     });
@@ -483,7 +488,7 @@
     }
   }
 
-  $$('.nav-item').forEach((btn) => {
+  $$('.nav-item, .mobile-nav-btn, .mobile-nav-fab').forEach((btn) => {
     btn.addEventListener('click', () => {
       const v = btn.dataset.view;
       if (v) switchView(v);
@@ -2078,8 +2083,52 @@
       } catch (_) {}
     }
 
-    // D. TikTok via TikMate API
+    // D. TikTok via TikWM & TikMate API
     if (platform.id === 'tiktok') {
+      try {
+        const twRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`);
+        if (twRes.ok) {
+          const twData = await twRes.json();
+          if (twData && twData.code === 0 && twData.data) {
+            let playUrl = twData.data.play || '';
+            if (playUrl && !playUrl.startsWith('http')) playUrl = 'https://www.tikwm.com' + playUrl;
+            let musicUrl = twData.data.music || '';
+            if (musicUrl && !musicUrl.startsWith('http')) musicUrl = 'https://www.tikwm.com' + musicUrl;
+
+            const formats = [];
+            if (playUrl) {
+              formats.push({
+                id: 'nowm',
+                quality: '⚡ فيديو أصلي فائق الدقة بدون علامة مائية (MP4)',
+                ext: 'mp4',
+                url: playUrl,
+                directUrl: playUrl
+              });
+            }
+            if (musicUrl) {
+              formats.push({
+                id: 'audio',
+                quality: '🎵 ملف صوتي فقط (MP3 نقي)',
+                ext: 'mp3',
+                url: musicUrl,
+                directUrl: musicUrl
+              });
+            }
+
+            if (formats.length > 0) {
+              return {
+                ok: true,
+                platform: 'TikTok',
+                title: twData.data.title || 'TikTok Video',
+                author: twData.data.author?.nickname || 'TikTok Creator',
+                thumbnail: twData.data.cover || '',
+                formats
+              };
+            }
+          }
+        }
+      } catch (_) {}
+
       try {
         const formData = new FormData();
         formData.append('url', cleanUrl);
@@ -3200,11 +3249,213 @@
     };
   }
 
+  /* ---------------- DEDICATED SOCIAL VIDEO SAVER HUB ---------------- */
+  function setupSocialVideoSaver() {
+    const urlInput = $('#socialHubUrlInput');
+    const pasteBtn = $('#btnSocialHubPaste');
+    const analyzeBtn = $('#btnSocialHubAnalyze');
+    const loader = $('#socialHubLoader');
+    const loaderText = $('#socialHubLoaderText');
+    const preview = $('#socialHubPreview');
+    const thumb = $('#socialHubThumb');
+    const platBadge = $('#socialHubPlatformBadge');
+    const titleEl = $('#socialHubTitle');
+    const authorEl = $('#socialHubAuthor');
+    const btnFull = $('#btnDownloadFullVideo');
+    const btnAudio = $('#btnDownloadAudioOnly');
+    const progressCard = $('#socialHubProgressCard');
+    const spStatus = $('#spStatusLabel');
+    const spSpeed = $('#spSpeedLabel');
+    const spBar = $('#spProgressBar');
+    const spPercent = $('#spPercentLabel');
+    const spSize = $('#spSizeLabel');
+
+    let currentResolved = null;
+
+    // Platform chips filter/quick-hint
+    $$('.social-pill').forEach((pill) => {
+      pill.addEventListener('click', () => {
+        $$('.social-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        if (urlInput) urlInput.focus();
+      });
+    });
+
+    // 1-Tap Paste from Clipboard
+    if (pasteBtn && urlInput) {
+      pasteBtn.addEventListener('click', async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text && text.trim().startsWith('http')) {
+            urlInput.value = text.trim();
+            toast(S.lang === 'ar' ? 'تم لصق الرابط من الحافظة' : 'Pasted link from clipboard');
+            triggerAnalyze();
+          } else if (text) {
+            urlInput.value = text.trim();
+          } else {
+            toast(S.lang === 'ar' ? 'الحافظة فارغة' : 'Clipboard is empty');
+          }
+        } catch (_) {
+          urlInput.focus();
+        }
+      });
+    }
+
+    const triggerAnalyze = async () => {
+      const u = urlInput?.value?.trim();
+      if (!u || !/^https?:\/\//i.test(u)) {
+        toast(S.lang === 'ar' ? 'يرجى إدخال رابط فيديو صحيح' : 'Please enter a valid video link');
+        return;
+      }
+
+      if (loader) loader.hidden = false;
+      if (preview) preview.hidden = true;
+      if (progressCard) progressCard.hidden = true;
+
+      const plat = detectSocialPlatform(u) || { name: 'Video', icon: '🎬', color: '#00f2fe' };
+      if (loaderText) {
+        loaderText.textContent = S.lang === 'ar' 
+          ? `جاري فحص واستخراج الفيديو من ${plat.name}...` 
+          : `Analyzing video stream from ${plat.name}...`;
+      }
+
+      try {
+        const data = await resolveSocialMedia(u, plat);
+        currentResolved = data;
+        if (loader) loader.hidden = true;
+
+        if (data && data.ok) {
+          if (preview) preview.hidden = false;
+          if (titleEl) titleEl.textContent = data.title || `${plat.name} Video`;
+          if (authorEl) authorEl.textContent = data.author || plat.name;
+          if (platBadge) {
+            platBadge.textContent = `${plat.icon || '🎬'} ${plat.name}`;
+            platBadge.style.borderColor = plat.color || '#00f2fe';
+          }
+          if (thumb) {
+            if (data.thumbnail) {
+              thumb.src = data.thumbnail;
+              thumb.style.display = 'block';
+            } else {
+              thumb.style.display = 'none';
+            }
+          }
+        } else {
+          toast(S.lang === 'ar' ? 'تعذّر استخراج الفيديو، سيتم التنزيل المباشر' : 'Could not resolve, will download directly');
+        }
+      } catch (err) {
+        if (loader) loader.hidden = true;
+        toast(S.lang === 'ar' ? 'خطأ في فحص الرابط' : `Analysis error: ${err.message}`);
+      }
+    };
+
+    if (analyzeBtn) {
+      analyzeBtn.addEventListener('click', triggerAnalyze);
+    }
+    if (urlInput) {
+      urlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') triggerAnalyze();
+      });
+    }
+
+    const startSocialDownload = async (isAudioOnly) => {
+      const u = urlInput?.value?.trim();
+      if (!u) return;
+
+      const plat = detectSocialPlatform(u) || { name: 'Media' };
+      let downloadUrl = u;
+      let filename = `${plat.name}_${Date.now()}.mp4`;
+      let referer = '';
+
+      if (currentResolved && currentResolved.formats?.length) {
+        const formats = currentResolved.formats;
+        const rawTitle = (currentResolved.title || plat.name)
+          .replace(/[\/\\:*?"<>|]/g, '_')
+          .slice(0, 50)
+          .trim();
+
+        if (isAudioOnly) {
+          const audioFmt = formats.find(f => f.id === 'audio' || f.ext === 'mp3' || f.ext === 'm4a') || formats[0];
+          downloadUrl = audioFmt.directUrl || audioFmt.url || u;
+          referer = audioFmt.referer || '';
+          filename = `${plat.name}_${rawTitle}.mp3`;
+        } else {
+          const videoFmt = formats.find(f => f.id !== 'audio' && f.ext === 'mp4') || formats[0];
+          downloadUrl = videoFmt.directUrl || videoFmt.url || u;
+          referer = videoFmt.referer || '';
+          filename = `${plat.name}_${rawTitle}.mp4`;
+        }
+      }
+
+      if (progressCard) progressCard.hidden = false;
+      if (spStatus) {
+        spStatus.textContent = isAudioOnly 
+          ? (S.lang === 'ar' ? 'جاري تحميل الصوت MP3...' : 'Downloading MP3 audio...') 
+          : (S.lang === 'ar' ? 'جاري تحميل الفيديو كامل (صوت + صورة)...' : 'Downloading full video...');
+      }
+
+      toast(isAudioOnly 
+        ? (S.lang === 'ar' ? 'بدأ تحميل الملف الصوتي MP3!' : 'Audio download started!') 
+        : (S.lang === 'ar' ? 'بدأ تحميل الفيديو كامل بالصوت!' : 'Full video download started!'));
+
+      if (window.tayyar?.add) {
+        try {
+          const res = await window.tayyar.add({
+            url: downloadUrl,
+            socialUrl: u,
+            filename,
+            userFileName: filename,
+            referer: referer || undefined,
+            isSocial: true,
+            formatId: isAudioOnly ? 'audio' : 'best'
+          });
+
+          if (res && res.id) {
+            window.tayyar.on('dl:progress', (items) => {
+              const list = Array.isArray(items) ? items : [items];
+              const match = list.find(it => it.id === res.id);
+              if (match) {
+                const pct = match.size > 0 ? Math.min(100, Math.round((match.downloaded / match.size) * 100)) : 0;
+                if (spBar) spBar.style.width = `${pct}%`;
+                if (spPercent) spPercent.textContent = `${pct}%`;
+                if (spSpeed) spSpeed.textContent = fmtSpeed(match.speed || 0);
+                if (spSize) spSize.textContent = `${fmtSize(match.downloaded || 0)} / ${match.size > 0 ? fmtSize(match.size) : '...'}`;
+
+                if (match.status === 'completed') {
+                  if (spStatus) spStatus.textContent = S.lang === 'ar' ? '✅ اكتمل التحميل وحُفظ بنجاح!' : '✅ Download completed!';
+                  toast(S.lang === 'ar' ? '✅ اكتمل تحميل الفيديو وحُفظ في المعرض ومجلد التحميلات!' : '✅ Video downloaded to Gallery & Downloads!');
+                }
+              }
+            });
+          }
+        } catch (e) {
+          toast(`Download error: ${e.message}`);
+        }
+      }
+    };
+
+    if (btnFull) {
+      btnFull.addEventListener('click', () => startSocialDownload(false));
+    }
+    if (btnAudio) {
+      btnAudio.addEventListener('click', () => startSocialDownload(true));
+    }
+  }
+
   /* ---------------- IPC & INITIALIZATION ---------------- */
   async function init() {
+    const isMobileDevice = window.tayyar?.isMobile || 
+                           window.Capacitor?.isNativePlatform?.() || 
+                           window.innerWidth <= 768 ||
+                           /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobileDevice) {
+      document.body.classList.add('is-mobile');
+    }
+
     initHeatmap();
     renderTrackersTable();
     renderPluginsView();
+    setupSocialVideoSaver();
 
     if (!window.tayyar) {
       setupMobileAndWebEngine();

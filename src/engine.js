@@ -551,7 +551,7 @@ class DownloadManager extends EventEmitter {
       if (d.formatId && d.formatId !== 'best' && d.formatId !== 'direct') {
         args.push('-f', `${d.formatId}+bestaudio/bestvideo+bestaudio/best`);
       } else {
-        args.push('-f', 'bestvideo+bestaudio/best');
+        args.push('-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best[ext=mp4]/best');
       }
 
       if (d.filename.endsWith('.mp3') || d.filename.endsWith('.m4a')) {

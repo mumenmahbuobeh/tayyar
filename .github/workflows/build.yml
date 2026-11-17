@@ -48,23 +48,29 @@ jobs:
         run: |
           mkdir -p bin
           if [ "${{ runner.os }}" = "Windows" ]; then
+            echo "Fetching Windows yt-dlp & FFmpeg binaries..."
             curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe -o bin/yt-dlp.exe
             curl -L -s https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip -o ffmpeg.zip
-            tar -xf ffmpeg.zip -C bin --strip-components=2 "ffmpeg-master-latest-win64-gpl/bin/ffmpeg.exe" "ffmpeg-master-latest-win64-gpl/bin/ffprobe.exe" || true
-            rm -f ffmpeg.zip
+            powershell -NoProfile -Command "Expand-Archive -Path ffmpeg.zip -DestinationPath ffmpeg_temp -Force; Copy-Item 'ffmpeg_temp\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe' -Destination 'bin\ffmpeg.exe' -Force; Copy-Item 'ffmpeg_temp\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe' -Destination 'bin\ffprobe.exe' -Force"
+            rm -rf ffmpeg_temp ffmpeg.zip
+            test -f bin/ffmpeg.exe || { echo "ERROR: ffmpeg.exe missing from bin/"; exit 1; }
+            test -f bin/yt-dlp.exe || { echo "ERROR: yt-dlp.exe missing from bin/"; exit 1; }
+            echo "Verified Windows media binaries: ffmpeg.exe & yt-dlp.exe ready in bin/"
             npm run dist:win
             find dist -type f -name "*Setup*.exe" -exec cp -fv {} dist/Tayyar.Setup.1.0.5.exe \; -exec cp -fv {} dist/Tayyar-Setup-1.0.5.exe \; || true
             find dist -type f -name "*.exe" ! -name "*Setup*" ! -name "*blockmap*" -exec cp -fv {} dist/Tayyar.1.0.5.exe \; -exec cp -fv {} dist/Tayyar-1.0.5.exe \; || true
           elif [ "${{ runner.os }}" = "macOS" ]; then
+            echo "Fetching macOS yt-dlp binary..."
             curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos -o bin/yt-dlp
             chmod +x bin/yt-dlp
             npm run dist:mac
             cp dist/Tayyar-*.dmg dist/Tayyar-1.0.5.dmg 2>/dev/null || true
           else
+            echo "Fetching Linux yt-dlp & FFmpeg binaries..."
             curl -L -s https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o bin/yt-dlp
             chmod +x bin/yt-dlp
             curl -L -s https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz -o ffmpeg.tar.xz
-            tar -xf ffmpeg.tar.xz -C bin --strip-components=2 "ffmpeg-master-latest-linux64-gpl/bin/ffmpeg" "ffmpeg-master-latest-linux64-gpl/bin/ffprobe" || true
+            tar -xf ffmpeg.tar.xz --wildcards '*/bin/ffmpeg' '*/bin/ffprobe' --strip-components=2 -C bin || true
             chmod +x bin/ffmpeg bin/ffprobe 2>/dev/null || true
             rm -f ffmpeg.tar.xz
             npm run dist:linux
@@ -150,7 +156,9 @@ jobs:
           mkdir -p build-apk
           APK_FILE=$(find android/app/build/outputs/apk -type f -name "*.apk" | head -n 1)
           if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
-            cp "$APK_FILE" build-apk/Tayyar-Android-v1.0.5.apk
+            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.5.apk
+            cp -fv "$APK_FILE" build-apk/Tayyar-Android-1.0.5.apk
+            cp -fv "$APK_FILE" build-apk/Tayyar-v1.0.5.apk
           else
             echo "Error: APK file not found!" && exit 1
           fi
@@ -229,7 +237,22 @@ jobs:
           if [ -f "Tayyar.1.0.5.exe" ]; then
             cp -fv Tayyar.1.0.5.exe Tayyar-1.0.5.exe
           fi
+          # Ensure old 1.0.0 assets are excluded from final-release directory
+          rm -f *1.0.0* 2>/dev/null || true
           ls -la
+
+      - name: Clean up Obsolete 1.0.0 Release Assets from GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Scanning GitHub releases for obsolete 1.0.0 files..."
+          curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases" | \
+          jq -r '.[] | .assets[]? | select(.name | test("1\\.0\\.0")) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
+            if [ -n "$asset_id" ]; then
+              echo "Withdrawing & deleting old asset: $asset_name (ID: $asset_id)"
+              curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" || true
+            fi
+          done || true
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
