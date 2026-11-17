@@ -3362,6 +3362,11 @@
       const u = urlInput?.value?.trim();
       if (!u) return;
 
+      if (!currentResolved || !currentResolved.formats?.length) {
+        toast(S.lang === 'ar' ? 'جاري فحص واستخراج رابط الفيديو أولاً...' : 'Analyzing video stream first...');
+        await triggerAnalyze();
+      }
+
       const plat = detectSocialPlatform(u) || { name: 'Media' };
       let downloadUrl = u;
       let filename = `${plat.name}_${Date.now()}.mp4`;
