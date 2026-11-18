@@ -1,7 +1,9 @@
 'use strict';
 const { app, BrowserWindow, ipcMain, dialog, shell, Notification, clipboard, Menu } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const http = require('http');
+const https = require('https');
 const { DownloadManager, isDownloadableUrl } = require('./engine');
 const social = require('./social');
 
@@ -80,7 +82,46 @@ function startBridge() {
 
     if (req.method === 'GET' && (req.url === '/ping' || req.url === '/status')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: '1.0.6', bridge: true }));
+      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: '1.0.13', bridge: true, stories: true }));
+    }
+
+    // Receive Story/Status media blob (WhatsApp Web, Instagram/Facebook/Snapchat Web Stories)
+    if (req.method === 'POST' && req.url === '/add-blob' && fromExtension && req.headers['x-tayyar'] === '1') {
+      const chunks = [];
+      let totalLen = 0;
+      req.on('data', (c) => {
+        totalLen += c.length;
+        if (totalLen > 60 * 1024 * 1024) { req.destroy(); return; }
+        chunks.push(c);
+      });
+      req.on('end', () => {
+        try {
+          const payload = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+          const dataUrl = String(payload.dataUrl || '');
+          const m = dataUrl.match(/^data:([^;]+);base64,(.+)$/s);
+          if (!m) { res.writeHead(400); return res.end(); }
+          const mime = m[1].toLowerCase();
+          const buf = Buffer.from(m[2], 'base64');
+          const ext = mime.includes('mp4') || mime.includes('video') ? 'mp4'
+            : mime.includes('png') ? 'png'
+            : mime.includes('webp') ? 'webp' : 'jpg';
+          const rawName = String(payload.filename || `Story_${Date.now()}.${ext}`)
+            .replace(/[\\/:*?"<>|\r\n]/g, '_');
+          const finalName = rawName.includes('.') ? rawName : `${rawName}.${ext}`;
+          const storiesDir = path.join(mgr?.settings?.saveDir || path.join(app.getPath('downloads'), 'Tayyar'), 'Stories');
+          fs.mkdirSync(storiesDir, { recursive: true });
+          const destPath = path.join(storiesDir, finalName);
+          fs.writeFileSync(destPath, buf);
+          if (Notification.isSupported()) {
+            new Notification({ title: 'Tayyar Story Saved', body: finalName }).show();
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true, path: destPath, filename: finalName }));
+        } catch (_) {
+          res.writeHead(400); res.end();
+        }
+      });
+      return;
     }
 
     if (req.method !== 'POST' || req.url !== '/add' || !fromExtension || req.headers['x-tayyar'] !== '1') {
@@ -193,6 +234,13 @@ function wireIpc() {
       return await social.resolveSocialMedia(url);
     } catch (e) {
       return { ok: false, error: e.message };
+    }
+  });
+  h('stories:resolve', async (input, platform, opts) => {
+    try {
+      return await social.resolveStories(input, platform, opts || {});
+    } catch (e) {
+      return { ok: false, stories: [], error: e.message };
     }
   });
   h('ytdlp:check', async () => social.isYtDlpAvailable());

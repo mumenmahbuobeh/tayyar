@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.12';
+  const APP_VERSION = '1.0.13';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -119,6 +119,34 @@
       alreadyLatestToast: `Tayyar is already up to date (v${APP_VERSION})`,
       newVerAvailable: 'New update available:',
       openOrAnalyze: 'Analyze & Download this link',
+      storiesHubTitle: 'Stories & Status Saver',
+      storiesHubSub: 'WhatsApp • Instagram • Facebook • Snapchat',
+      storiesHubDesc: 'Download active photo & video stories in original quality',
+      storiesBadge: 'HD Stories',
+      waGrantBtn: 'Allow WhatsApp',
+      waGrantBizBtn: 'WA Business',
+      refresh: 'Refresh',
+      storyInputPlaceholder: 'Enter @username or paste Story link...',
+      fetchStoriesBtn: 'Fetch Active Stories',
+      fetchingStories: 'Scanning active stories...',
+      saveAllStories: 'Save All',
+      allPlatformsLbl: 'Video & File Platforms',
+      saveBtn: 'Save',
+      savedBtn: 'Saved',
+      waNeedPermTitle: 'Grant WhatsApp Status Access',
+      waNeedPermDesc: 'Tap "Allow WhatsApp" above and select "Use this folder" to view & save all WhatsApp photo and video statuses directly to your Gallery.',
+      waEmptyTitle: 'No WhatsApp statuses found yet',
+      waEmptyDesc: 'Open WhatsApp and view a status first, then tap Refresh here to save it in HD.',
+      waIosTitle: 'WhatsApp Statuses on iOS',
+      waIosDesc: 'iOS isolates WhatsApp files for privacy. You can save Snapchat, Instagram & Facebook stories directly using the tabs above, or import any saved clip below.',
+      waIosImportBtn: 'Import Photo / Video',
+      storyEmptyPromptTitle: 'Enter @username or Story Link',
+      storyEmptyPromptDesc: 'Type any public Snapchat/Instagram username or paste a Story link to extract all active photos and videos.',
+      storyNotFoundTitle: 'No public stories found',
+      storyAuthHint: 'This story may be private or require login. Try a public username or copy a direct public Story link.',
+      storySavedToast: 'Story saved to Downloads/Tayyar/Stories & Gallery!',
+      storiesFoundCount: 'stories found',
+      waGrantedToast: 'WhatsApp folder connected!',
     },
     ar: {
       appTitle: 'تيّار',
@@ -226,6 +254,34 @@
       alreadyLatestToast: `تطبيق تيّار محدّث بالفعل على أحدث إصدار (v${APP_VERSION})`,
       newVerAvailable: 'تحديث جديد متوفر:',
       openOrAnalyze: 'فحص وتحميل هذا الرابط',
+      storiesHubTitle: 'حافظ الستوريات والحالات',
+      storiesHubSub: 'واتساب • انستغرام • فيسبوك • سناب شات',
+      storiesHubDesc: 'تحميل حالات وستوريات الصور والفيديو بأعلى جودة أصلية',
+      storiesBadge: 'ستوريات HD',
+      waGrantBtn: 'السماح لواتساب',
+      waGrantBizBtn: 'واتساب للأعمال',
+      refresh: 'تحديث',
+      storyInputPlaceholder: 'أدخل اسم المستخدم @username أو الصق رابط الستوري...',
+      fetchStoriesBtn: 'جلب الستوريات النشطة',
+      fetchingStories: 'جاري فحص واستخراج الستوريات...',
+      saveAllStories: 'حفظ الكل',
+      allPlatformsLbl: 'منصات الفيديو والملفات',
+      saveBtn: 'حفظ',
+      savedBtn: 'تم الحفظ',
+      waNeedPermTitle: 'منح صلاحية حالات واتساب',
+      waNeedPermDesc: 'اضغط على "السماح لواتساب" بالأعلى ثم اختر "استخدام هذا المجلد" لعرض وحفظ جميع حالات واتساب (صور وفيديو) مباشرة في الاستوديو.',
+      waEmptyTitle: 'لا توجد حالات واتساب حالياً',
+      waEmptyDesc: 'افتح تطبيق واتساب وشاهد الحالة أولاً، ثم اضغط على تحديث هنا لحفظها فوراً بجودتها الأصلية.',
+      waIosTitle: 'حالات واتساب على آيفون (iOS)',
+      waIosDesc: 'نظام iOS يعزل ملفات واتساب للخصوصية. يمكنك تحميل ستوريات سناب شات وانستغرام وفيسبوك مباشرة من التبويبات أعلاه.',
+      waIosImportBtn: 'استيراد صورة / فيديو',
+      storyEmptyPromptTitle: 'أدخل اسم المستخدم أو رابط الستوري',
+      storyEmptyPromptDesc: 'اكتب اسم مستخدم عام في سناب شات أو انستغرام أو الصق رابط ستوري لاستخراج جميع الصور والفيديوهات النشطة.',
+      storyNotFoundTitle: 'لم يتم العثور على ستوريات عامة',
+      storyAuthHint: 'قد يكون الحساب خاصاً أو يتطلب تسجيل دخول. جرّب حساباً عاماً أو الصق رابط ستوري عام مباشر.',
+      storySavedToast: 'تم حفظ الستوري في Downloads/Tayyar/Stories والمعرض!',
+      storiesFoundCount: 'ستوريات متاحة',
+      waGrantedToast: 'تم ربط مجلد حالات واتساب بنجاح!',
     },
   };
 
@@ -245,6 +301,11 @@
     activePolls: new Map(),
     updateRelease: null,
     hasNewerUpdate: false,
+    storyPlatform: 'whatsapp',
+    waStatuses: [],
+    waNeedsSaf: false,
+    waLoadedOnce: false,
+    socialStories: [],
   };
 
   function t(key) {
@@ -449,6 +510,9 @@
 
     if (tabName === 'downloads') renderDownloadsList();
     if (tabName === 'search') renderSearchResults();
+    if (tabName === 'platforms' && state.storyPlatform === 'whatsapp' && !state.waLoadedOnce) {
+      loadWhatsAppStatuses();
+    }
   }
 
   // Interactive Finger-Slide Chromatic Liquid Glass Lens Controller (Matches Quranify Video!)
@@ -1150,6 +1214,8 @@
     renderHomeRecent();
     if (state.activeTab === 'downloads') renderDownloadsList();
     if (state.activeTab === 'search') renderSearchResults();
+    if (typeof renderWhatsAppStatusesGrid === 'function') renderWhatsAppStatusesGrid();
+    if (typeof renderSocialStoriesGrid === 'function') renderSocialStoriesGrid();
   }
 
   /* ==================== HOME EXTRACTOR HANDLERS ==================== */
@@ -1472,6 +1538,378 @@
     } else if (state.updateRelease.html_url) {
       window.open(state.updateRelease.html_url, '_blank');
     }
+  });
+
+  /* ==================== UNIVERSAL STORIES & STATUS SAVER (WA / SNAP / IG / FB) ==================== */
+  const STORY_DL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  const STORY_PLAY_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>';
+  const STORY_IMG_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+
+  function isAndroidNative() {
+    try {
+      const cap = window.Capacitor;
+      if (cap && typeof cap.getPlatform === 'function') {
+        return cap.getPlatform() === 'android';
+      }
+    } catch (_) {}
+    return /Android/i.test(navigator.userAgent) && !!getNativeEngine();
+  }
+
+  function switchStoryPlatform(plat) {
+    state.storyPlatform = plat;
+    $$('#storyPlatPills .story-pill').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.storyPlat === plat);
+    });
+    const waPanel = $('#storyPanelWhatsApp');
+    const socPanel = $('#storyPanelSocial');
+    if (waPanel) waPanel.hidden = plat !== 'whatsapp';
+    if (socPanel) socPanel.hidden = plat === 'whatsapp';
+
+    if (plat === 'whatsapp') {
+      loadWhatsAppStatuses();
+    } else {
+      renderSocialStoriesGrid();
+    }
+  }
+
+  function renderWhatsAppStatusesGrid() {
+    const grid = $('#waStatusGrid');
+    if (!grid) return;
+
+    const native = getNativeEngine();
+    const canNativeWa = isAndroidNative() && native && typeof native.listWhatsAppStatuses === 'function';
+
+    // Hide Android-only toolbar buttons on iOS / Web
+    const waToolbar = $('.wa-toolbar');
+    if (waToolbar) waToolbar.hidden = !canNativeWa;
+
+    if (!canNativeWa) {
+      grid.innerHTML = `
+        <div class="story-empty-card">
+          <div class="story-empty-title">${t('waIosTitle')}</div>
+          <div class="story-empty-desc">${t('waIosDesc')}</div>
+        </div>
+      `;
+      return;
+    }
+
+    if (state.waNeedsSaf && state.waStatuses.length === 0) {
+      grid.innerHTML = `
+        <div class="story-empty-card">
+          <div class="story-empty-title">${t('waNeedPermTitle')}</div>
+          <div class="story-empty-desc">${t('waNeedPermDesc')}</div>
+        </div>
+      `;
+      return;
+    }
+
+    if (state.waStatuses.length === 0) {
+      grid.innerHTML = `
+        <div class="story-empty-card">
+          <div class="story-empty-title">${t('waEmptyTitle')}</div>
+          <div class="story-empty-desc">${t('waEmptyDesc')}</div>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = state.waStatuses.map((item, idx) => `
+      <div class="story-tile">
+        ${item.thumbnail
+          ? `<img class="story-tile-img" src="${item.thumbnail}" alt="" />`
+          : `<div class="story-tile-fallback">${item.type === 'video' ? STORY_PLAY_SVG : STORY_IMG_SVG}</div>`}
+        <span class="story-type-pill">${item.type === 'video' ? 'MP4' : 'IMG'}</span>
+        <button type="button" class="story-save-btn" data-wa-idx="${idx}">
+          ${STORY_DL_SVG}
+          <span>${item._saved ? t('savedBtn') : t('saveBtn')}</span>
+        </button>
+      </div>
+    `).join('');
+
+    $$('.story-save-btn[data-wa-idx]', grid).forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const idx = Number(btn.dataset.waIdx);
+        const entry = state.waStatuses[idx];
+        if (!entry) return;
+        const eng = getNativeEngine();
+        if (!eng || typeof eng.saveWhatsAppStatus !== 'function') return;
+        try {
+          const res = await eng.saveWhatsAppStatus({
+            uri: entry.uri || '',
+            path: entry.path || '',
+            name: entry.name || `Status_${Date.now()}.${entry.type === 'video' ? 'mp4' : 'jpg'}`,
+          });
+          if (res && res.ok) {
+            entry._saved = true;
+            state.downloads.unshift({
+              id: `wa_${Date.now()}_${idx}`,
+              url: entry.uri || entry.path || 'whatsapp://status',
+              filename: res.filename || entry.name,
+              status: 'completed',
+              downloaded: res.size || entry.size || 0,
+              total: res.size || entry.size || 0,
+              percent: 100,
+              speed: 0,
+              addedAt: Date.now(),
+            });
+            saveDownloads();
+            renderAllViews();
+            showToast(t('storySavedToast'));
+          }
+        } catch (err) {
+          showToast(`${t('dlFailToast')}: ${err.message || ''}`);
+        }
+      });
+    });
+  }
+
+  async function loadWhatsAppStatuses() {
+    state.waLoadedOnce = true;
+    const native = getNativeEngine();
+    if (!isAndroidNative() || !native || typeof native.listWhatsAppStatuses !== 'function') {
+      renderWhatsAppStatusesGrid();
+      return;
+    }
+    try {
+      const res = await native.listWhatsAppStatuses();
+      state.waStatuses = Array.isArray(res?.items) ? res.items : [];
+      state.waNeedsSaf = !!res?.needsSaf;
+      renderWhatsAppStatusesGrid();
+    } catch (_) {
+      renderWhatsAppStatusesGrid();
+    }
+  }
+
+  async function requestWhatsAppFolder(isBusiness) {
+    const native = getNativeEngine();
+    if (!native || typeof native.requestWhatsAppStatusAccess !== 'function') return;
+    try {
+      const res = await native.requestWhatsAppStatusAccess({ business: !!isBusiness });
+      if (res && res.granted) {
+        showToast(t('waGrantedToast'));
+        await loadWhatsAppStatuses();
+      }
+    } catch (e) {
+      showToast(e.message || t('dlFailToast'));
+    }
+  }
+
+  // Cross-platform JS fallback for iOS (CapacitorHttp handles zero-CORS natively!)
+  async function resolveStoriesViaJs(rawInput, plat) {
+    const clean = rawInput.trim();
+    const stories = [];
+    const seen = new Set();
+
+    if (plat === 'snapchat') {
+      let user = clean.replace(/^@/, '').split(/[/?#]/)[0];
+      const urls = /^https?:\/\//i.test(clean)
+        ? [clean]
+        : [
+            `https://www.snapchat.com/add/${encodeURIComponent(user)}`,
+            `https://story.snapchat.com/s/${encodeURIComponent(user)}`,
+          ];
+      for (const u of urls) {
+        try {
+          const r = await fetch(u);
+          if (!r.ok) continue;
+          const html = await r.text();
+          const m = html.match(/<script[^>]+id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
+          if (m && m[1]) {
+            const j = JSON.parse(m[1]);
+            const pp = j?.props?.pageProps || {};
+            const prof = pp.userProfile?.publicProfileInfo || pp.userProfile?.userInfo || {};
+            const uname = prof.username || user || 'snapchat';
+            const avatar = prof.profilePictureUrl || '';
+            const addList = (arr, prefix) => {
+              if (!Array.isArray(arr)) return;
+              arr.forEach((snap, idx) => {
+                const mUrl = snap?.snapUrls?.mediaUrl || snap?.mediaUrl || '';
+                if (!mUrl || seen.has(mUrl)) return;
+                seen.add(mUrl);
+                const isVid = snap?.snapMediaType === 1 || /\.mp4/i.test(mUrl);
+                const ext = isVid ? 'mp4' : 'jpg';
+                stories.push({
+                  id: `snap_${prefix}_${idx}`,
+                  type: isVid ? 'video' : 'image',
+                  url: mUrl,
+                  thumbnail: snap?.snapUrls?.mediaPreviewUrl?.value || (isVid ? avatar : mUrl),
+                  ext,
+                  filename: sanitizeName(`Snapchat_${uname}_${prefix}_${idx + 1}`, ext),
+                });
+              });
+            };
+            addList(pp.story?.snapList, 'story');
+            (pp.curatedHighlights || []).forEach((h, i) => addList(h?.snapList, `hl${i + 1}`));
+            (pp.spotlightHighlights || []).forEach((h, i) => addList(h?.snapList, `spot${i + 1}`));
+            if (stories.length > 0) return { ok: true, stories };
+          }
+        } catch (_) {}
+      }
+      return { ok: false, stories: [] };
+    }
+
+    // Instagram / Facebook iOS CapacitorHttp HTML extraction
+    try {
+      const targetUrl = /^https?:\/\//i.test(clean)
+        ? clean
+        : (plat === 'instagram'
+            ? `https://www.instagram.com/stories/${encodeURIComponent(clean.replace(/^@/, ''))}/`
+            : `https://www.facebook.com/stories/${encodeURIComponent(clean.replace(/^@/, ''))}/`);
+      const r = await fetch(targetUrl);
+      if (r.ok) {
+        const html = await r.text();
+        const matches = [...html.matchAll(/"(?:browser_native_hd_url|playable_url_quality_hd|playable_url|video_url)":"(https:[^"\\]+)"/g)];
+        matches.forEach((m, i) => {
+          const vUrl = m[1].replace(/\\\//g, '/').replace(/\\u0026/g, '&');
+          if (!seen.has(vUrl)) {
+            seen.add(vUrl);
+            stories.push({
+              id: `${plat}_${i}`,
+              type: 'video',
+              url: vUrl,
+              thumbnail: '',
+              ext: 'mp4',
+              filename: sanitizeName(`${plat}_Story_${i + 1}`, 'mp4'),
+            });
+          }
+        });
+        if (stories.length === 0) {
+          const ogV = html.match(/<meta[^>]+property=["']og:video(?::secure_url|:url)?["'][^>]+content=["']([^"']+)["']/i);
+          if (ogV && ogV[1]) {
+            stories.push({
+              id: `${plat}_og`,
+              type: 'video',
+              url: ogV[1].replace(/&amp;/g, '&'),
+              thumbnail: '',
+              ext: 'mp4',
+              filename: sanitizeName(`${plat}_Story_1`, 'mp4'),
+            });
+          }
+        }
+      }
+    } catch (_) {}
+
+    return { ok: stories.length > 0, stories, needsAuth: stories.length === 0 };
+  }
+
+  function renderSocialStoriesGrid(emptyMode = 'prompt') {
+    const grid = $('#socialStoriesGrid');
+    const resBar = $('#storyResultsBar');
+    const countLbl = $('#storyCountLbl');
+    if (!grid) return;
+
+    if (state.socialStories.length === 0) {
+      if (resBar) resBar.hidden = true;
+      const isNotFound = emptyMode === 'notfound';
+      grid.innerHTML = `
+        <div class="story-empty-card">
+          <div class="story-empty-title">${isNotFound ? t('storyNotFoundTitle') : t('storyEmptyPromptTitle')}</div>
+          <div class="story-empty-desc">${isNotFound ? t('storyAuthHint') : t('storyEmptyPromptDesc')}</div>
+        </div>
+      `;
+      return;
+    }
+
+    if (resBar) resBar.hidden = false;
+    if (countLbl) countLbl.textContent = `${state.socialStories.length} ${t('storiesFoundCount')}`;
+
+    grid.innerHTML = state.socialStories.map((st, idx) => `
+      <div class="story-tile">
+        ${st.thumbnail
+          ? `<img class="story-tile-img" src="${escapeHtml(st.thumbnail)}" alt="" />`
+          : `<div class="story-tile-fallback">${st.type === 'video' ? STORY_PLAY_SVG : STORY_IMG_SVG}</div>`}
+        <span class="story-type-pill">${st.type === 'video' ? 'MP4' : 'JPG'}</span>
+        <button type="button" class="story-save-btn" data-story-idx="${idx}">
+          ${STORY_DL_SVG}
+          <span>${t('saveBtn')}</span>
+        </button>
+      </div>
+    `).join('');
+
+    $$('.story-save-btn[data-story-idx]', grid).forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const st = state.socialStories[Number(btn.dataset.storyIdx)];
+        if (!st || !st.url) return;
+        startDownload({
+          url: st.url,
+          filename: st.filename || sanitizeName(`Story_${Date.now()}`, st.ext || 'mp4'),
+          isAudio: false,
+        });
+      });
+    });
+  }
+
+  async function fetchSocialStories() {
+    const inp = ($('#storyInput')?.value || '').trim();
+    if (!inp) {
+      showToast(t('storyEmptyPromptTitle'));
+      return;
+    }
+    const loader = $('#storyLoader');
+    if (loader) loader.hidden = false;
+    state.socialStories = [];
+    renderSocialStoriesGrid('prompt');
+
+    let result = null;
+    const native = getNativeEngine();
+    if (native && typeof native.resolveStories === 'function') {
+      try {
+        result = await native.resolveStories({ input: inp, platform: state.storyPlatform });
+      } catch (_) {}
+    }
+    if (!result || !Array.isArray(result.stories) || result.stories.length === 0) {
+      result = await resolveStoriesViaJs(inp, state.storyPlatform);
+    }
+
+    if (loader) loader.hidden = true;
+    state.socialStories = Array.isArray(result?.stories) ? result.stories : [];
+    renderSocialStoriesGrid(state.socialStories.length ? 'ok' : 'notfound');
+  }
+
+  // Wire Stories Hub events
+  $('#btnOpenStoriesHub')?.addEventListener('click', () => {
+    switchTab('platforms');
+    switchStoryPlatform('whatsapp');
+  });
+
+  $$('#storyPlatPills .story-pill').forEach((pill) => {
+    pill.addEventListener('click', () => switchStoryPlatform(pill.dataset.storyPlat));
+  });
+
+  $('#btnWaGrantNormal')?.addEventListener('click', () => requestWhatsAppFolder(false));
+  $('#btnWaGrantBiz')?.addEventListener('click', () => requestWhatsAppFolder(true));
+  $('#btnWaRefresh')?.addEventListener('click', () => loadWhatsAppStatuses());
+
+  $('#btnStoryPaste')?.addEventListener('click', async () => {
+    try {
+      const txt = (await navigator.clipboard.readText() || '').trim();
+      if (txt && $('#storyInput')) {
+        $('#storyInput').value = txt;
+        showToast(t('pasteSuccess'));
+      }
+    } catch (_) {
+      $('#storyInput')?.focus();
+    }
+  });
+
+  $('#btnFetchStories')?.addEventListener('click', fetchSocialStories);
+  $('#storyInput')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      $('#storyInput')?.blur();
+      fetchSocialStories();
+    }
+  });
+
+  $('#btnSaveAllStories')?.addEventListener('click', () => {
+    state.socialStories.forEach((st) => {
+      if (st && st.url) {
+        startDownload({
+          url: st.url,
+          filename: st.filename || sanitizeName(`Story_${Date.now()}`, st.ext || 'mp4'),
+          isAudio: false,
+        });
+      }
+    });
   });
 
   /* ==================== BOOTSTRAP ==================== */

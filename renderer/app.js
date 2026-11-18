@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.12 is the latest available release.',
+      upToDateDesc: 'Version 1.0.13 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -196,6 +196,17 @@
       customizeLayout: 'Customize Layout',
       channelStable: 'Stable',
       channelBeta: 'Beta',
+      modeVideosTab: 'Videos & Reels',
+      modeStoriesTab: 'Stories Saver',
+      storyInputPlaceholder: 'Enter @username or paste Story link (Snapchat, Instagram, Facebook)...',
+      storyCookiesLbl: 'Browser Session (for private stories):',
+      cookiesNone: 'Public / No Login',
+      fetchStoriesBtn: 'Fetch Active Stories',
+      fetchingStories: 'Scanning active stories...',
+      saveAllStories: 'Download All Stories',
+      waDeskTitle: 'WhatsApp Status Saver (Desktop)',
+      waDeskDesc: 'Install the Tayyar Browser Extension, open WhatsApp Web, and hover over any Status photo or video to click "Save WhatsApp Story" — it saves directly to Downloads/Tayyar/Stories in original HD!',
+      openWaWebBtn: 'Open WhatsApp Web',
     },
     ar: {
       dashboard: 'لوحة التحكم',
@@ -326,7 +337,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.12 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.13 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -388,6 +399,17 @@
       customizeLayout: 'تخصيص التخطيط',
       channelStable: 'مستقر (Stable)',
       channelBeta: 'تجريبي (Beta)',
+      modeVideosTab: 'فيديوهات وريلز',
+      modeStoriesTab: 'حافظ الستوريات',
+      storyInputPlaceholder: 'أدخل اسم المستخدم @username أو الصق رابط الستوري (سناب، انستغرام، فيسبوك)...',
+      storyCookiesLbl: 'جلسة المتصفح (للستوريات الخاصة):',
+      cookiesNone: 'عام / بدون تسجيل دخول',
+      fetchStoriesBtn: 'جلب الستوريات النشطة',
+      fetchingStories: 'جاري فحص واستخراج الستوريات...',
+      saveAllStories: 'تحميل جميع الستوريات',
+      waDeskTitle: 'حافظ حالات واتساب (سطح المكتب)',
+      waDeskDesc: 'ثبّت إضافة متصفح تيّار وافتح واتساب ويب، ثم مرّر الفأرة فوق أي حالة (صورة أو فيديو) واضغط "Save WhatsApp Story" ليتم حفظها فوراً في مجلد Downloads/Tayyar/Stories بأعلى جودة أصلية!',
+      openWaWebBtn: 'فتح واتساب ويب',
     },
   };
 
@@ -970,7 +992,7 @@
       author: 'griciaisl12',
       short: 'MS',
       color: 'avatar-blue',
-      version: 'v1.0.12',
+      version: 'v1.0.13',
       desc: 'Resolves GitHub repository release, file links, Google Drive/Docs into real downloads with mirror acceleration.',
       installed: false,
       enabled: false,
@@ -1514,7 +1536,7 @@
         author: 'User',
         short: name.slice(0, 2).toUpperCase(),
         color: 'avatar-blue',
-        version: 'v1.0.12',
+        version: 'v1.0.13',
         desc: `Installed from ${val}`,
         installed: true,
         enabled: true,
@@ -2900,7 +2922,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases — Stable Default) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.12';
+  const CURRENT_APP_VERSION = '1.0.13';
   let availableUpdateRelease = null;
   let isNewerUpdateAvailable = false;
   let updateDownloadTaskId = null;
@@ -3896,6 +3918,171 @@
     if (btnAudio) {
       btnAudio.addEventListener('click', () => startSocialDownload(true));
     }
+
+    /* -------- DESKTOP UNIVERSAL STORIES SAVER (WhatsApp, Snapchat, Instagram, Facebook) -------- */
+    const videosPanel = $('#socialVideosPanel');
+    const storiesPanel = $('#socialStoriesPanel');
+    const btnModeVideos = $('#btnModeVideos');
+    const btnModeStories = $('#btnModeStories');
+    const deskStoryInput = $('#deskStoryInput');
+    const deskStoryCookies = $('#deskStoryCookies');
+    const deskStorySocialBox = $('#deskStorySocialBox');
+    const deskStoryWaBox = $('#deskStoryWhatsAppBox');
+    const deskStoryLoader = $('#deskStoryLoader');
+    const deskStoryResBar = $('#deskStoryResultsBar');
+    const deskStoryCountLbl = $('#deskStoryCountLbl');
+    const deskStoryGrid = $('#deskStoryGrid');
+
+    let deskStoryPlat = 'snapchat';
+    let deskStoriesList = [];
+
+    function switchSocialMode(mode) {
+      const isStories = mode === 'stories';
+      if (videosPanel) videosPanel.hidden = isStories;
+      if (storiesPanel) storiesPanel.hidden = !isStories;
+      if (btnModeVideos) {
+        btnModeVideos.classList.toggle('primary', !isStories);
+        btnModeVideos.classList.toggle('outline', isStories);
+      }
+      if (btnModeStories) {
+        btnModeStories.classList.toggle('primary', isStories);
+        btnModeStories.classList.toggle('outline', !isStories);
+      }
+    }
+
+    btnModeVideos?.addEventListener('click', () => switchSocialMode('videos'));
+    btnModeStories?.addEventListener('click', () => switchSocialMode('stories'));
+
+    function switchDeskStoryPlat(plat) {
+      deskStoryPlat = plat;
+      $$('#deskStoryPlatPills .desk-story-pill').forEach((b) => {
+        b.classList.toggle('active', b.dataset.deskStory === plat);
+      });
+      if (deskStorySocialBox) deskStorySocialBox.hidden = plat === 'whatsapp';
+      if (deskStoryWaBox) deskStoryWaBox.hidden = plat !== 'whatsapp';
+      if (plat === 'whatsapp') {
+        if (deskStoryResBar) deskStoryResBar.hidden = true;
+        if (deskStoryGrid) deskStoryGrid.innerHTML = '';
+      }
+    }
+
+    $$('#deskStoryPlatPills .desk-story-pill').forEach((btn) => {
+      btn.addEventListener('click', () => switchDeskStoryPlat(btn.dataset.deskStory));
+    });
+
+    $('#btnDeskOpenWaWeb')?.addEventListener('click', () => {
+      window.tayyar?.openUrl?.('https://web.whatsapp.com');
+    });
+    $('#btnDeskOpenExtFolder')?.addEventListener('click', () => {
+      window.tayyar?.openExtensionFolder?.('chrome');
+    });
+
+    $('#btnDeskStoryPaste')?.addEventListener('click', async () => {
+      try {
+        const txt = (await navigator.clipboard.readText() || '').trim();
+        if (txt && deskStoryInput) {
+          deskStoryInput.value = txt;
+          toast(S.lang === 'ar' ? 'تم لصق الرابط من الحافظة' : 'Pasted from clipboard');
+        }
+      } catch (_) {
+        deskStoryInput?.focus();
+      }
+    });
+
+    function renderDeskStories(errorMsg = '') {
+      if (!deskStoryGrid) return;
+      if (!deskStoriesList.length) {
+        if (deskStoryResBar) deskStoryResBar.hidden = true;
+        if (errorMsg) {
+          deskStoryGrid.innerHTML = `<div class="desk-story-empty">${errorMsg}</div>`;
+        } else {
+          deskStoryGrid.innerHTML = '';
+        }
+        return;
+      }
+      if (deskStoryResBar) deskStoryResBar.hidden = false;
+      if (deskStoryCountLbl) {
+        deskStoryCountLbl.textContent = S.lang === 'ar'
+          ? `${deskStoriesList.length} ستوريات جاهزة للتحميل`
+          : `${deskStoriesList.length} active stories ready`;
+      }
+
+      deskStoryGrid.innerHTML = deskStoriesList.map((st, idx) => `
+        <div class="desk-story-card">
+          ${st.thumbnail
+            ? `<img src="${st.thumbnail}" alt="" />`
+            : `<div class="desk-story-fallback">${st.type === 'video' ? '▶' : '▣'}</div>`}
+          <span class="desk-story-type">${st.type === 'video' ? 'MP4' : 'JPG'}</span>
+          <button type="button" class="desk-story-dl-btn" data-dstory-idx="${idx}">
+            ${S.lang === 'ar' ? 'تحميل' : 'Download'}
+          </button>
+        </div>
+      `).join('');
+
+      $$('.desk-story-dl-btn', deskStoryGrid).forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const st = deskStoriesList[Number(btn.dataset.dstoryIdx)];
+          if (!st || !st.url) return;
+          window.tayyar?.add?.({
+            url: st.url,
+            filename: st.filename || `Story_${Date.now()}.${st.ext || 'mp4'}`,
+            userFileName: st.filename || `Story_${Date.now()}.${st.ext || 'mp4'}`,
+            isSocial: false,
+          });
+          toast(S.lang === 'ar' ? 'بدأ تحميل الستوري!' : 'Story download started!');
+        });
+      });
+    }
+
+    async function fetchDeskStories() {
+      const inp = (deskStoryInput?.value || '').trim();
+      if (!inp) {
+        toast(S.lang === 'ar' ? 'أدخل اسم المستخدم أو رابط الستوري أولاً' : 'Enter a @username or Story link first');
+        return;
+      }
+      if (deskStoryLoader) deskStoryLoader.hidden = false;
+      if (deskStoryResBar) deskStoryResBar.hidden = true;
+      deskStoriesList = [];
+      renderDeskStories();
+
+      try {
+        const cookies = deskStoryCookies?.value || '';
+        const res = await window.tayyar?.storiesResolve?.(inp, deskStoryPlat, { browserCookies: cookies });
+        if (deskStoryLoader) deskStoryLoader.hidden = true;
+        if (res && res.ok && Array.isArray(res.stories) && res.stories.length > 0) {
+          deskStoriesList = res.stories;
+          renderDeskStories();
+        } else {
+          const msg = res?.error || (S.lang === 'ar'
+            ? 'لم يتم العثور على ستوريات عامة. للستوريات الخاصة اختر المتصفح (Chrome / Edge / Firefox) من جلسة المتصفح بالأعلى.'
+            : 'No public stories found. For private stories, select your logged-in browser (Chrome/Edge/Firefox) above.');
+          renderDeskStories(msg);
+        }
+      } catch (err) {
+        if (deskStoryLoader) deskStoryLoader.hidden = true;
+        renderDeskStories(err.message || 'Story fetch error');
+      }
+    }
+
+    $('#btnDeskFetchStories')?.addEventListener('click', fetchDeskStories);
+    deskStoryInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') fetchDeskStories();
+    });
+
+    $('#btnDeskSaveAllStories')?.addEventListener('click', () => {
+      if (!deskStoriesList.length) return;
+      deskStoriesList.forEach((st) => {
+        if (st && st.url) {
+          window.tayyar?.add?.({
+            url: st.url,
+            filename: st.filename || `Story_${Date.now()}.${st.ext || 'mp4'}`,
+            userFileName: st.filename || `Story_${Date.now()}.${st.ext || 'mp4'}`,
+            isSocial: false,
+          });
+        }
+      });
+      toast(S.lang === 'ar' ? `بدأ تحميل ${deskStoriesList.length} ستوريات!` : `Downloading ${deskStoriesList.length} stories!`);
+    });
   }
 
   /* ---------------- IPC & INITIALIZATION ---------------- */

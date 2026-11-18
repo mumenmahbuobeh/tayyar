@@ -5,7 +5,7 @@ const EVENTS = ['dl:update', 'dl:progress', 'dl:removed', 'settings', 'ui:add-ur
 const inv = (name) => (...args) => ipcRenderer.invoke(name, ...args);
 
 const bridge = {
-  version: '1.0.6',
+  version: '1.0.13',
   list: inv('list'),
   platform: inv('platform'),
   settings: {
@@ -30,6 +30,7 @@ const bridge = {
   fetchTrackers: inv('trackers:fetch'),
   socialDetect: inv('social:detect'),
   socialResolve: inv('social:resolve'),
+  storiesResolve: inv('stories:resolve'),
   ytdlpCheck: inv('ytdlp:check'),
   ytdlpInstall: inv('ytdlp:install'),
   on(channel, cb) {

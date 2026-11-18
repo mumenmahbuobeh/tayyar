@@ -10,8 +10,9 @@ const PLATFORMS = [
   { id: 'youtube', name: 'YouTube', color: '#ff0000', icon: '🎬', pattern: /(?:youtube\.com\/(?:watch\?|shorts\/|live\/|embed\/)|youtu\.be\/)/i },
   { id: 'tiktok', name: 'TikTok', color: '#00f2fe', icon: '🎵', pattern: /(?:tiktok\.com\/|vt\.tiktok\.com\/|vm\.tiktok\.com\/)/i },
   { id: 'instagram', name: 'Instagram', color: '#e1306c', icon: '📸', pattern: /(?:instagram\.com\/(?:p|reel|tv|stories)\/)/i },
-  { id: 'facebook', name: 'Facebook', color: '#1877f2', icon: '📘', pattern: /(?:facebook\.com\/(?:watch|reel|videos|stories)|fb\.watch\/)/i },
-  { id: 'snapchat', name: 'Snapchat', color: '#fffc00', icon: '👻', pattern: /(?:snapchat\.com\/(?:spotlight|t|add|story)\/)/i },
+  { id: 'facebook', name: 'Facebook', color: '#1877f2', icon: '📘', pattern: /(?:facebook\.com\/(?:watch|reel|videos|stories)|m\.facebook\.com\/stories|fb\.watch\/)/i },
+  { id: 'snapchat', name: 'Snapchat', color: '#fffc00', icon: '👻', pattern: /(?:(?:www\.|story\.)?snapchat\.com\/(?:spotlight|t|add|story|s)\/)/i },
+  { id: 'whatsapp', name: 'WhatsApp', color: '#25d366', icon: '💬', pattern: /(?:web\.whatsapp\.com|whatsapp\.com)/i },
   { id: 'twitter', name: 'X / Twitter', color: '#1da1f2', icon: '🐦', pattern: /(?:twitter\.com|x\.com)\/[^/]+\/status\//i },
   { id: 'pinterest', name: 'Pinterest', color: '#e60023', icon: '📌', pattern: /(?:pinterest\.com\/pin\/|pin\.it\/)/i },
   { id: 'reddit', name: 'Reddit', color: '#ff4500', icon: '🤖', pattern: /(?:reddit\.com\/r\/[^/]+\/comments\/|v\.redd\.it\/)/i },
@@ -647,11 +648,450 @@ function resolveOpenGraphVideo(url) {
   });
 }
 
+function httpFetchText(targetUrl, extraHeaders = {}, maxRedirects = 5) {
+  return new Promise((resolve, reject) => {
+    try {
+      const u = new URL(targetUrl);
+      const client = u.protocol === 'http:' ? http : https;
+      const req = client.get(targetUrl, {
+        headers: Object.assign({
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,application/json,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9'
+        }, extraHeaders),
+        timeout: 12000
+      }, (res) => {
+        if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location && maxRedirects > 0) {
+          let nextUrl = res.headers.location;
+          if (nextUrl.startsWith('/')) nextUrl = `${u.protocol}//${u.host}${nextUrl}`;
+          res.resume();
+          return resolve(httpFetchText(nextUrl, extraHeaders, maxRedirects - 1));
+        }
+        let body = '';
+        res.on('data', (chunk) => {
+          body += chunk;
+          if (body.length > 2500000) res.destroy();
+        });
+        res.on('end', () => resolve({ status: res.statusCode || 0, body, url: targetUrl }));
+      });
+      req.on('error', reject);
+      req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')); });
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
+function cleanStoryName(str, fallback) {
+  return String(str || fallback || 'story')
+    .replace(/[^a-zA-Z0-9._\-\u0600-\u06FF]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 48) || (fallback || 'story');
+}
+
+function extractSnapchatStoriesFromNextData(html, usernameHint) {
+  const m = html.match(/<script[^>]+id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
+  if (!m || !m[1]) return { username: usernameHint, stories: [] };
+  const json = JSON.parse(m[1]);
+  const pp = json?.props?.pageProps || {};
+  const userProfile = pp.userProfile?.publicProfileInfo || pp.userProfile?.userInfo || {};
+  const username = userProfile.username || userProfile.title || usernameHint || 'snapchat_user';
+  const avatar = userProfile.profilePictureUrl || userProfile.squareHeroImageUrl || '';
+  const stories = [];
+  const seen = new Set();
+
+  const pushSnap = (snap, idx, prefix) => {
+    const mediaUrl = snap?.snapUrls?.mediaUrl || snap?.mediaUrl || '';
+    if (!mediaUrl || seen.has(mediaUrl)) return;
+    seen.add(mediaUrl);
+    const isVideo = snap?.snapMediaType === 1 || /\.mp4(\?|$)/i.test(mediaUrl) || mediaUrl.includes('mp4');
+    const thumb = snap?.snapUrls?.mediaPreviewUrl?.value || snap?.thumbnailUrl || avatar || (isVideo ? '' : mediaUrl);
+    const ext = isVideo ? 'mp4' : 'jpg';
+    stories.push({
+      id: snap?.snapId?.value || `snap_${prefix}_${idx}`,
+      type: isVideo ? 'video' : 'image',
+      url: mediaUrl,
+      thumbnail: thumb,
+      ext,
+      filename: `Snapchat_${cleanStoryName(username, 'story')}_${prefix}_${idx + 1}.${ext}`,
+      timestamp: snap?.timestampInSec?.value ? Number(snap.timestampInSec.value) * 1000 : Date.now()
+    });
+  };
+
+  if (Array.isArray(pp.story?.snapList)) {
+    pp.story.snapList.forEach((s, i) => pushSnap(s, i, 'story'));
+  }
+  if (Array.isArray(pp.curatedHighlights)) {
+    pp.curatedHighlights.forEach((hl, hIdx) => {
+      if (Array.isArray(hl?.snapList)) {
+        hl.snapList.forEach((s, i) => pushSnap(s, i, `hl${hIdx + 1}`));
+      }
+    });
+  }
+  if (Array.isArray(pp.spotlightHighlights)) {
+    pp.spotlightHighlights.forEach((hl, hIdx) => {
+      if (Array.isArray(hl?.snapList)) {
+        hl.snapList.forEach((s, i) => pushSnap(s, i, `spot${hIdx + 1}`));
+      }
+    });
+  }
+
+  return { username, avatar, stories };
+}
+
+async function resolveSnapchatStories(input) {
+  let clean = String(input || '').trim();
+  let username = '';
+  let targetUrls = [];
+
+  if (/^https?:\/\//i.test(clean)) {
+    targetUrls.push(clean);
+    const uMatch = clean.match(/snapchat\.com\/(?:add|s|story)\/([a-zA-Z0-9._-]+)/i);
+    if (uMatch) username = uMatch[1];
+  } else {
+    username = clean.replace(/^@/, '').split(/[/?#]/)[0].trim();
+    if (!username) return { ok: false, platform: 'Snapchat', stories: [], error: 'Invalid Snapchat username or URL' };
+    targetUrls.push(`https://www.snapchat.com/add/${encodeURIComponent(username)}`);
+    targetUrls.push(`https://story.snapchat.com/s/${encodeURIComponent(username)}`);
+  }
+
+  for (const url of targetUrls) {
+    try {
+      const { status, body } = await httpFetchText(url, {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
+      });
+      if (status >= 200 && status < 400 && body) {
+        const parsed = extractSnapchatStoriesFromNextData(body, username);
+        if (parsed.stories.length > 0) {
+          return {
+            ok: true,
+            platform: 'Snapchat',
+            username: parsed.username,
+            avatar: parsed.avatar || '',
+            stories: parsed.stories
+          };
+        }
+        // Fallback: OpenGraph video or image on direct /t/ or spotlight links
+        const ogVid = body.match(/<meta[^>]+property=["']og:video(?::secure_url|:url)?["'][^>]+content=["']([^"']+)["']/i) ||
+                      body.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:video(?::secure_url|:url)?["']/i);
+        const ogImg = body.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+        if (ogVid && ogVid[1]) {
+          const vUrl = ogVid[1].replace(/&amp;/g, '&');
+          return {
+            ok: true,
+            platform: 'Snapchat',
+            username: username || 'snapchat',
+            stories: [{
+              id: 'snap_og_1',
+              type: 'video',
+              url: vUrl,
+              thumbnail: ogImg ? ogImg[1].replace(/&amp;/g, '&') : '',
+              ext: 'mp4',
+              filename: `Snapchat_${cleanStoryName(username || 'story', 'story')}_1.mp4`
+            }]
+          };
+        }
+      }
+    } catch (_) {}
+  }
+
+  return {
+    ok: false,
+    platform: 'Snapchat',
+    username,
+    stories: [],
+    error: 'No active public Snapchat stories found for this user or link.'
+  };
+}
+
+async function runYtDlpStories(targetUrl, platformName, browserCookies) {
+  let bin = getYtDlpPath();
+  if (!fs.existsSync(bin)) {
+    try { await downloadYtDlp(); bin = getYtDlpPath(); } catch (_) {}
+  }
+  const args = ['--dump-single-json', '--no-warnings', '--ignore-errors'];
+  if (browserCookies && ['chrome', 'edge', 'firefox', 'brave', 'opera', 'safari'].includes(browserCookies)) {
+    args.push('--cookies-from-browser', browserCookies);
+  }
+  args.push(targetUrl);
+
+  return new Promise((resolve, reject) => {
+    cp.execFile(bin, args, { maxBuffer: 25 * 1024 * 1024, windowsHide: true, timeout: 30000 }, (err, stdout, stderr) => {
+      if (err && !stdout) return reject(new Error(stderr || err.message));
+      try {
+        const info = JSON.parse(stdout);
+        const entries = Array.isArray(info.entries) && info.entries.length ? info.entries : [info];
+        const stories = [];
+        const baseName = cleanStoryName(info.uploader || info.channel || info.title || platformName, platformName);
+
+        entries.forEach((entry, idx) => {
+          if (!entry) return;
+          let mediaUrl = entry.url || '';
+          let ext = entry.ext || 'mp4';
+          if (Array.isArray(entry.formats) && entry.formats.length) {
+            const bestMp4 = entry.formats
+              .filter(f => f.url && !String(f.url).includes('.m3u8') && f.vcodec !== 'none' && f.acodec !== 'none')
+              .sort((a, b) => (b.height || 0) - (a.height || 0))[0];
+            const anyBest = entry.formats
+              .filter(f => f.url && !String(f.url).includes('.m3u8'))
+              .sort((a, b) => (b.height || 0) - (a.height || 0))[0];
+            if (bestMp4) { mediaUrl = bestMp4.url; ext = bestMp4.ext || 'mp4'; }
+            else if (anyBest) { mediaUrl = anyBest.url; ext = anyBest.ext || 'mp4'; }
+          }
+          if (!mediaUrl && entry.thumbnail) {
+            mediaUrl = entry.thumbnail;
+            ext = 'jpg';
+          }
+          if (!mediaUrl) return;
+          const isImg = ['jpg', 'jpeg', 'png', 'webp'].includes(String(ext).toLowerCase());
+          stories.push({
+            id: entry.id || `${platformName.toLowerCase()}_${idx}`,
+            type: isImg ? 'image' : 'video',
+            url: mediaUrl,
+            sourceUrl: entry.webpage_url || targetUrl,
+            thumbnail: entry.thumbnail || (isImg ? mediaUrl : ''),
+            ext: isImg ? 'jpg' : 'mp4',
+            filename: `${platformName}_${baseName}_story_${idx + 1}.${isImg ? 'jpg' : 'mp4'}`,
+            duration: entry.duration || 0
+          });
+        });
+
+        resolve({
+          ok: stories.length > 0,
+          platform: platformName,
+          username: info.uploader || info.channel || baseName,
+          stories
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  });
+}
+
+async function resolveInstagramStories(input, opts = {}) {
+  let clean = String(input || '').trim();
+  let username = '';
+  let targetUrl = clean;
+
+  if (/^https?:\/\//i.test(clean)) {
+    const m = clean.match(/instagram\.com\/(?:stories\/)?([a-zA-Z0-9._]+)/i);
+    if (m && !['p', 'reel', 'tv', 'explore'].includes(m[1].toLowerCase())) username = m[1];
+  } else {
+    username = clean.replace(/^@/, '').split(/[/?#]/)[0].trim();
+    if (!username) return { ok: false, platform: 'Instagram', stories: [], error: 'Invalid Instagram username or Story URL' };
+    targetUrl = `https://www.instagram.com/stories/${encodeURIComponent(username)}/`;
+  }
+
+  // 1. Try yt-dlp (supports public stories & private stories when browserCookies is chosen!)
+  try {
+    const yRes = await runYtDlpStories(targetUrl, 'Instagram', opts.browserCookies);
+    if (yRes && yRes.ok && yRes.stories.length > 0) return yRes;
+  } catch (_) {}
+
+  // 2. Try rahad-all-downloader-v2 if a direct URL was provided
+  if (/^https?:\/\//i.test(targetUrl)) {
+    try {
+      const { alldl } = require('rahad-all-downloader-v2');
+      const dlRes = await alldl(targetUrl, { retries: 1 });
+      if (dlRes?.data?.videoUrl) {
+        return {
+          ok: true,
+          platform: 'Instagram',
+          username: username || 'instagram',
+          stories: [{
+            id: 'ig_alldl_1',
+            type: 'video',
+            url: dlRes.data.videoUrl,
+            thumbnail: dlRes.data.thumbnail || '',
+            ext: 'mp4',
+            filename: `Instagram_${cleanStoryName(username || 'story', 'story')}_1.mp4`
+          }]
+        };
+      }
+    } catch (_) {}
+  }
+
+  // 3. Try OpenGraph / JSON metadata extraction
+  try {
+    const { status, body } = await httpFetchText(targetUrl, {
+      'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1'
+    });
+    if (status === 200 && body) {
+      const stories = [];
+      const seen = new Set();
+      const vidMatches = [...body.matchAll(/"video_url":"(https:[^"\\]+)"/g)];
+      vidMatches.forEach((vm, idx) => {
+        const u = vm[1].replace(/\\u0026/g, '&').replace(/\\\//g, '/');
+        if (!seen.has(u)) {
+          seen.add(u);
+          stories.push({
+            id: `ig_vid_${idx}`,
+            type: 'video',
+            url: u,
+            thumbnail: '',
+            ext: 'mp4',
+            filename: `Instagram_${cleanStoryName(username || 'story', 'story')}_${stories.length + 1}.mp4`
+          });
+        }
+      });
+      if (stories.length === 0) {
+        const ogVid = body.match(/<meta[^>]+property=["']og:video(?::secure_url|:url)?["'][^>]+content=["']([^"']+)["']/i);
+        const ogImg = body.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+        if (ogVid && ogVid[1]) {
+          stories.push({
+            id: 'ig_og_vid',
+            type: 'video',
+            url: ogVid[1].replace(/&amp;/g, '&'),
+            thumbnail: ogImg ? ogImg[1].replace(/&amp;/g, '&') : '',
+            ext: 'mp4',
+            filename: `Instagram_${cleanStoryName(username || 'story', 'story')}_1.mp4`
+          });
+        }
+      }
+      if (stories.length > 0) {
+        return { ok: true, platform: 'Instagram', username: username || 'instagram', stories };
+      }
+    }
+  } catch (_) {}
+
+  return {
+    ok: false,
+    needsAuth: true,
+    platform: 'Instagram',
+    username,
+    stories: [],
+    error: 'Instagram requires a logged-in session for Stories. Select your browser (Chrome/Edge/Firefox) in Browser Cookies above, or use the Tayyar Browser Extension while viewing the story.'
+  };
+}
+
+async function resolveFacebookStories(input, opts = {}) {
+  let clean = String(input || '').trim();
+  if (!/^https?:\/\//i.test(clean)) {
+    const user = clean.replace(/^@/, '').trim();
+    if (!user) return { ok: false, platform: 'Facebook', stories: [], error: 'Please enter a valid Facebook Story URL' };
+    clean = `https://www.facebook.com/stories/${encodeURIComponent(user)}/`;
+  }
+
+  // 1. Try yt-dlp (with optional browser cookies for friends-only stories)
+  try {
+    const yRes = await runYtDlpStories(clean, 'Facebook', opts.browserCookies);
+    if (yRes && yRes.ok && yRes.stories.length > 0) return yRes;
+  } catch (_) {}
+
+  // 2. Try rahad-all-downloader-v2
+  try {
+    const { alldl } = require('rahad-all-downloader-v2');
+    const dlRes = await alldl(clean, { retries: 1 });
+    if (dlRes?.data?.videoUrl) {
+      return {
+        ok: true,
+        platform: 'Facebook',
+        username: 'facebook',
+        stories: [{
+          id: 'fb_alldl_1',
+          type: 'video',
+          url: dlRes.data.videoUrl,
+          thumbnail: dlRes.data.thumbnail || '',
+          ext: 'mp4',
+          filename: `Facebook_Story_${Date.now()}.mp4`
+        }]
+      };
+    }
+  } catch (_) {}
+
+  // 3. Mobile HTML scraper (playable_url_quality_hd / browser_native_hd_url / og:video / og:image)
+  try {
+    const { status, body } = await httpFetchText(clean, {
+      'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1'
+    });
+    if (status === 200 && body) {
+      const stories = [];
+      const seen = new Set();
+      const rxList = [
+        /"(?:browser_native_hd_url|playable_url_quality_hd|browser_native_sd_url|playable_url)":"(https:[^"\\]+)"/g
+      ];
+      for (const rx of rxList) {
+        for (const m of body.matchAll(rx)) {
+          const u = m[1].replace(/\\\//g, '/').replace(/\\u0025/g, '%').replace(/\\u0026/g, '&');
+          if (!seen.has(u)) {
+            seen.add(u);
+            stories.push({
+              id: `fb_hd_${stories.length}`,
+              type: 'video',
+              url: u,
+              thumbnail: '',
+              ext: 'mp4',
+              filename: `Facebook_Story_${stories.length + 1}.mp4`
+            });
+          }
+        }
+      }
+      if (stories.length === 0) {
+        const ogVid = body.match(/<meta[^>]+property=["']og:video(?::secure_url|:url)?["'][^>]+content=["']([^"']+)["']/i);
+        const ogImg = body.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+        if (ogVid && ogVid[1]) {
+          stories.push({
+            id: 'fb_og_1',
+            type: 'video',
+            url: ogVid[1].replace(/&amp;/g, '&'),
+            thumbnail: ogImg ? ogImg[1].replace(/&amp;/g, '&') : '',
+            ext: 'mp4',
+            filename: `Facebook_Story_1.mp4`
+          });
+        }
+      }
+      if (stories.length > 0) {
+        return { ok: true, platform: 'Facebook', username: 'facebook', stories };
+      }
+    }
+  } catch (_) {}
+
+  return {
+    ok: false,
+    needsAuth: true,
+    platform: 'Facebook',
+    stories: [],
+    error: 'Could not fetch this Facebook Story publicly. Select your browser in Browser Cookies above or use the Tayyar Browser Extension while viewing the story.'
+  };
+}
+
+async function resolveStories(input, platform, opts = {}) {
+  const raw = String(input || '').trim();
+  let plat = String(platform || '').toLowerCase();
+
+  if (!plat || plat === 'auto') {
+    if (/snapchat\.com/i.test(raw)) plat = 'snapchat';
+    else if (/instagram\.com/i.test(raw)) plat = 'instagram';
+    else if (/facebook\.com|fb\.watch/i.test(raw)) plat = 'facebook';
+    else if (/whatsapp\.com/i.test(raw)) plat = 'whatsapp';
+  }
+
+  if (plat === 'snapchat') return resolveSnapchatStories(raw);
+  if (plat === 'instagram') return resolveInstagramStories(raw, opts);
+  if (plat === 'facebook') return resolveFacebookStories(raw, opts);
+  if (plat === 'whatsapp') {
+    return {
+      ok: false,
+      platform: 'WhatsApp',
+      isWhatsAppWeb: true,
+      stories: [],
+      error: 'Open WhatsApp Web with the Tayyar Browser Extension to save any WhatsApp Status (photo or video) directly to Tayyar in 1 click.'
+    };
+  }
+
+  return { ok: false, platform: plat || 'Unknown', stories: [], error: 'Unsupported story platform' };
+}
+
 module.exports = {
   detectPlatform,
   isYtDlpAvailable,
   downloadYtDlp,
   resolveSocialMedia,
+  resolveStories,
+  resolveSnapchatStories,
+  resolveInstagramStories,
+  resolveFacebookStories,
   resolveTikTokSsstik,
   resolveYouTubePiped,
   getYtDlpPath,

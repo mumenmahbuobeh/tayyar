@@ -250,7 +250,7 @@
             </div>
             <div class="card-main-val" id="engineStatusVal" data-i="ready">Ready</div>
             <div class="card-footer">
-              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.12</span>
+              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.13</span>
               <span class="status-indicator online" id="engineStatusDot"></span>
             </div>
           </div>
@@ -479,16 +479,21 @@
         </div>
       </section>
 
-      <!-- ========== VIEW: DEDICATED SOCIAL VIDEO DOWNLOADER (Mobile & Desktop) ========== -->
+      <!-- ========== VIEW: DEDICATED SOCIAL VIDEO & STORY DOWNLOADER ========== -->
       <section class="view-panel" id="viewSocial">
         <header class="view-header">
           <div>
-            <h1 class="view-title" data-i="socialHubTitle">Social Video Downloader</h1>
-            <p class="view-subtitle" data-i="socialHubSubtitle">Download videos, Reels, and Shorts without watermarks in
-              ultra-HD with full audio merging</p>
+            <h1 class="view-title" data-i="socialHubTitle">Video & Story Downloader</h1>
+            <p class="view-subtitle" data-i="socialHubSubtitle">Download videos, Reels, Shorts & Stories from WhatsApp, Instagram, Facebook & Snapchat</p>
+          </div>
+          <div class="social-mode-tabs" id="socialModeTabs">
+            <button type="button" class="pill-btn primary" data-social-mode="videos" id="btnModeVideos" data-i="modeVideosTab">Videos & Reels</button>
+            <button type="button" class="pill-btn outline" data-social-mode="stories" id="btnModeStories" data-i="modeStoriesTab">Stories Saver</button>
           </div>
         </header>
 
+        <!-- ===== SUB-PANEL 1: VIDEOS & REELS ===== -->
+        <div id="socialVideosPanel">
         <!-- Supported Platforms Bar -->
         <div class="social-platforms-row">
           <span class="social-pill" data-plat="tiktok"><span class="pill-dot">⚡</span> TikTok</span>
@@ -586,6 +591,68 @@
             <li><strong data-i="socialTip3Title">Instant Gallery Save:</strong> <span data-i="socialTip3Desc">On
                 Android, downloaded videos are saved directly to Downloads and indexed in your Gallery.</span></li>
           </ul>
+        </div>
+        </div> <!-- /socialVideosPanel -->
+
+        <!-- ===== SUB-PANEL 2: UNIVERSAL STORIES SAVER (WhatsApp, Instagram, Facebook, Snapchat) ===== -->
+        <div id="socialStoriesPanel" hidden>
+          <div class="desk-story-pills" id="deskStoryPlatPills">
+            <button type="button" class="desk-story-pill active" data-desk-story="snapchat">Snapchat</button>
+            <button type="button" class="desk-story-pill" data-desk-story="instagram">Instagram</button>
+            <button type="button" class="desk-story-pill" data-desk-story="facebook">Facebook</button>
+            <button type="button" class="desk-story-pill" data-desk-story="whatsapp">WhatsApp</button>
+          </div>
+
+          <!-- Social Story Input Box (Snapchat / Instagram / Facebook) -->
+          <div class="social-input-card glass-panel" id="deskStorySocialBox">
+            <div class="social-input-group">
+              <input type="text" id="deskStoryInput" class="social-url-field" data-i-placeholder="storyInputPlaceholder"
+                placeholder="Enter @username or paste Story link (Snapchat, Instagram, Facebook)..." />
+              <button type="button" id="btnDeskStoryPaste" class="pill-btn glass-btn">
+                <span data-i="paste">Paste</span>
+              </button>
+            </div>
+            <div class="desk-story-options-row">
+              <label class="desk-cookie-label">
+                <span data-i="storyCookiesLbl">Browser Session (for private stories):</span>
+                <select id="deskStoryCookies" class="styled-select">
+                  <option value="" data-i="cookiesNone">Public / No Login</option>
+                  <option value="chrome">Google Chrome</option>
+                  <option value="edge">Microsoft Edge</option>
+                  <option value="firefox">Mozilla Firefox</option>
+                  <option value="brave">Brave Browser</option>
+                </select>
+              </label>
+              <button type="button" id="btnDeskFetchStories" class="pill-btn primary">
+                <span data-i="fetchStoriesBtn">Fetch Active Stories</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- WhatsApp Web Status Box (Desktop) -->
+          <div class="social-input-card glass-panel" id="deskStoryWhatsAppBox" hidden>
+            <h3 style="margin:0 0 6px 0;font-size:16px;" data-i="waDeskTitle">WhatsApp Status Saver (Desktop)</h3>
+            <p style="margin:0 0 14px 0;font-size:13px;color:var(--text-dim);line-height:1.6;" data-i="waDeskDesc">
+              Install the Tayyar Browser Extension, open WhatsApp Web, and hover over any Status photo or video to click "Save WhatsApp Story" — it saves directly to Downloads/Tayyar/Stories in original HD!
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button type="button" id="btnDeskOpenWaWeb" class="pill-btn primary" data-i="openWaWebBtn">Open WhatsApp Web</button>
+              <button type="button" id="btnDeskOpenExtFolder" class="pill-btn outline" data-i="openFolder">Open Extension Folder</button>
+            </div>
+          </div>
+
+          <!-- Story Loader -->
+          <div class="social-loader-card glass-panel" id="deskStoryLoader" hidden>
+            <div class="spinner"></div>
+            <p data-i="fetchingStories">Scanning active stories...</p>
+          </div>
+
+          <!-- Story Results Bar & Grid -->
+          <div class="desk-story-results-bar" id="deskStoryResultsBar" hidden>
+            <span id="deskStoryCountLbl">0 stories</span>
+            <button type="button" id="btnDeskSaveAllStories" class="pill-btn primary" data-i="saveAllStories">Download All Stories</button>
+          </div>
+          <div class="desk-story-grid" id="deskStoryGrid"></div>
         </div>
       </section>
 
@@ -1557,7 +1624,7 @@
             </svg>
           </div>
           <div class="about-hero-details">
-            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.12</span></h2>
+            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.13</span></h2>
             <p class="about-tagline" data-i="aboutTagline">Before content collapses, preserve what truly matters, let
               beauty enter your orbit of preservation.</p>
             <div class="about-dev-by">
@@ -1592,7 +1659,7 @@
           <div class="updates-status-row">
             <div>
               <h4 class="update-title" id="updateTitleText" data-i="upToDate">Tayyar is up to date</h4>
-              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.12 is the latest available
+              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.13 is the latest available
                 release.</div>
             </div>
             <div class="update-actions">

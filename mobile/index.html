@@ -60,7 +60,7 @@
             <div class="pro-glass-card command-card">
               <div class="command-head">
                 <span class="command-label" data-i="quickDownloadLbl">Quick Download</span>
-                <span class="command-ver">v1.0.12</span>
+                <span class="command-ver">v1.0.13</span>
               </div>
 
               <!-- Sleek URL Input with Inline Paste Button -->
@@ -161,9 +161,34 @@
             </div>
           </div>
 
-          <!-- Secondary Column: Sleek Brand Chips + Recent Activity -->
+          <!-- Secondary Column: Stories Quick Card + Sleek Brand Chips + Recent Activity -->
           <div class="home-secondary-col">
-            <div class="section-row">
+            <!-- Quick Stories Saver Entry Card -->
+            <button type="button" class="pro-glass-card stories-quick-banner" id="btnOpenStoriesHub">
+              <div class="sqb-left">
+                <div class="sqb-rings">
+                  <span class="sqb-dot brand-whatsapp">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.82 14.07c-.24.68-1.42 1.3-1.95 1.38-.5.08-1.13.11-1.82-.11-.42-.13-.96-.31-1.65-.61-2.91-1.25-4.81-4.2-4.96-4.4-.14-.2-1.18-1.57-1.18-3s.75-2.13 1.01-2.42c.27-.29.58-.36.78-.36.2 0 .39.01.56.01.18.01.42-.07.66.5.24.58.82 2.02.89 2.17.07.15.12.32.02.52-.1.2-.15.32-.29.49-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.29.76 1.25 1.63 2.02 1.12 1 2.06 1.31 2.35 1.46.29.15.46.12.63-.07.17-.2.73-.85.92-1.14.19-.29.39-.24.66-.14.27.1 1.7.8 1.99.95.29.15.49.22.56.34.07.12.07.7-.17 1.38z"/></svg>
+                  </span>
+                  <span class="sqb-dot brand-instagram">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  </span>
+                  <span class="sqb-dot brand-facebook">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/></svg>
+                  </span>
+                  <span class="sqb-dot brand-snapchat">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.2 2c-3.3 0-5.8 2.4-5.8 6.1 0 .9.1 1.8.2 2.3-.4.2-.9.1-1.2-.1-.3-.2-.7-.2-1 0-.4.2-.6.6-.5 1 .1.5.7.9 1.6 1.2.2.1.4.2.4.4 0 .2-.4.9-1.2 1.6-.9.8-2 1.2-2.2 1.3-.3.1-.5.4-.5.7 0 .5.6.9 1.7 1.1.4.1.6.3.7.7.1.4.4.7.9.7.3 0 .7-.1 1.2-.1.7 0 1.3.2 2.1.7.8.5 1.7 1.1 3.3 1.1s2.5-.6 3.3-1.1c.8-.5 1.4-.7 2.1-.7.5 0 .9.1 1.2.1.5 0 .8-.3.9-.7.1-.4.3-.6.7-.7 1.1-.2 1.7-.6 1.7-1.1 0-.3-.2-.6-.5-.7-.2-.1-1.3-.5-2.2-1.3-.8-.7-1.2-1.4-1.2-1.6 0-.2.2-.3.4-.4.9-.3 1.5-.7 1.6-1.2.1-.4-.1-.8-.5-1-.3-.2-.7-.2-1 0-.3.2-.8.3-1.2.1.1-.5.2-1.4.2-2.3C18 4.4 15.5 2 12.2 2z"/></svg>
+                  </span>
+                </div>
+                <div class="sqb-text">
+                  <div class="sqb-title" data-i="storiesHubTitle">Stories & Status Saver</div>
+                  <div class="sqb-sub" data-i="storiesHubSub">WhatsApp • Instagram • Facebook • Snapchat</div>
+                </div>
+              </div>
+              <span class="sqb-chev">›</span>
+            </button>
+
+            <div class="section-row" style="margin-top:16px;">
               <h2 class="section-title" data-i="supportedSources">Supported Sources</h2>
               <button type="button" class="section-link" id="btnSeeAllPlatforms" data-i="seeAll">See all</button>
             </div>
@@ -223,11 +248,109 @@
         </div>
       </section>
 
-      <!-- ==================== TAB 2: PLATFORMS (SLEEK PRO DARK GLASS CARDS) ==================== -->
+      <!-- ==================== TAB 2: PLATFORMS & STORIES SAVER ==================== -->
       <section class="tab-view" id="tabPlatforms" data-tab="platforms">
         <div class="page-head">
-          <h1 class="large-title" data-i="platformsTitle">Platforms</h1>
-          <p class="large-subtitle" data-i="platformsSubtitle">Select a source for direct watermark-free saving</p>
+          <h1 class="large-title" data-i="platformsTitle">Platforms & Stories</h1>
+          <p class="large-subtitle" data-i="platformsSubtitle">Save Stories, Statuses & HD videos without watermarks</p>
+        </div>
+
+        <!-- DEDICATED UNIVERSAL STORIES SAVER HUB -->
+        <div class="pro-glass-card stories-hub-card" id="storiesHubCard">
+          <div class="stories-hub-head">
+            <div>
+              <h2 class="stories-hub-title" data-i="storiesHubTitle">Stories & Status Saver</h2>
+              <p class="stories-hub-hint" data-i="storiesHubDesc">Download active photo & video stories in original quality</p>
+            </div>
+            <span class="stories-live-badge" data-i="storiesBadge">HD Stories</span>
+          </div>
+
+          <!-- 4 Brand Selector Pills -->
+          <div class="story-plat-pills" id="storyPlatPills">
+            <button type="button" class="story-pill active" data-story-plat="whatsapp">
+              <span class="sp-ic brand-whatsapp">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.82 14.07c-.24.68-1.42 1.3-1.95 1.38-.5.08-1.13.11-1.82-.11-.42-.13-.96-.31-1.65-.61-2.91-1.25-4.81-4.2-4.96-4.4-.14-.2-1.18-1.57-1.18-3s.75-2.13 1.01-2.42c.27-.29.58-.36.78-.36.2 0 .39.01.56.01.18.01.42-.07.66.5.24.58.82 2.02.89 2.17.07.15.12.32.02.52-.1.2-.15.32-.29.49-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.29.76 1.25 1.63 2.02 1.12 1 2.06 1.31 2.35 1.46.29.15.46.12.63-.07.17-.2.73-.85.92-1.14.19-.29.39-.24.66-.14.27.1 1.7.8 1.99.95.29.15.49.22.56.34.07.12.07.7-.17 1.38z"/></svg>
+              </span>
+              <span>WhatsApp</span>
+            </button>
+            <button type="button" class="story-pill" data-story-plat="snapchat">
+              <span class="sp-ic brand-snapchat">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.2 2c-3.3 0-5.8 2.4-5.8 6.1 0 .9.1 1.8.2 2.3-.4.2-.9.1-1.2-.1-.3-.2-.7-.2-1 0-.4.2-.6.6-.5 1 .1.5.7.9 1.6 1.2.2.1.4.2.4.4 0 .2-.4.9-1.2 1.6-.9.8-2 1.2-2.2 1.3-.3.1-.5.4-.5.7 0 .5.6.9 1.7 1.1.4.1.6.3.7.7.1.4.4.7.9.7.3 0 .7-.1 1.2-.1.7 0 1.3.2 2.1.7.8.5 1.7 1.1 3.3 1.1s2.5-.6 3.3-1.1c.8-.5 1.4-.7 2.1-.7.5 0 .9.1 1.2.1.5 0 .8-.3.9-.7.1-.4.3-.6.7-.7 1.1-.2 1.7-.6 1.7-1.1 0-.3-.2-.6-.5-.7-.2-.1-1.3-.5-2.2-1.3-.8-.7-1.2-1.4-1.2-1.6 0-.2.2-.3.4-.4.9-.3 1.5-.7 1.6-1.2.1-.4-.1-.8-.5-1-.3-.2-.7-.2-1 0-.3.2-.8.3-1.2.1.1-.5.2-1.4.2-2.3C18 4.4 15.5 2 12.2 2z"/></svg>
+              </span>
+              <span>Snapchat</span>
+            </button>
+            <button type="button" class="story-pill" data-story-plat="instagram">
+              <span class="sp-ic brand-instagram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              </span>
+              <span>Instagram</span>
+            </button>
+            <button type="button" class="story-pill" data-story-plat="facebook">
+              <span class="sp-ic brand-facebook">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/></svg>
+              </span>
+              <span>Facebook</span>
+            </button>
+          </div>
+
+          <!-- PANEL A: WHATSAPP STATUS SAVER (Android Native + iOS Helper) -->
+          <div class="story-panel" id="storyPanelWhatsApp">
+            <div class="wa-toolbar">
+              <button type="button" class="wa-action-btn primary" id="btnWaGrantNormal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span data-i="waGrantBtn">Allow WhatsApp</span>
+              </button>
+              <button type="button" class="wa-action-btn" id="btnWaGrantBiz">
+                <span data-i="waGrantBizBtn">WA Business</span>
+              </button>
+              <button type="button" class="wa-action-btn" id="btnWaRefresh">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                <span data-i="refresh">Refresh</span>
+              </button>
+            </div>
+            <div class="story-grid" id="waStatusGrid"></div>
+          </div>
+
+          <!-- PANEL B: SNAPCHAT / INSTAGRAM / FACEBOOK STORY FETCHER -->
+          <div class="story-panel" id="storyPanelSocial" hidden>
+            <div class="url-capsule">
+              <svg class="url-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+              <input
+                type="text"
+                id="storyInput"
+                class="url-field"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+                data-i-placeholder="storyInputPlaceholder"
+                placeholder="Enter @username or paste Story link..."
+              />
+              <button type="button" class="inline-paste-btn" id="btnStoryPaste">
+                <span data-i="paste">Paste</span>
+              </button>
+            </div>
+            <button type="button" class="cta-primary-btn" id="btnFetchStories">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span data-i="fetchStoriesBtn">Fetch Active Stories</span>
+            </button>
+
+            <div class="story-loader-row" id="storyLoader" hidden>
+              <div class="liquid-spinner"></div>
+              <span data-i="fetchingStories">Scanning active stories...</span>
+            </div>
+
+            <div class="story-results-bar" id="storyResultsBar" hidden>
+              <span class="story-count-lbl" id="storyCountLbl">0 stories</span>
+              <button type="button" class="pill-action-btn" id="btnSaveAllStories" data-i="saveAllStories">Save All</button>
+            </div>
+
+            <div class="story-grid" id="socialStoriesGrid"></div>
+          </div>
+        </div>
+
+        <div class="section-row" style="margin-top:20px;">
+          <h2 class="section-title" data-i="allPlatformsLbl">Video & File Platforms</h2>
         </div>
 
         <div class="platforms-grid">
@@ -411,7 +534,7 @@
               </svg>
             </div>
             <div class="identity-body">
-              <div class="identity-name">Tayyar <span class="ver-pill">v1.0.12</span></div>
+              <div class="identity-name">Tayyar <span class="ver-pill">v1.0.13</span></div>
               <div class="identity-sub" data-i="identitySub">Apple Liquid Glass • Native Android & iOS</div>
             </div>
           </div>
@@ -521,7 +644,7 @@
                 </span>
                 <div>
                   <div class="ios-row-title" id="updStatusTitle" data-i="upToDate">Tayyar is up to date</div>
-                  <div class="ios-row-hint" id="updStatusDesc" data-i="upToDateDesc">Version 1.0.12 is the latest stable release.</div>
+                  <div class="ios-row-hint" id="updStatusDesc" data-i="upToDateDesc">Version 1.0.13 is the latest stable release.</div>
                 </div>
               </div>
               <button type="button" class="pill-action-btn" id="btnCheckUpdate" data-i="check">Check</button>

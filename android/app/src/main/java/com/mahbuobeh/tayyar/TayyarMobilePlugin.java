@@ -1,25 +1,37 @@
 package com.mahbuobeh.tayyar;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
+import androidx.activity.result.ActivityResult;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,6 +39,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -882,6 +900,623 @@ public class TayyarMobilePlugin extends Plugin {
                     fallbackRet.put("title", "Media_Video");
                     fallbackRet.put("formats", fallbackFormats);
                     call.resolve(fallbackRet);
+                }
+            }
+        }).start();
+    }
+
+    /* ==================== WHATSAPP STATUS SAVER (ANDROID NATIVE + SAF) ==================== */
+
+    private static final String PREFS_WA = "tayyar_wa_status_prefs";
+    private static final String KEY_WA_URI = "wa_tree_uri";
+    private static final String KEY_WA_BIZ_URI = "wa_biz_tree_uri";
+
+    private static class WaStatusEntry {
+        String id;
+        String name;
+        String type; // "video" or "image"
+        long size;
+        long modified;
+        String uri;
+        String path;
+        String source; // "WhatsApp" or "WhatsApp Business"
+        String thumbnail;
+    }
+
+    @PluginMethod
+    public void requestWhatsAppStatusAccess(PluginCall call) {
+        try {
+            boolean isBusiness = Boolean.TRUE.equals(call.getBoolean("business", false));
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                String docId = isBusiness
+                    ? "primary:Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses"
+                    : "primary:Android/media/com.whatsapp/WhatsApp/Media/.Statuses";
+                Uri initialUri = DocumentsContract.buildDocumentUri(
+                    "com.android.externalstorage.documents",
+                    docId
+                );
+                intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
+            }
+
+            call.setKeepAlive(true);
+            startActivityForResult(call, intent, "handleWhatsAppFolderResult");
+        } catch (Exception e) {
+            Log.e(TAG, "requestWhatsAppStatusAccess error", e);
+            call.reject("Could not open folder picker: " + e.getMessage());
+        }
+    }
+
+    @ActivityCallback
+    private void handleWhatsAppFolderResult(PluginCall call, ActivityResult result) {
+        if (call == null) return;
+        try {
+            if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                Uri treeUri = result.getData().getData();
+                if (treeUri != null) {
+                    int flags = result.getData().getFlags() & Intent.FLAG_GRANT_READ_URI_PERMISSION;
+                    if (flags == 0) flags = Intent.FLAG_GRANT_READ_URI_PERMISSION;
+                    try {
+                        getContext().getContentResolver().takePersistableUriPermission(treeUri, flags);
+                    } catch (Exception ignored) {}
+
+                    boolean isBusiness = Boolean.TRUE.equals(call.getBoolean("business", false)) ||
+                        treeUri.toString().toLowerCase().contains("w4b") ||
+                        treeUri.toString().toLowerCase().contains("business");
+                    SharedPreferences prefs = getContext().getSharedPreferences(PREFS_WA, Context.MODE_PRIVATE);
+                    prefs.edit().putString(isBusiness ? KEY_WA_BIZ_URI : KEY_WA_URI, treeUri.toString()).apply();
+
+                    JSObject ret = new JSObject();
+                    ret.put("ok", true);
+                    ret.put("granted", true);
+                    ret.put("uri", treeUri.toString());
+                    call.resolve(ret);
+                    return;
+                }
+            }
+            JSObject ret = new JSObject();
+            ret.put("ok", false);
+            ret.put("granted", false);
+            call.resolve(ret);
+        } catch (Exception e) {
+            call.reject(e.getMessage());
+        }
+    }
+
+    private String makeThumbnailDataUrl(Context context, Uri contentUri, File file, boolean isVideo) {
+        Bitmap bmp = null;
+        try {
+            if (isVideo) {
+                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                try {
+                    if (contentUri != null) {
+                        mmr.setDataSource(context, contentUri);
+                    } else if (file != null) {
+                        mmr.setDataSource(file.getAbsolutePath());
+                    }
+                    bmp = mmr.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                } finally {
+                    try { mmr.release(); } catch (Exception ignored) {}
+                }
+            } else {
+                BitmapFactory.Options opts = new BitmapFactory.Options();
+                opts.inSampleSize = 4;
+                if (contentUri != null) {
+                    try (InputStream is = context.getContentResolver().openInputStream(contentUri)) {
+                        if (is != null) bmp = BitmapFactory.decodeStream(is, null, opts);
+                    }
+                } else if (file != null) {
+                    bmp = BitmapFactory.decodeFile(file.getAbsolutePath(), opts);
+                }
+            }
+
+            if (bmp != null) {
+                int maxDim = 220;
+                int w = bmp.getWidth();
+                int h = bmp.getHeight();
+                if (w > maxDim || h > maxDim) {
+                    float scale = Math.min((float) maxDim / w, (float) maxDim / h);
+                    Bitmap scaled = Bitmap.createScaledBitmap(bmp, Math.max(1, Math.round(w * scale)), Math.max(1, Math.round(h * scale)), true);
+                    if (scaled != bmp) bmp.recycle();
+                    bmp = scaled;
+                }
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.JPEG, 68, baos);
+                bmp.recycle();
+                return "data:image/jpeg;base64," + Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
+            }
+        } catch (Exception ignored) {
+            if (bmp != null && !bmp.isRecycled()) bmp.recycle();
+        }
+        return "";
+    }
+
+    private boolean isStatusMediaName(String name) {
+        if (name == null || name.startsWith(".")) return false;
+        String low = name.toLowerCase();
+        return low.endsWith(".jpg") || low.endsWith(".jpeg") || low.endsWith(".png") ||
+               low.endsWith(".webp") || low.endsWith(".mp4");
+    }
+
+    @PluginMethod
+    public void listWhatsAppStatuses(PluginCall call) {
+        final Context context = getContext().getApplicationContext();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    List<WaStatusEntry> found = new ArrayList<>();
+                    Set<String> seenNames = new HashSet<>();
+                    boolean hasSafPermission = false;
+
+                    SharedPreferences prefs = context.getSharedPreferences(PREFS_WA, Context.MODE_PRIVATE);
+                    String[] safKeys = new String[] { KEY_WA_URI, KEY_WA_BIZ_URI };
+                    String[] safLabels = new String[] { "WhatsApp", "WhatsApp Business" };
+
+                    // 1. Scan persisted SAF tree URIs (Android 11+ standard path)
+                    for (int k = 0; k < safKeys.length; k++) {
+                        String uriStr = prefs.getString(safKeys[k], null);
+                        if (uriStr == null || uriStr.isEmpty()) continue;
+                        try {
+                            Uri treeUri = Uri.parse(uriStr);
+                            String docId = DocumentsContract.getTreeDocumentId(treeUri);
+                            Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, docId);
+                            String[] projection = new String[] {
+                                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                                DocumentsContract.Document.COLUMN_SIZE,
+                                DocumentsContract.Document.COLUMN_LAST_MODIFIED
+                            };
+                            try (Cursor cursor = context.getContentResolver().query(childrenUri, projection, null, null, null)) {
+                                if (cursor != null) {
+                                    hasSafPermission = true;
+                                    while (cursor.moveToNext()) {
+                                        String childId = cursor.getString(0);
+                                        String name = cursor.getString(1);
+                                        long size = cursor.isNull(2) ? 0 : cursor.getLong(2);
+                                        long modified = cursor.isNull(3) ? 0 : cursor.getLong(3);
+                                        if (!isStatusMediaName(name) || seenNames.contains(name)) continue;
+                                        seenNames.add(name);
+                                        Uri docUri = DocumentsContract.buildDocumentUriUsingTree(treeUri, childId);
+                                        WaStatusEntry entry = new WaStatusEntry();
+                                        entry.id = "wa_saf_" + Math.abs(name.hashCode());
+                                        entry.name = name;
+                                        entry.type = name.toLowerCase().endsWith(".mp4") ? "video" : "image";
+                                        entry.size = size;
+                                        entry.modified = modified;
+                                        entry.uri = docUri.toString();
+                                        entry.path = "";
+                                        entry.source = safLabels[k];
+                                        found.add(entry);
+                                    }
+                                }
+                            }
+                        } catch (Exception ex) {
+                            Log.w(TAG, "SAF scan warning: " + ex.getMessage());
+                        }
+                    }
+
+                    // 2. Scan direct filesystem paths (Android 10 and below + devices allowing direct media read)
+                    File extRoot = Environment.getExternalStorageDirectory();
+                    if (extRoot != null) {
+                        String[][] dirs = new String[][] {
+                            { "Android/media/com.whatsapp/WhatsApp/Media/.Statuses", "WhatsApp" },
+                            { "WhatsApp/Media/.Statuses", "WhatsApp" },
+                            { "Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses", "WhatsApp Business" },
+                            { "WhatsApp Business/Media/.Statuses", "WhatsApp Business" }
+                        };
+                        for (String[] pair : dirs) {
+                            File dir = new File(extRoot, pair[0]);
+                            if (dir.exists() && dir.isDirectory() && dir.canRead()) {
+                                File[] files = dir.listFiles();
+                                if (files != null) {
+                                    for (File f : files) {
+                                        if (!f.isFile()) continue;
+                                        String name = f.getName();
+                                        if (!isStatusMediaName(name) || seenNames.contains(name)) continue;
+                                        seenNames.add(name);
+                                        WaStatusEntry entry = new WaStatusEntry();
+                                        entry.id = "wa_fs_" + Math.abs(name.hashCode());
+                                        entry.name = name;
+                                        entry.type = name.toLowerCase().endsWith(".mp4") ? "video" : "image";
+                                        entry.size = f.length();
+                                        entry.modified = f.lastModified();
+                                        entry.uri = "";
+                                        entry.path = f.getAbsolutePath();
+                                        entry.source = pair[1];
+                                        found.add(entry);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Sort newest first & cap at 48 items for smooth rendering
+                    Collections.sort(found, new Comparator<WaStatusEntry>() {
+                        @Override
+                        public int compare(WaStatusEntry a, WaStatusEntry b) {
+                            return Long.compare(b.modified, a.modified);
+                        }
+                    });
+                    if (found.size() > 48) {
+                        found = found.subList(0, 48);
+                    }
+
+                    JSArray arr = new JSArray();
+                    for (WaStatusEntry e : found) {
+                        Uri u = (e.uri != null && !e.uri.isEmpty()) ? Uri.parse(e.uri) : null;
+                        File f = (e.path != null && !e.path.isEmpty()) ? new File(e.path) : null;
+                        e.thumbnail = makeThumbnailDataUrl(context, u, f, "video".equals(e.type));
+
+                        JSObject obj = new JSObject();
+                        obj.put("id", e.id);
+                        obj.put("name", e.name);
+                        obj.put("type", e.type);
+                        obj.put("size", e.size);
+                        obj.put("modified", e.modified);
+                        obj.put("uri", e.uri);
+                        obj.put("path", e.path);
+                        obj.put("source", e.source);
+                        obj.put("thumbnail", e.thumbnail);
+                        arr.put(obj);
+                    }
+
+                    JSObject ret = new JSObject();
+                    ret.put("ok", true);
+                    ret.put("hasPermission", hasSafPermission || found.size() > 0);
+                    ret.put("needsSaf", Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !hasSafPermission && found.size() == 0);
+                    ret.put("items", arr);
+                    call.resolve(ret);
+                } catch (Exception e) {
+                    Log.e(TAG, "listWhatsAppStatuses error", e);
+                    call.reject(e.getMessage());
+                }
+            }
+        }).start();
+    }
+
+    @PluginMethod
+    public void saveWhatsAppStatus(PluginCall call) {
+        final String uriStr = call.getString("uri", "");
+        final String filePath = call.getString("path", "");
+        final String rawName = call.getString("name", "WhatsApp_Status_" + System.currentTimeMillis() + ".jpg");
+        final Context context = getContext().getApplicationContext();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                InputStream is = null;
+                OutputStream os = null;
+                Uri mediaStoreUri = null;
+                File directFile = null;
+                try {
+                    if (uriStr != null && !uriStr.isEmpty()) {
+                        is = context.getContentResolver().openInputStream(Uri.parse(uriStr));
+                    } else if (filePath != null && !filePath.isEmpty()) {
+                        is = new FileInputStream(new File(filePath));
+                    }
+                    if (is == null) {
+                        call.reject("Could not read WhatsApp status file");
+                        return;
+                    }
+
+                    String safeName = sanitizeFilename("WA_" + rawName, rawName);
+                    String mimeType = getMimeTypeForName(safeName);
+                    String savedPath = "";
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        ContentResolver resolver = context.getContentResolver();
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.Downloads.DISPLAY_NAME, safeName);
+                        values.put(MediaStore.Downloads.MIME_TYPE, mimeType);
+                        values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Tayyar/Stories");
+                        values.put(MediaStore.Downloads.IS_PENDING, 1);
+
+                        mediaStoreUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                        if (mediaStoreUri != null) {
+                            os = resolver.openOutputStream(mediaStoreUri);
+                            savedPath = "Downloads/Tayyar/Stories/" + safeName;
+                        }
+                    }
+
+                    if (os == null) {
+                        File pubDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                        File storyDir = new File(new File(pubDir, "Tayyar"), "Stories");
+                        if (!storyDir.exists()) storyDir.mkdirs();
+                        directFile = new File(storyDir, safeName);
+                        os = new FileOutputStream(directFile);
+                        savedPath = directFile.getAbsolutePath();
+                    }
+
+                    byte[] buf = new byte[32768];
+                    int read;
+                    long totalBytes = 0;
+                    while ((read = is.read(buf)) != -1) {
+                        os.write(buf, 0, read);
+                        totalBytes += read;
+                    }
+                    os.flush();
+
+                    if (mediaStoreUri != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        ContentValues doneVals = new ContentValues();
+                        doneVals.put(MediaStore.Downloads.IS_PENDING, 0);
+                        context.getContentResolver().update(mediaStoreUri, doneVals, null, null);
+                    }
+                    if (directFile != null) {
+                        MediaScannerConnection.scanFile(
+                            context,
+                            new String[] { directFile.getAbsolutePath() },
+                            new String[] { mimeType },
+                            null
+                        );
+                    }
+
+                    JSObject ret = new JSObject();
+                    ret.put("ok", true);
+                    ret.put("filename", safeName);
+                    ret.put("path", savedPath);
+                    ret.put("size", totalBytes);
+                    call.resolve(ret);
+                } catch (Exception e) {
+                    Log.e(TAG, "saveWhatsAppStatus error", e);
+                    call.reject("Save failed: " + e.getMessage());
+                } finally {
+                    try { if (is != null) is.close(); } catch (Exception ignored) {}
+                    try { if (os != null) os.close(); } catch (Exception ignored) {}
+                }
+            }
+        }).start();
+    }
+
+    /* ==================== MULTI-PLATFORM STORY RESOLVER (SNAPCHAT / INSTAGRAM / FACEBOOK) ==================== */
+
+    private String fetchHtmlString(String targetUrl, String userAgent) {
+        try {
+            String cur = targetUrl;
+            for (int hop = 0; hop < 5; hop++) {
+                URL u = new URL(cur);
+                HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+                conn.setInstanceFollowRedirects(false);
+                conn.setRequestProperty("User-Agent", userAgent);
+                conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+                conn.setRequestProperty("Accept-Language", "en-US,en;q=0.9");
+                conn.setConnectTimeout(9000);
+                conn.setReadTimeout(14000);
+
+                int code = conn.getResponseCode();
+                if (code >= 300 && code < 400) {
+                    String loc = conn.getHeaderField("Location");
+                    conn.disconnect();
+                    if (loc != null && !loc.isEmpty()) {
+                        if (loc.startsWith("/")) loc = u.getProtocol() + "://" + u.getHost() + loc;
+                        cur = loc;
+                        continue;
+                    }
+                }
+                if (code >= 200 && code < 400) {
+                    StringBuilder sb = new StringBuilder();
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                            if (sb.length() > 1800000) break;
+                        }
+                    }
+                    conn.disconnect();
+                    return sb.toString();
+                }
+                conn.disconnect();
+                break;
+            }
+        } catch (Exception ignored) {}
+        return "";
+    }
+
+    private void appendSnapchatSnapList(org.json.JSONArray snapList, String username, String prefix, String avatar, Set<String> seen, JSArray outStories) {
+        if (snapList == null) return;
+        for (int i = 0; i < snapList.length(); i++) {
+            try {
+                org.json.JSONObject snap = snapList.getJSONObject(i);
+                org.json.JSONObject snapUrls = snap.optJSONObject("snapUrls");
+                String mediaUrl = snapUrls != null ? snapUrls.optString("mediaUrl", "") : snap.optString("mediaUrl", "");
+                if (mediaUrl.isEmpty() || seen.contains(mediaUrl)) continue;
+                seen.add(mediaUrl);
+
+                int mediaType = snap.optInt("snapMediaType", -1);
+                boolean isVideo = mediaType == 1 || mediaUrl.toLowerCase().contains(".mp4") || mediaUrl.toLowerCase().contains("mp4");
+                String thumb = "";
+                if (snapUrls != null && snapUrls.has("mediaPreviewUrl")) {
+                    org.json.JSONObject pv = snapUrls.optJSONObject("mediaPreviewUrl");
+                    if (pv != null) thumb = pv.optString("value", "");
+                }
+                if (thumb.isEmpty()) thumb = isVideo ? avatar : mediaUrl;
+
+                String ext = isVideo ? "mp4" : "jpg";
+                JSObject item = new JSObject();
+                item.put("id", "snap_" + prefix + "_" + i);
+                item.put("type", isVideo ? "video" : "image");
+                item.put("url", mediaUrl);
+                item.put("thumbnail", thumb);
+                item.put("ext", ext);
+                item.put("filename", sanitizeFilename("Snapchat_" + username + "_" + prefix + "_" + (i + 1) + "." + ext, mediaUrl));
+                outStories.put(item);
+            } catch (Exception ignored) {}
+        }
+    }
+
+    @PluginMethod
+    public void resolveStories(PluginCall call) {
+        final String rawInput = call.getString("input", "").trim();
+        final String rawPlat = call.getString("platform", "auto").toLowerCase().trim();
+
+        if (rawInput.isEmpty()) {
+            call.reject("Input cannot be empty");
+            return;
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String plat = rawPlat;
+                    if (plat.isEmpty() || "auto".equals(plat)) {
+                        if (rawInput.toLowerCase().contains("snapchat.com")) plat = "snapchat";
+                        else if (rawInput.toLowerCase().contains("instagram.com")) plat = "instagram";
+                        else if (rawInput.toLowerCase().contains("facebook.com") || rawInput.toLowerCase().contains("fb.watch")) plat = "facebook";
+                    }
+
+                    JSArray stories = new JSArray();
+                    Set<String> seen = new HashSet<>();
+                    String detectedUser = rawInput.replaceFirst("^@", "");
+
+                    // 1. SNAPCHAT PUBLIC STORIES (__NEXT_DATA__ JSON Parser — Zero Login Required!)
+                    if ("snapchat".equals(plat)) {
+                        List<String> urlsToTry = new ArrayList<>();
+                        if (rawInput.startsWith("http://") || rawInput.startsWith("https://")) {
+                            urlsToTry.add(rawInput);
+                            Matcher um = Pattern.compile("snapchat\\.com/(?:add|s|story)/([a-zA-Z0-9._-]+)", Pattern.CASE_INSENSITIVE).matcher(rawInput);
+                            if (um.find()) detectedUser = um.group(1);
+                        } else {
+                            detectedUser = rawInput.replaceFirst("^@", "").split("[/?#]")[0].trim();
+                            urlsToTry.add("https://www.snapchat.com/add/" + URLEncoder.encode(detectedUser, "UTF-8"));
+                            urlsToTry.add("https://story.snapchat.com/s/" + URLEncoder.encode(detectedUser, "UTF-8"));
+                        }
+
+                        for (String u : urlsToTry) {
+                            String html = fetchHtmlString(u, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
+                            if (html.isEmpty()) continue;
+
+                            Pattern pNext = Pattern.compile("<script[^>]+id=[\"']__NEXT_DATA__[\"'][^>]*>([\\s\\S]*?)</script>", Pattern.CASE_INSENSITIVE);
+                            Matcher mNext = pNext.matcher(html);
+                            if (mNext.find()) {
+                                try {
+                                    org.json.JSONObject root = new org.json.JSONObject(mNext.group(1));
+                                    org.json.JSONObject pp = root.optJSONObject("props") != null ? root.optJSONObject("props").optJSONObject("pageProps") : null;
+                                    if (pp != null) {
+                                        String avatar = "";
+                                        org.json.JSONObject up = pp.optJSONObject("userProfile");
+                                        if (up != null) {
+                                            org.json.JSONObject pub = up.optJSONObject("publicProfileInfo");
+                                            if (pub == null) pub = up.optJSONObject("userInfo");
+                                            if (pub != null) {
+                                                detectedUser = pub.optString("username", detectedUser);
+                                                avatar = pub.optString("profilePictureUrl", pub.optString("squareHeroImageUrl", ""));
+                                            }
+                                        }
+                                        org.json.JSONObject st = pp.optJSONObject("story");
+                                        if (st != null) {
+                                            appendSnapchatSnapList(st.optJSONArray("snapList"), detectedUser, "story", avatar, seen, stories);
+                                        }
+                                        org.json.JSONArray curHl = pp.optJSONArray("curatedHighlights");
+                                        if (curHl != null) {
+                                            for (int h = 0; h < curHl.length(); h++) {
+                                                org.json.JSONObject hlObj = curHl.optJSONObject(h);
+                                                if (hlObj != null) {
+                                                    appendSnapchatSnapList(hlObj.optJSONArray("snapList"), detectedUser, "hl" + (h + 1), avatar, seen, stories);
+                                                }
+                                            }
+                                        }
+                                        org.json.JSONArray spotHl = pp.optJSONArray("spotlightHighlights");
+                                        if (spotHl != null) {
+                                            for (int h = 0; h < spotHl.length(); h++) {
+                                                org.json.JSONObject hlObj = spotHl.optJSONObject(h);
+                                                if (hlObj != null) {
+                                                    appendSnapchatSnapList(hlObj.optJSONArray("snapList"), detectedUser, "spot" + (h + 1), avatar, seen, stories);
+                                                }
+                                            }
+                                        }
+                                    }
+                                } catch (Exception ex) {
+                                    Log.w(TAG, "Snapchat __NEXT_DATA__ parse warning: " + ex.getMessage());
+                                }
+                            }
+
+                            if (stories.length() == 0) {
+                                Matcher mv = Pattern.compile("<meta[^>]+property=[\"']og:video(?::secure_url|:url)?[\"'][^>]+content=[\"']([^\"']+)[\"']", Pattern.CASE_INSENSITIVE).matcher(html);
+                                if (mv.find()) {
+                                    String vUrl = mv.group(1).replace("&amp;", "&");
+                                    JSObject item = new JSObject();
+                                    item.put("id", "snap_og_1");
+                                    item.put("type", "video");
+                                    item.put("url", vUrl);
+                                    item.put("thumbnail", "");
+                                    item.put("ext", "mp4");
+                                    item.put("filename", sanitizeFilename("Snapchat_" + detectedUser + "_1.mp4", vUrl));
+                                    stories.put(item);
+                                }
+                            }
+                            if (stories.length() > 0) break;
+                        }
+                    }
+
+                    // 2. INSTAGRAM & FACEBOOK STORIES (Native Mobile HTML + Embedded JSON Extractor)
+                    if ("instagram".equals(plat) || "facebook".equals(plat)) {
+                        String targetUrl = rawInput;
+                        if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
+                            detectedUser = rawInput.replaceFirst("^@", "").split("[/?#]")[0].trim();
+                            targetUrl = "instagram".equals(plat)
+                                ? "https://www.instagram.com/stories/" + URLEncoder.encode(detectedUser, "UTF-8") + "/"
+                                : "https://www.facebook.com/stories/" + URLEncoder.encode(detectedUser, "UTF-8") + "/";
+                        }
+
+                        String html = fetchHtmlString(targetUrl, "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1");
+                        if (!html.isEmpty()) {
+                            Pattern pJsonVid = Pattern.compile("\"(?:browser_native_hd_url|playable_url_quality_hd|browser_native_sd_url|playable_url|video_url)\":\"(https:[^\"\\\\]+)\"");
+                            Matcher mJsonVid = pJsonVid.matcher(html);
+                            while (mJsonVid.find()) {
+                                String vUrl = mJsonVid.group(1).replace("\\/", "/").replace("\\u0026", "&").replace("\\u0025", "%");
+                                if (!seen.contains(vUrl)) {
+                                    seen.add(vUrl);
+                                    JSObject item = new JSObject();
+                                    item.put("id", plat + "_vid_" + stories.length());
+                                    item.put("type", "video");
+                                    item.put("url", vUrl);
+                                    item.put("thumbnail", "");
+                                    item.put("ext", "mp4");
+                                    String label = "instagram".equals(plat) ? "Instagram" : "Facebook";
+                                    item.put("filename", sanitizeFilename(label + "_Story_" + (stories.length() + 1) + ".mp4", vUrl));
+                                    stories.put(item);
+                                }
+                            }
+
+                            if (stories.length() == 0) {
+                                Matcher mv = Pattern.compile("<meta[^>]+property=[\"']og:video(?::secure_url|:url)?[\"'][^>]+content=[\"']([^\"']+)[\"']", Pattern.CASE_INSENSITIVE).matcher(html);
+                                Matcher mi = Pattern.compile("<meta[^>]+property=[\"']og:image[\"'][^>]+content=[\"']([^\"']+)[\"']", Pattern.CASE_INSENSITIVE).matcher(html);
+                                String thumb = mi.find() ? mi.group(1).replace("&amp;", "&") : "";
+                                if (mv.find()) {
+                                    String vUrl = mv.group(1).replace("&amp;", "&");
+                                    JSObject item = new JSObject();
+                                    item.put("id", plat + "_og_vid");
+                                    item.put("type", "video");
+                                    item.put("url", vUrl);
+                                    item.put("thumbnail", thumb);
+                                    item.put("ext", "mp4");
+                                    String label = "instagram".equals(plat) ? "Instagram" : "Facebook";
+                                    item.put("filename", sanitizeFilename(label + "_Story_1.mp4", vUrl));
+                                    stories.put(item);
+                                }
+                            }
+                        }
+                    }
+
+                    JSObject ret = new JSObject();
+                    ret.put("ok", stories.length() > 0);
+                    ret.put("platform", plat);
+                    ret.put("username", detectedUser);
+                    ret.put("stories", stories);
+                    if (stories.length() == 0) {
+                        ret.put("needsAuth", "instagram".equals(plat) || "facebook".equals(plat));
+                    }
+                    call.resolve(ret);
+                } catch (Exception e) {
+                    Log.e(TAG, "resolveStories error", e);
+                    JSObject ret = new JSObject();
+                    ret.put("ok", false);
+                    ret.put("stories", new JSArray());
+                    ret.put("error", e.getMessage());
+                    call.resolve(ret);
                 }
             }
         }).start();

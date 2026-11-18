@@ -6,6 +6,7 @@
  */
 
 const BRIDGE_ADD = 'http://127.0.0.1:6824/add';
+const BRIDGE_ADD_BLOB = 'http://127.0.0.1:6824/add-blob';
 const BRIDGE_PING = 'http://127.0.0.1:6824/ping';
 
 async function getSettings() {
@@ -177,6 +178,23 @@ chrome.downloads.onCreated.addListener(async (downloadItem) => {
   }
 });
 
+async function sendBlobToTayyar(dataUrl, filename) {
+  if (!dataUrl || typeof dataUrl !== 'string') return false;
+  try {
+    const res = await fetch(BRIDGE_ADD_BLOB, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Tayyar': '1',
+      },
+      body: JSON.stringify({ dataUrl, filename: filename || `Story_${Date.now()}.mp4` }),
+    });
+    return res.ok;
+  } catch (_) {
+    return false;
+  }
+}
+
 // Message listener for popup & content scripts
 chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
   if (req.type === 'PING') {
@@ -185,6 +203,10 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
   }
   if (req.type === 'SEND_URL') {
     sendToTayyar(req.url, req.referer || sender?.tab?.url).then((ok) => sendResponse({ ok }));
+    return true;
+  }
+  if (req.type === 'SEND_BLOB') {
+    sendBlobToTayyar(req.dataUrl, req.filename).then((ok) => sendResponse({ ok }));
     return true;
   }
   if (req.type === 'GET_TAB_MEDIA') {
