@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Tayyar Mobile</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="theme-royal">
+  <!-- Ambient Apple Liquid Glass Top Atmospheric Aura -->
+  <div class="ambient-aura" aria-hidden="true"></div>
+
+  <!-- Inline Optical SVG Filter for subtle Apple Liquid Glass Specular Shimmer -->
+  <svg width="0" height="0" style="position:absolute;pointer-events:none;" aria-hidden="true">
+    <defs>
+      <filter id="liquidRefract" x="-15%" y="-15%" width="130%" height="130%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="0.4" result="blur" />
+        <feColorMatrix in="blur" type="matrix"
+          values="1 0 0 0 0
+                  0 1 0 0 0
+                  0 0 1 0 0
+                  0 0 0 1.08 0" />
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Collapsing Frosted Top Header (Appears smoothly on scroll like iOS / Quranify) -->
+  <header class="sticky-top-bar" id="stickyTopBar">
+    <div class="sticky-top-inner">
+      <div class="sticky-brand-dot"></div>
+      <span class="sticky-title" id="stickyTitle" data-i="tabHomeTitle">Tayyar</span>
+      <button class="sticky-lang-pill" id="btnTopLang" type="button" aria-label="Switch Language">AR</button>
+    </div>
+  </header>
+
+  <!-- Main Scrollable Viewport -->
+  <main class="app-scroll" id="appScroll">
+    <div class="app-container">
+
+      <!-- ==================== TAB 1: HOME (VIDEO & DIRECT DOWNLOADER) ==================== -->
+      <section class="tab-view active" id="tabHome" data-tab="home">
+        <div class="large-header-row">
+          <div>
+            <h1 class="large-title" data-i="appTitle">Tayyar</h1>
+            <p class="large-subtitle" data-i="homeSubtitle">Universal Liquid Glass Downloader</p>
+          </div>
+          <div class="header-pills">
+            <button class="glass-icon-pill" id="btnHeaderLang" type="button">
+              <span id="headerLangCode">AR</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Home Adaptive Split Grid (1 col Portrait, 2 col Landscape/Tablet) -->
+        <div class="home-split">
+          <!-- Left / Top Column: Smart URL Extractor Card -->
+          <div class="home-primary-col">
+            <div class="glass-hero-card">
+              <div class="hero-card-head">
+                <div class="hero-badge">
+                  <span class="pulse-dot"></span>
+                  <span data-i="engineReady">Turbo Engine Ready</span>
+                </div>
+                <span class="hero-ver">v1.0.9</span>
+              </div>
+
+              <div class="url-capsule">
+                <svg class="url-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                <input
+                  type="url"
+                  id="urlInput"
+                  class="url-field"
+                  autocomplete="off"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  data-i-placeholder="urlPlaceholder"
+                  placeholder="Paste TikTok, YouTube, Instagram, or file link..."
+                />
+                <button type="button" class="clear-x-btn" id="btnClearUrl" hidden aria-label="Clear">✕</button>
+              </div>
+
+              <div class="hero-action-row">
+                <button type="button" class="glass-btn secondary" id="btnPaste">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                    <rect x="8" y="2" width="8" height="4" rx="1"/>
+                  </svg>
+                  <span data-i="paste">Paste</span>
+                </button>
+                <button type="button" class="glass-btn primary" id="btnAnalyze">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  <span data-i="extractBtn">Analyze & Download</span>
+                </button>
+              </div>
+
+              <!-- Quick Stats Strip inside Hero -->
+              <div class="stats-strip">
+                <div class="stat-chip">
+                  <span class="stat-val" id="statActive">0</span>
+                  <span class="stat-lbl" data-i="statActive">Active</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-chip">
+                  <span class="stat-val" id="statDone">0</span>
+                  <span class="stat-lbl" data-i="statDone">Saved</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-chip">
+                  <span class="stat-val" id="statSpeed">0 KB/s</span>
+                  <span class="stat-lbl" data-i="statSpeed">Speed</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Analyzing Loader -->
+            <div class="glass-card loader-card" id="analyzeLoader" hidden>
+              <div class="liquid-spinner"></div>
+              <div class="loader-text" id="loaderText" data-i="analyzingStream">Extracting highest quality stream...</div>
+            </div>
+
+            <!-- Extracted Video / Media Preview Card -->
+            <div class="glass-card preview-card" id="previewCard" hidden>
+              <div class="preview-top">
+                <div class="preview-thumb-wrap">
+                  <img id="previewThumb" class="preview-thumb" src="" alt="" />
+                  <div class="preview-thumb-fallback" id="previewThumbFallback">🎬</div>
+                  <span class="preview-plat-tag" id="previewPlatTag">TikTok</span>
+                </div>
+                <div class="preview-meta">
+                  <h3 class="preview-title" id="previewTitle">Video Title</h3>
+                  <p class="preview-author" id="previewAuthor">Creator</p>
+                  <div class="preview-quality-badge" id="previewQualityBadge" data-i="noWatermarkBadge">No Watermark • Full Audio</div>
+                </div>
+              </div>
+
+              <div class="preview-btn-stack">
+                <button type="button" class="glass-btn primary full" id="btnDlVideo">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  <span data-i="dlFullVideo">Download Full Video (MP4 + Audio)</span>
+                </button>
+                <button type="button" class="glass-btn tinted full" id="btnDlAudio">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18V5l12-2v13"/>
+                    <circle cx="6" cy="18" r="3"/>
+                    <circle cx="18" cy="16" r="3"/>
+                  </svg>
+                  <span data-i="dlAudioOnly">Download Pure Audio (MP3)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right / Bottom Column: Supported Platforms Horizontal Strip + Recent -->
+          <div class="home-secondary-col">
+            <!-- Quick Platforms Horizontal Carousel (Quranify Reciters style) -->
+            <div class="section-row">
+              <h2 class="section-title" data-i="quickPlatforms">Quick Platforms</h2>
+              <button type="button" class="section-link" id="btnSeeAllPlatforms" data-i="seeAll">See all</button>
+            </div>
+            <div class="avatar-carousel" id="platformCarousel">
+              <button type="button" class="plat-avatar-item" data-plat="tiktok">
+                <div class="plat-orb orb-tiktok"><span>⚡</span></div>
+                <span class="plat-name">TikTok</span>
+              </button>
+              <button type="button" class="plat-avatar-item" data-plat="youtube">
+                <div class="plat-orb orb-youtube"><span>▶</span></div>
+                <span class="plat-name">YouTube</span>
+              </button>
+              <button type="button" class="plat-avatar-item" data-plat="instagram">
+                <div class="plat-orb orb-instagram"><span>📷</span></div>
+                <span class="plat-name">Instagram</span>
+              </button>
+              <button type="button" class="plat-avatar-item" data-plat="facebook">
+                <div class="plat-orb orb-facebook"><span>f</span></div>
+                <span class="plat-name">Facebook</span>
+              </button>
+              <button type="button" class="plat-avatar-item" data-plat="snapchat">
+                <div class="plat-orb orb-snapchat"><span>👻</span></div>
+                <span class="plat-name">Snapchat</span>
+              </button>
+              <button type="button" class="plat-avatar-item" data-plat="twitter">
+                <div class="plat-orb orb-twitter"><span>𝕏</span></div>
+                <span class="plat-name">Twitter / X</span>
+              </button>
+            </div>
+
+            <!-- Recent Downloads Preview -->
+            <div class="section-row" style="margin-top:22px;">
+              <h2 class="section-title" data-i="recentDownloads">Recent Downloads</h2>
+              <button type="button" class="section-link" id="btnSeeAllDownloads" data-i="seeAll">See all</button>
+            </div>
+            <div class="recent-list" id="homeRecentList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 2: PLATFORMS (QURANIFY BENTO MESH TILES) ==================== -->
+      <section class="tab-view" id="tabPlatforms" data-tab="platforms">
+        <div class="large-header-row">
+          <div>
+            <h1 class="large-title" data-i="platformsTitle">Platforms</h1>
+            <p class="large-subtitle" data-i="platformsSubtitle">Choose a source for 1-tap watermark-free saving</p>
+          </div>
+        </div>
+
+        <div class="mesh-bento-grid">
+          <button type="button" class="mesh-tile tile-tiktok" data-plat="tiktok">
+            <div class="tile-art art-rings"></div>
+            <div class="tile-icon-badge">⚡</div>
+            <div class="tile-bottom">
+              <span class="tile-sub" data-i="tileNoWm">No Watermark HD</span>
+              <span class="tile-title">TikTok</span>
+            </div>
+          </button>
+
+          <button type="button" class="mesh-tile tile-youtube" data-plat="youtube">
+            <div class="tile-art art-flower"></div>
+            <div class="tile-icon-badge">▶</div>
+            <div class="tile-bottom">
+              <span class="tile-sub" data-i="tileYtDesc">Video MP4 & MP3</span>
+              <span class="tile-title">YouTube</span>
+            </div>
+          </button>
+
+          <button type="button" class="mesh-tile tile-instagram" data-plat="instagram">
+            <div class="tile-art art-sunburst"></div>
+            <div class="tile-icon-badge">📷</div>
+            <div class="tile-bottom">
+              <span class="tile-sub" data-i="tileIgDesc">Reels & Stories</span>
+              <span class="tile-title">Instagram</span>
+            </div>
+          </button>
+
+          <button type="button" class="mesh-tile tile-facebook" data-plat="facebook">
+            <div class="tile-art art-waves"></div>
+            <div class="tile-icon-badge">f</div>
+            <div class="tile-bottom">
+              <span class="tile-sub" data-i="tileFbDesc">HD Watch & Reels</span>
+              <span class="tile-title">Facebook</span>
+            </div>
+          </button>
+
+          <button type="button" class="mesh-tile tile-snapchat" data-plat="snapchat">
+            <div class="tile-art art-rays"></div>
+            <div class="tile-icon-badge">👻</div>
+            <div class="tile-bottom">
+              <span class="tile-sub" data-i="tileSnapDesc">Spotlight Videos</span>
+              <span class="tile-title">Snapchat</span>
+            </div>
+          </button>
+
+          <button type="button" class="mesh-tile tile-twitter" data-plat="twitter">
+            <div class="tile-art art-rings"></div>
+            <div class="tile-icon-badge">𝕏</div>
+            <div class="tile-bottom">
+              <span class="tile-sub" data-i="tileXDesc">Direct HD MP4</span>
+              <span class="tile-title">Twitter / X</span>
+            </div>
+          </button>
+
+          <button type="button" class="mesh-tile tile-reddit" data-plat="reddit">
+            <div class="tile-art art-flower"></div>
+            <div class="tile-icon-badge">👽</div>
+            <div class="tile-bottom">
+              <span class="tile-sub" data-i="tileRedditDesc">Posts & Clips</span>
+              <span class="tile-title">Reddit</span>
+            </div>
+          </button>
+
+          <button type="button" class="mesh-tile tile-direct" data-plat="direct">
+            <div class="tile-art art-rays"></div>
+            <div class="tile-icon-badge">🚀</div>
+            <div class="tile-bottom">
+              <span class="tile-sub" data-i="tileDirectDesc">APK, ZIP, PDF, Any File</span>
+              <span class="tile-title" data-i="directFiles">Direct Files</span>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: DOWNLOADS ==================== -->
+      <section class="tab-view" id="tabDownloads" data-tab="downloads">
+        <div class="large-header-row">
+          <div>
+            <h1 class="large-title" data-i="downloadsTitle">Downloads</h1>
+            <p class="large-subtitle" data-i="downloadsSubtitle">Saved directly to Downloads/Tayyar & Gallery</p>
+          </div>
+          <button type="button" class="glass-icon-pill" id="btnClearDone" data-i-title="clearCompleted" title="Clear Completed">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px;">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6M14 11v6"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="filter-pills" id="dlFilterBar">
+          <button type="button" class="filter-pill active" data-filter="all">
+            <span data-i="filterAll">All</span> <span class="fp-count" id="cntAll">0</span>
+          </button>
+          <button type="button" class="filter-pill" data-filter="active">
+            <span data-i="filterActive">Active</span> <span class="fp-count" id="cntActive">0</span>
+          </button>
+          <button type="button" class="filter-pill" data-filter="completed">
+            <span data-i="filterCompleted">Saved</span> <span class="fp-count" id="cntDone">0</span>
+          </button>
+          <button type="button" class="filter-pill" data-filter="error">
+            <span data-i="filterFailed">Failed</span> <span class="fp-count" id="cntError">0</span>
+          </button>
+        </div>
+
+        <div class="downloads-list" id="downloadsList"></div>
+      </section>
+
+      <!-- ==================== TAB 4: SETTINGS (EXACT QURANIFY GROUPED IOS STYLE) ==================== -->
+      <section class="tab-view" id="tabSettings" data-tab="settings">
+        <div class="large-header-row">
+          <h1 class="large-title" data-i="settingsTitle">Settings</h1>
+        </div>
+
+        <div class="settings-grid">
+          <!-- Brand Identity Highlight Card -->
+          <div class="ios-card identity-card">
+            <div class="identity-logo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M12 3v13m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+              </svg>
+            </div>
+            <div class="identity-body">
+              <div class="identity-name">Tayyar Mobile <span class="ver-pill">v1.0.9</span></div>
+              <div class="identity-sub" data-i="identitySub">Apple Liquid Glass Edition • Native Android & iOS</div>
+            </div>
+          </div>
+
+          <!-- Group 1: Language & Appearance -->
+          <div class="ios-group-label" data-i="grpGeneral">Language & Appearance</div>
+          <div class="ios-card ios-list-group">
+            <div class="ios-row">
+              <div class="ios-row-left">
+                <span class="ios-ic">🌐</span>
+                <div>
+                  <div class="ios-row-title" data-i="languageLbl">Language</div>
+                  <div class="ios-row-hint" data-i="languageHint">Switch between full English & Arabic</div>
+                </div>
+              </div>
+              <div class="segmented-pill" id="langSegment">
+                <button type="button" class="seg-opt" data-lang="en">EN</button>
+                <button type="button" class="seg-opt" data-lang="ar">عربي</button>
+              </div>
+            </div>
+
+            <div class="ios-sep"></div>
+
+            <div class="ios-row">
+              <div class="ios-row-left">
+                <span class="ios-ic">✨</span>
+                <div>
+                  <div class="ios-row-title" data-i="auraThemeLbl">Liquid Glass Aura</div>
+                  <div class="ios-row-hint" data-i="auraThemeHint">Top atmospheric glow color</div>
+                </div>
+              </div>
+              <div class="aura-dots" id="auraPicker">
+                <button type="button" class="aura-dot active" data-aura="theme-royal" style="background:linear-gradient(135deg,#2563eb,#1e1b4b)" aria-label="Royal Blue"></button>
+                <button type="button" class="aura-dot" data-aura="theme-cyan" style="background:linear-gradient(135deg,#06b6d4,#0f172a)" aria-label="Liquid Cyan"></button>
+                <button type="button" class="aura-dot" data-aura="theme-violet" style="background:linear-gradient(135deg,#9333ea,#1e1b4b)" aria-label="Midnight Violet"></button>
+                <button type="button" class="aura-dot" data-aura="theme-oled" style="background:#111111" aria-label="Pure OLED"></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Group 2: Download Preferences -->
+          <div class="ios-group-label" data-i="grpDownload">Download Preferences</div>
+          <div class="ios-card ios-list-group">
+            <div class="ios-row">
+              <div class="ios-row-left">
+                <span class="ios-ic">🎬</span>
+                <div>
+                  <div class="ios-row-title" data-i="defaultFormatLbl">Default Mode</div>
+                  <div class="ios-row-hint" data-i="defaultFormatHint">Preferred stream when downloading</div>
+                </div>
+              </div>
+              <select class="ios-select" id="cfgDefaultFormat">
+                <option value="video" data-i="fmtVideoOpt">Video MP4</option>
+                <option value="audio" data-i="fmtAudioOpt">Audio MP3</option>
+              </select>
+            </div>
+
+            <div class="ios-sep"></div>
+
+            <div class="ios-row">
+              <div class="ios-row-left">
+                <span class="ios-ic">🖼️</span>
+                <div>
+                  <div class="ios-row-title" data-i="autoGalleryLbl">Save to Gallery</div>
+                  <div class="ios-row-hint" data-i="autoGalleryHint">Index videos immediately in Photos / Gallery</div>
+                </div>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="cfgAutoGallery" checked />
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <div class="ios-sep"></div>
+
+            <div class="ios-row">
+              <div class="ios-row-left">
+                <span class="ios-ic">📋</span>
+                <div>
+                  <div class="ios-row-title" data-i="autoAnalyzeLbl">Auto-Analyze on Paste</div>
+                  <div class="ios-row-hint" data-i="autoAnalyzeHint">Extract video immediately after pasting</div>
+                </div>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="cfgAutoAnalyze" checked />
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Group 3: App Updates (Strict Stable Default) -->
+          <div class="ios-group-label" data-i="grpUpdates">App Updates</div>
+          <div class="ios-card ios-list-group">
+            <div class="ios-row">
+              <div class="ios-row-left">
+                <span class="ios-ic">🛡️</span>
+                <div>
+                  <div class="ios-row-title" id="updStatusTitle" data-i="upToDate">Tayyar is up to date</div>
+                  <div class="ios-row-hint" id="updStatusDesc" data-i="upToDateDesc">Version 1.0.9 is the latest stable release.</div>
+                </div>
+              </div>
+              <button type="button" class="glass-btn sm secondary" id="btnCheckUpdate" data-i="check">Check</button>
+            </div>
+
+            <div class="ios-row" id="updActionRow" hidden>
+              <button type="button" class="glass-btn primary full" id="btnDownloadUpdate" data-i="updateNow">Download New Update</button>
+            </div>
+
+            <div class="ios-sep"></div>
+
+            <div class="ios-row">
+              <div class="ios-row-left">
+                <span class="ios-ic">📡</span>
+                <div>
+                  <div class="ios-row-title" data-i="updateChannelLbl">Update Channel</div>
+                  <div class="ios-row-hint" data-i="updateChannelHint">Stable releases recommended</div>
+                </div>
+              </div>
+              <select class="ios-select" id="cfgUpdateChannel">
+                <option value="stable" selected data-i="channelStable">Stable</option>
+                <option value="beta" data-i="channelBeta">Beta</option>
+              </select>
+            </div>
+
+            <div class="beta-note" id="betaChannelNote" hidden data-i="betaWarning">
+              Beta builds may be less stable. Switching back to Stable stops beta notifications.
+            </div>
+          </div>
+
+          <!-- Group 4: About -->
+          <div class="ios-group-label" data-i="grpAbout">About</div>
+          <div class="ios-card ios-list-group">
+            <a class="ios-row ios-link-row" href="https://github.com/mumenmahbuobeh/tayyar" target="_blank" rel="noopener">
+              <div class="ios-row-left">
+                <span class="ios-ic">💻</span>
+                <div>
+                  <div class="ios-row-title" data-i="githubRepo">GitHub Repository</div>
+                  <div class="ios-row-hint">mumenmahbuobeh/tayyar • MIT Open Source</div>
+                </div>
+              </div>
+              <span class="ios-chev">›</span>
+            </a>
+            <div class="ios-sep"></div>
+            <div class="ios-row">
+              <div class="ios-row-left">
+                <span class="ios-ic">👨‍💻</span>
+                <div>
+                  <div class="ios-row-title" data-i="developerLbl">Developer</div>
+                  <div class="ios-row-hint">Mu'men Mahbuobeh</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 5: SEARCH ==================== -->
+      <section class="tab-view" id="tabSearch" data-tab="search">
+        <div class="large-header-row">
+          <h1 class="large-title" data-i="searchTitle">Search</h1>
+        </div>
+
+        <div class="search-capsule">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="search"
+            id="searchInput"
+            class="search-field"
+            data-i-placeholder="searchPlaceholder"
+            placeholder="Search saved files or paste any video URL..."
+          />
+        </div>
+
+        <div class="search-results" id="searchResults"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==================== FLOATING LIQUID GLASS ACTIVE MINI-BAR (QURANIFY MINI-PLAYER STYLE) ==================== -->
+  <div class="floating-mini-bar" id="miniBar" hidden>
+    <div class="mini-bar-left" id="miniBarTap">
+      <div class="mini-art" id="miniArt">🎬</div>
+      <div class="mini-info">
+        <div class="mini-title" id="miniTitle">Downloading video...</div>
+        <div class="mini-sub" id="miniSub">0% • 0 KB/s</div>
+      </div>
+    </div>
+    <div class="mini-controls">
+      <button type="button" class="mini-btn" id="btnMiniCancel" aria-label="Cancel">✕</button>
+    </div>
+    <div class="mini-progress-line"><div class="mini-progress-fill" id="miniProgressFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- ==================== TRUE APPLE LIQUID GLASS FLOATING CAPSULE TAB BAR ==================== -->
+  <nav class="liquid-dock" id="liquidDock" aria-label="Main Navigation">
+    <!-- Interactive Draggable Chromatic Refraction Lens -->
+    <div class="liquid-lens" id="liquidLens" aria-hidden="true">
+      <div class="lens-prism"></div>
+      <div class="lens-specular"></div>
+    </div>
+
+    <button type="button" class="dock-tab active" data-tab="home" id="dockHome">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5H15v-6h-6v6H4.5A1.5 1.5 0 0 1 3 20v-9.5z"/>
+      </svg>
+      <span data-i="navHome">Home</span>
+    </button>
+
+    <button type="button" class="dock-tab" data-tab="platforms" id="dockPlatforms">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7.5" height="7.5" rx="2"/>
+        <rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/>
+        <rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/>
+        <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/>
+      </svg>
+      <span data-i="navPlatforms">Platforms</span>
+    </button>
+
+    <button type="button" class="dock-tab" data-tab="downloads" id="dockDownloads">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      <span class="dock-badge" id="dockBadge" hidden>0</span>
+      <span data-i="navDownloads">Downloads</span>
+    </button>
+
+    <button type="button" class="dock-tab" data-tab="settings" id="dockSettings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span data-i="navSettings">Settings</span>
+    </button>
+
+    <button type="button" class="dock-tab" data-tab="search" id="dockSearch">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7.5"/>
+        <line x1="20.5" y1="20.5" x2="16.4" y2="16.4"/>
+      </svg>
+      <span data-i="navSearch">Search</span>
+    </button>
+  </nav>
+
+  <!-- Liquid Glass Toast Pill -->
+  <div class="liquid-toast" id="liquidToast" hidden></div>
+
+  <script src="capacitor.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

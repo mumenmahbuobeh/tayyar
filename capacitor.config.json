@@ -1,8 +1,13 @@
 {
   "appId": "com.mahbuobeh.tayyar",
   "appName": "Tayyar",
-  "webDir": "renderer",
+  "webDir": "mobile",
   "server": {
     "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
   }
 }

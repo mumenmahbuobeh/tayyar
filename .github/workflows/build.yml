@@ -84,11 +84,11 @@ jobs:
         with:
           name: tayyar-desktop-${{ matrix.os }}
           path: |
-            dist/Tayyar-Setup-1.0.8.exe
-            dist/Tayyar-1.0.8.exe
-            dist/Tayyar-1.0.8.dmg
-            dist/Tayyar-1.0.8.AppImage
-            dist/tayyar_1.0.8_amd64.deb
+            dist/Tayyar-Setup-1.0.9.exe
+            dist/Tayyar-1.0.9.exe
+            dist/Tayyar-1.0.9.dmg
+            dist/Tayyar-1.0.9.AppImage
+            dist/tayyar_1.0.9_amd64.deb
             dist/latest*.yml
           if-no-files-found: ignore
 
@@ -155,7 +155,7 @@ jobs:
           mkdir -p build-apk
           APK_FILE=$(find android/app/build/outputs/apk -type f -name "*.apk" | head -n 1)
           if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
-            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.8.apk
+            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.9.apk
           else
             echo "Error: APK file not found!" && exit 1
           fi
@@ -164,7 +164,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-android-apk
-          path: build-apk/Tayyar-Android-v1.0.8.apk
+          path: build-apk/Tayyar-Android-v1.0.9.apk
 
   build-ios:
     name: Build iOS Package
@@ -195,7 +195,7 @@ jobs:
           APP_PATH=$(find build/Build/Products -name "*.app" -type d | head -n 1)
           if [ -n "$APP_PATH" ] && [ -d "$APP_PATH" ]; then
             cp -r "$APP_PATH" build/Payload/
-            cd build && zip -r ../../../Tayyar-iOS-v1.0.8.ipa Payload
+            cd build && zip -r ../../../Tayyar-iOS-v1.0.9.ipa Payload
           else
             echo "Error: iOS .app bundle not found!" && exit 1
           fi
@@ -204,13 +204,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-ios-ipa
-          path: Tayyar-iOS-v1.0.8.ipa
+          path: Tayyar-iOS-v1.0.9.ipa
 
       - name: Attach iOS IPA to Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.8
-          files: Tayyar-iOS-v1.0.8.ipa
+          tag_name: v1.0.9
+          files: Tayyar-iOS-v1.0.9.ipa
           fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -238,7 +238,7 @@ jobs:
           cd final-release
           # Strip any blockmap files, old version assets, and duplicate space-separated filenames
           rm -f *.blockmap 2>/dev/null || true
-          rm -f *1.0.0* *1.0.5* *1.0.6* *1.0.7* 2>/dev/null || true
+          rm -f *1.0.0* *1.0.5* *1.0.6* *1.0.7* *1.0.8* 2>/dev/null || true
           find . -type f -name "* *" -delete 2>/dev/null || true
           echo "Curated Final Release Assets (Strictly 1 Clean Binary per Platform):"
           ls -la
@@ -249,7 +249,7 @@ jobs:
         run: |
           echo "Scanning GitHub releases for obsolete or duplicate assets..."
           curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases" | \
-          jq -r '.[] | .assets[]? | select((.name | test("1\\.0\\.8") | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
+          jq -r '.[] | .assets[]? | select((.name | test("1\\.0\\.9") | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
             if [ -n "$asset_id" ] && [ -n "$asset_name" ]; then
               echo "Withdrawing & deleting unwanted release asset: $asset_name (ID: $asset_id)"
               curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" || true
@@ -259,28 +259,28 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.8
-          name: "Tayyar v1.0.8 — Multiplatform Release (Windows, Linux, macOS, Android, iOS)"
+          tag_name: v1.0.9
+          name: "Tayyar v1.0.9 — Multiplatform Release (Windows, Linux, macOS, Android, iOS)"
           body: |
-            ## 🚀 Tayyar Download Manager v1.0.8
+            ## 🚀 Tayyar Download Manager v1.0.9
 
             Universal high-speed multi-connection download manager designed and developed by **Mu'men Mahbuobeh**.
 
             ### 📦 Download Packages (Official & Clean Binaries)
             * **Windows:**
-              * [Tayyar-Setup-1.0.8.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.8/Tayyar-Setup-1.0.8.exe) (Installer with Bundled Media Engine)
-              * [Tayyar-1.0.8.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.8/Tayyar-1.0.8.exe) (Portable Executable)
+              * [Tayyar-Setup-1.0.9.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.9/Tayyar-Setup-1.0.9.exe) (Installer with Bundled Media Engine)
+              * [Tayyar-1.0.9.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.9/Tayyar-1.0.9.exe) (Portable Executable)
             * **Android:**
-              * [Tayyar-Android-v1.0.8.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.8/Tayyar-Android-v1.0.8.apk) (Android 7.0+ with Dedicated Mobile UI & Gallery Saver)
+              * [Tayyar-Android-v1.0.9.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.9/Tayyar-Android-v1.0.9.apk) (Android 7.0+ with Dedicated Mobile UI & Gallery Saver)
             * **iOS (Apple iPhone/iPad):**
-              * [Tayyar-iOS-v1.0.8.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.8/Tayyar-iOS-v1.0.8.ipa) (Sideload / AltStore / TrollStore / LiveContainer)
+              * [Tayyar-iOS-v1.0.9.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.9/Tayyar-iOS-v1.0.9.ipa) (Sideload / AltStore / TrollStore / LiveContainer)
             * **macOS:**
-              * [Tayyar-1.0.8.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.8/Tayyar-1.0.8.dmg) (Apple Silicon & Intel)
+              * [Tayyar-1.0.9.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.9/Tayyar-1.0.9.dmg) (Apple Silicon & Intel)
             * **Linux:**
-              * [Tayyar-1.0.8.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.8/Tayyar-1.0.8.AppImage)
-              * [tayyar_1.0.8_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.8/tayyar_1.0.8_amd64.deb)
+              * [Tayyar-1.0.9.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.9/Tayyar-1.0.9.AppImage)
+              * [tayyar_1.0.9_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.9/tayyar_1.0.9_amd64.deb)
 
-            ### ✨ Key Features in v1.0.8
+            ### ✨ Key Features in v1.0.9
             * **Dedicated Mobile Experience:** Liquid Glass bottom navigation bar with dedicated 1-tap Social Video Downloader Hub.
             * **Full Audio+Video Stream Muxing:** Progressive download for TikTok, YouTube, Instagram, and Facebook with zero watermark and complete sound.
             * **Android Gallery Integration:** Automatically registers downloaded videos directly into the phone's native Gallery / الاستوديو.
