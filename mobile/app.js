@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.9';
+  const APP_VERSION = '1.0.10';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura';
@@ -56,6 +56,8 @@
       languageHint: 'Switch between full English & Arabic',
       auraThemeLbl: 'Liquid Glass Aura',
       auraThemeHint: 'Top atmospheric glow color',
+      spatialPhysicsLbl: 'Antigravity 3D Physics',
+      spatialPhysicsHint: 'Weightless floating inertia, tilt & glass refraction',
       grpDownload: 'Download Preferences',
       defaultFormatLbl: 'Default Mode',
       defaultFormatHint: 'Preferred stream when downloading',
@@ -155,6 +157,8 @@
       languageHint: 'التبديل بين العربية الكاملة والإنجليزية الكاملة',
       auraThemeLbl: 'هالة الزجاج السائل',
       auraThemeHint: 'لون الإضاءة العلوية للواجهة',
+      spatialPhysicsLbl: 'فيزياء Antigravity ثلاثية الأبعاد',
+      spatialPhysicsHint: 'طفو انسيابي، إمالة تفاعلية، وانكسار ضوئي للزجاج',
       grpDownload: 'تفضيلات التحميل',
       defaultFormatLbl: 'الوضع الافتراضي',
       defaultFormatHint: 'الصيغة المفضلة عند التحميل',
@@ -218,11 +222,12 @@
     lang: 'en',
     activeTab: 'home',
     filter: 'all',
-    aura: 'theme-royal',
+    aura: 'theme-spatial',
     prefs: {
       defaultFormat: 'video',
       autoGallery: true,
       autoAnalyze: true,
+      spatialPhysics: true,
     },
     downloads: [],
     currentResolved: null,
@@ -341,11 +346,12 @@
   }
 
   function applyAura(auraClass) {
-    state.aura = auraClass;
-    document.body.className = auraClass;
-    try { localStorage.setItem(STORAGE_KEY_AURA, auraClass); } catch (_) {}
+    state.aura = auraClass || 'theme-spatial';
+    document.body.classList.remove('theme-spatial', 'theme-royal', 'theme-cyan', 'theme-violet', 'theme-oled');
+    document.body.classList.add(state.aura);
+    try { localStorage.setItem(STORAGE_KEY_AURA, state.aura); } catch (_) {}
     $$('#auraPicker .aura-dot').forEach((d) => {
-      d.classList.toggle('active', d.dataset.aura === auraClass);
+      d.classList.toggle('active', d.dataset.aura === state.aura);
     });
   }
 
@@ -1414,14 +1420,160 @@
     }
   });
 
+  /* ==================== 60FPS ANTIGRAVITY SPATIAL PHYSICS ENGINE ==================== */
+  const cfgSpatialPhysics = $('#cfgSpatialPhysics');
+
+  function applySpatialPhysicsPref(enabled) {
+    state.prefs.spatialPhysics = !!enabled;
+    document.body.classList.toggle('no-spatial-physics', !enabled);
+    if (!enabled) {
+      $$('.mesh-tile, .glass-hero-card').forEach((el) => {
+        el.style.transform = '';
+      });
+    }
+  }
+
+  cfgSpatialPhysics?.addEventListener('change', () => {
+    applySpatialPhysicsPref(cfgSpatialPhysics.checked);
+    savePrefs();
+  });
+
+  function initAntigravityPhysics() {
+    const pointer = { x: -9999, y: -9999, active: false };
+    const physicsNodes = [];
+
+    // Register interactive spatial floating elements
+    $$('.mesh-tile, .glass-hero-card').forEach((el, idx) => {
+      physicsNodes.push({
+        el,
+        phase: idx * 0.9,
+        x: 0, y: 0,
+        vx: 0, vy: 0,
+        rx: 0, ry: 0,
+        vrx: 0, vry: 0,
+        isHero: el.classList.contains('glass-hero-card'),
+      });
+    });
+
+    const updatePointer = (x, y, active) => {
+      pointer.x = x;
+      pointer.y = y;
+      pointer.active = active;
+      if (active) {
+        const lx = Math.max(5, Math.min(95, (x / window.innerWidth) * 100));
+        const ly = Math.max(5, Math.min(95, (y / window.innerHeight) * 100));
+        document.documentElement.style.setProperty('--light-x', `${lx.toFixed(1)}%`);
+        document.documentElement.style.setProperty('--light-y', `${ly.toFixed(1)}%`);
+      }
+    };
+
+    window.addEventListener('pointermove', (e) => {
+      if (!state.prefs.spatialPhysics) return;
+      updatePointer(e.clientX, e.clientY, true);
+    }, { passive: true });
+
+    window.addEventListener('pointerdown', (e) => {
+      if (!state.prefs.spatialPhysics) return;
+      updatePointer(e.clientX, e.clientY, true);
+    }, { passive: true });
+
+    window.addEventListener('pointerup', () => {
+      pointer.active = false;
+    }, { passive: true });
+
+    window.addEventListener('pointercancel', () => {
+      pointer.active = false;
+    }, { passive: true });
+
+    // Real Gyroscope Parallax & Specular Light Shift on Android & iOS
+    window.addEventListener('deviceorientation', (e) => {
+      if (!state.prefs.spatialPhysics || e.gamma == null || e.beta == null) return;
+      const gx = Math.max(-22, Math.min(22, (e.gamma || 0) * 0.55));
+      const gy = Math.max(-22, Math.min(22, ((e.beta || 45) - 45) * 0.45));
+      document.documentElement.style.setProperty('--gyro-x', `${gx.toFixed(1)}px`);
+      document.documentElement.style.setProperty('--gyro-y', `${gy.toFixed(1)}px`);
+      if (!pointer.active) {
+        const lx = Math.max(10, Math.min(90, 50 + gx * 1.4));
+        const ly = Math.max(10, Math.min(90, 35 + gy * 1.4));
+        document.documentElement.style.setProperty('--light-x', `${lx.toFixed(1)}%`);
+        document.documentElement.style.setProperty('--light-y', `${ly.toFixed(1)}%`);
+      }
+    }, { passive: true });
+
+    // 60fps Weightless Spring-Inertia & Repulsion Loop
+    const STIFFNESS = 0.085;
+    const DAMPING = 0.78;
+    let tNow = 0;
+
+    function tick() {
+      requestAnimationFrame(tick);
+      if (document.hidden || !state.prefs.spatialPhysics) return;
+      tNow += 0.016;
+
+      for (let i = 0; i < physicsNodes.length; i++) {
+        const n = physicsNodes[i];
+        const view = n.el.closest('.tab-view');
+        if (!view || !view.classList.contains('active')) continue;
+
+        // Subtle zero-gravity sinusoidal micro-drift
+        const floatAmp = n.isHero ? 1.6 : 2.4;
+        let targetX = Math.cos(tNow * 0.7 + n.phase) * (floatAmp * 0.45);
+        let targetY = Math.sin(tNow * 0.95 + n.phase) * floatAmp;
+        let targetRx = 0;
+        let targetRy = 0;
+
+        if (pointer.active) {
+          const r = n.el.getBoundingClientRect();
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          const dx = cx - pointer.x;
+          const dy = cy - pointer.y;
+          const dist = Math.hypot(dx, dy);
+          const radius = n.isHero ? 260 : 210;
+
+          if (dist < radius && dist > 1) {
+            const force = (1 - dist / radius);
+            if (!n.isHero) {
+              // Subtle spatial repulsion push on nearby floating tiles
+              const push = force * 6.5;
+              targetX += (dx / dist) * push;
+              targetY += (dy / dist) * push;
+            }
+            // Smooth 3D specular glass tilt toward/away from finger force
+            const maxTilt = n.isHero ? 3.2 : 6.0;
+            targetRy = Math.max(-maxTilt, Math.min(maxTilt, (-dx / (r.width / 2)) * maxTilt * force));
+            targetRx = Math.max(-maxTilt, Math.min(maxTilt, (dy / (r.height / 2)) * maxTilt * force));
+          }
+        }
+
+        // Spring-damped inertia physics
+        n.vx = (n.vx + (targetX - n.x) * STIFFNESS) * DAMPING;
+        n.vy = (n.vy + (targetY - n.y) * STIFFNESS) * DAMPING;
+        n.vrx = (n.vrx + (targetRx - n.rx) * STIFFNESS) * DAMPING;
+        n.vry = (n.vry + (targetRy - n.ry) * STIFFNESS) * DAMPING;
+
+        n.x += n.vx;
+        n.y += n.vy;
+        n.rx += n.vrx;
+        n.ry += n.vry;
+
+        n.el.style.transform = `translate3d(${n.x.toFixed(2)}px, ${n.y.toFixed(2)}px, 0) rotateX(${n.rx.toFixed(2)}deg) rotateY(${n.ry.toFixed(2)}deg)`;
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
   /* ==================== BOOTSTRAP ==================== */
   function init() {
     loadStorage();
     applyAura(state.aura);
+    applySpatialPhysicsPref(state.prefs.spatialPhysics !== false);
 
     if (cfgDefaultFormat) cfgDefaultFormat.value = state.prefs.defaultFormat;
     if (cfgAutoGallery) cfgAutoGallery.checked = state.prefs.autoGallery;
     if (cfgAutoAnalyze) cfgAutoAnalyze.checked = state.prefs.autoAnalyze;
+    if (cfgSpatialPhysics) cfgSpatialPhysics.checked = state.prefs.spatialPhysics !== false;
 
     syncChannelUI();
     applyLanguage(state.lang, true);
@@ -1436,6 +1588,7 @@
     });
 
     renderAllViews();
+    initAntigravityPhysics();
     requestAnimationFrame(() => snapLiquidLens(state.activeTab, false));
   }
 

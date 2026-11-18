@@ -9,9 +9,15 @@
   <title>Tayyar Mobile</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="theme-royal">
-  <!-- Ambient Apple Liquid Glass Top Atmospheric Aura -->
-  <div class="ambient-aura" aria-hidden="true"></div>
+<body class="theme-spatial">
+  <!-- Deep OLED #0A0A0C + Smooth Shifting Multi-Color Spatial Mesh Gradients -->
+  <div class="ambient-aura" aria-hidden="true">
+    <div class="spatial-mesh" id="spatialMesh">
+      <div class="mesh-orb mesh-orb-indigo"></div>
+      <div class="mesh-orb mesh-orb-cyan"></div>
+      <div class="mesh-orb mesh-orb-violet"></div>
+    </div>
+  </div>
 
   <!-- Inline Optical SVG Filter for subtle Apple Liquid Glass Specular Shimmer -->
   <svg width="0" height="0" style="position:absolute;pointer-events:none;" aria-hidden="true">
@@ -64,7 +70,7 @@
                   <span class="pulse-dot"></span>
                   <span data-i="engineReady">Turbo Engine Ready</span>
                 </div>
-                <span class="hero-ver">v1.0.9</span>
+                <span class="hero-ver">v1.0.10</span>
               </div>
 
               <div class="url-capsule">
@@ -341,7 +347,7 @@
               </svg>
             </div>
             <div class="identity-body">
-              <div class="identity-name">Tayyar Mobile <span class="ver-pill">v1.0.9</span></div>
+              <div class="identity-name">Tayyar Mobile <span class="ver-pill">v1.0.10</span></div>
               <div class="identity-sub" data-i="identitySub">Apple Liquid Glass Edition • Native Android & iOS</div>
             </div>
           </div>
@@ -374,11 +380,27 @@
                 </div>
               </div>
               <div class="aura-dots" id="auraPicker">
-                <button type="button" class="aura-dot active" data-aura="theme-royal" style="background:linear-gradient(135deg,#2563eb,#1e1b4b)" aria-label="Royal Blue"></button>
+                <button type="button" class="aura-dot active" data-aura="theme-spatial" style="background:linear-gradient(135deg,#00f2fe,#4f46e5,#9333ea)" aria-label="Antigravity Spatial"></button>
+                <button type="button" class="aura-dot" data-aura="theme-royal" style="background:linear-gradient(135deg,#2563eb,#1e1b4b)" aria-label="Royal Blue"></button>
                 <button type="button" class="aura-dot" data-aura="theme-cyan" style="background:linear-gradient(135deg,#06b6d4,#0f172a)" aria-label="Liquid Cyan"></button>
-                <button type="button" class="aura-dot" data-aura="theme-violet" style="background:linear-gradient(135deg,#9333ea,#1e1b4b)" aria-label="Midnight Violet"></button>
                 <button type="button" class="aura-dot" data-aura="theme-oled" style="background:#111111" aria-label="Pure OLED"></button>
               </div>
+            </div>
+
+            <div class="ios-sep"></div>
+
+            <div class="ios-row">
+              <div class="ios-row-left">
+                <span class="ios-ic">🪐</span>
+                <div>
+                  <div class="ios-row-title" data-i="spatialPhysicsLbl">Antigravity 3D Physics</div>
+                  <div class="ios-row-hint" data-i="spatialPhysicsHint">Weightless floating inertia, tilt & glass refraction</div>
+                </div>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="cfgSpatialPhysics" checked />
+                <span class="ios-slider"></span>
+              </label>
             </div>
           </div>
 
@@ -440,7 +462,7 @@
                 <span class="ios-ic">🛡️</span>
                 <div>
                   <div class="ios-row-title" id="updStatusTitle" data-i="upToDate">Tayyar is up to date</div>
-                  <div class="ios-row-hint" id="updStatusDesc" data-i="upToDateDesc">Version 1.0.9 is the latest stable release.</div>
+                  <div class="ios-row-hint" id="updStatusDesc" data-i="upToDateDesc">Version 1.0.10 is the latest stable release.</div>
                 </div>
               </div>
               <button type="button" class="glass-btn sm secondary" id="btnCheckUpdate" data-i="check">Check</button>
