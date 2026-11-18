@@ -206,15 +206,15 @@
                 <div class="dropdown-item" data-preset="balanced"><span data-i="presetBalanced">Balanced</span></div>
                 <div class="dropdown-item" data-preset="task"><span data-i="presetTask">Task Focus</span></div>
                 <div class="dropdown-item" data-preset="speed"><span data-i="presetSpeed">Speed Focus</span></div>
-                <div class="dropdown-item active" data-preset="compact"><span data-i="presetCompact">Compact</span> <svg viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5" class="check-ic">
+                <div class="dropdown-item active" data-preset="compact"><span data-i="presetCompact">Compact</span> <svg
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="check-ic">
                     <path d="M20 6L9 17l-5-5" />
                   </svg></div>
               </div>
             </div>
             <div class="custom-dropdown-wrap">
-              <button class="icon-btn-round" id="bAddWidget" data-i-title="addCardTitle" title="Manage Cards"><svg viewBox="0 0 24 24"
-                  stroke="currentColor" stroke-width="2.5" fill="none">
+              <button class="icon-btn-round" id="bAddWidget" data-i-title="addCardTitle" title="Manage Cards"><svg
+                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none">
                   <path d="M12 5v14M5 12h14" />
                 </svg></button>
               <div class="dropdown-popover widget-picker-popover" id="widgetPickerPopover" hidden>
@@ -225,7 +225,8 @@
           </div>
 
           <div class="header-actions" id="standardDashActions">
-            <button class="icon-btn-ghost" id="bToggleCustomize" data-i-title="customizeLayout" title="Customize Layout">
+            <button class="icon-btn-ghost" id="bToggleCustomize" data-i-title="customizeLayout"
+              title="Customize Layout">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
               </svg>
@@ -249,7 +250,7 @@
             </div>
             <div class="card-main-val" id="engineStatusVal" data-i="ready">Ready</div>
             <div class="card-footer">
-              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.11</span>
+              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.12</span>
               <span class="status-indicator online" id="engineStatusDot"></span>
             </div>
           </div>
@@ -483,7 +484,8 @@
         <header class="view-header">
           <div>
             <h1 class="view-title" data-i="socialHubTitle">Social Video Downloader</h1>
-            <p class="view-subtitle" data-i="socialHubSubtitle">Download videos, Reels, and Shorts without watermarks in ultra-HD with full audio merging</p>
+            <p class="view-subtitle" data-i="socialHubSubtitle">Download videos, Reels, and Shorts without watermarks in
+              ultra-HD with full audio merging</p>
           </div>
         </header>
 
@@ -501,14 +503,22 @@
         <!-- Input Glass Card -->
         <div class="social-input-card glass-panel">
           <div class="social-input-group">
-            <input type="text" id="socialHubUrlInput" class="social-url-field" data-i-placeholder="socialUrlPlaceholder" placeholder="Paste video link from YouTube, TikTok, Instagram, Facebook..." />
-            <button type="button" id="btnSocialHubPaste" class="pill-btn glass-btn" data-i-title="pasteTitle" title="Paste from clipboard">
-              <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            <input type="text" id="socialHubUrlInput" class="social-url-field" data-i-placeholder="socialUrlPlaceholder"
+              placeholder="Paste video link from YouTube, TikTok, Instagram, Facebook..." />
+            <button type="button" id="btnSocialHubPaste" class="pill-btn glass-btn" data-i-title="pasteTitle"
+              title="Paste from clipboard">
+              <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              </svg>
               <span data-i="paste">Paste</span>
             </button>
           </div>
           <button type="button" id="btnSocialHubAnalyze" class="pill-btn primary full-width">
-            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <span id="btnSocialHubAnalyzeText" data-i="analyzeExtractBtn">Analyze & Extract Video</span>
           </button>
         </div>
@@ -516,7 +526,8 @@
         <!-- Analyzing Spinner -->
         <div class="social-loader-card glass-panel" id="socialHubLoader" hidden>
           <div class="spinner"></div>
-          <p id="socialHubLoaderText" data-i="analyzingStream">Analyzing link and extracting high-definition stream...</p>
+          <p id="socialHubLoaderText" data-i="analyzingStream">Analyzing link and extracting high-definition stream...
+          </p>
         </div>
 
         <!-- Video Preview Result Card -->
@@ -531,11 +542,17 @@
 
             <div class="preview-actions">
               <button type="button" id="btnDownloadFullVideo" class="pill-btn primary">
-                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
                 <span data-i="downloadFullVideo">🎬 Download Full Video (Audio + Video MP4)</span>
               </button>
               <button type="button" id="btnDownloadAudioOnly" class="pill-btn secondary">
-                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+                  <path d="M9 18V5l12-2v13"></path>
+                  <circle cx="6" cy="18" r="3"></circle>
+                  <circle cx="18" cy="16" r="3"></circle>
+                </svg>
                 <span data-i="downloadAudioOnly">🎵 Download Audio Only (Pure MP3)</span>
               </button>
             </div>
@@ -559,11 +576,15 @@
 
         <!-- Quick Tips Card -->
         <div class="social-tips-card glass-panel">
-          <h4 style="margin:0 0 8px 0; font-size:14px; color:var(--accent);" data-i="socialTipsTitle">💡 Tayyar Download Highlights:</h4>
+          <h4 style="margin:0 0 8px 0; font-size:14px; color:var(--accent);" data-i="socialTipsTitle">💡 Tayyar Download
+            Highlights:</h4>
           <ul style="margin:0; padding-inline-start:18px; font-size:12.5px; color:var(--text-dim); line-height:1.7;">
-            <li><strong data-i="socialTip1Title">No Watermark:</strong> <span data-i="socialTip1Desc">Direct downloads from TikTok, Instagram, Facebook, and Snapchat without logos or watermarks.</span></li>
-            <li><strong data-i="socialTip2Title">Auto Audio Merging:</strong> <span data-i="socialTip2Desc">Lossless automatic video & audio muxing up to Full HD and 4K Ultra HD.</span></li>
-            <li><strong data-i="socialTip3Title">Instant Gallery Save:</strong> <span data-i="socialTip3Desc">On Android, downloaded videos are saved directly to Downloads and indexed in your Gallery.</span></li>
+            <li><strong data-i="socialTip1Title">No Watermark:</strong> <span data-i="socialTip1Desc">Direct downloads
+                from TikTok, Instagram, Facebook, and Snapchat without logos or watermarks.</span></li>
+            <li><strong data-i="socialTip2Title">Auto Audio Merging:</strong> <span data-i="socialTip2Desc">Lossless
+                automatic video & audio muxing up to Full HD and 4K Ultra HD.</span></li>
+            <li><strong data-i="socialTip3Title">Instant Gallery Save:</strong> <span data-i="socialTip3Desc">On
+                Android, downloaded videos are saved directly to Downloads and indexed in your Gallery.</span></li>
           </ul>
         </div>
       </section>
@@ -641,21 +662,22 @@
         <header class="view-header">
           <h1 class="view-title" data-i="plugins">Plugins</h1>
           <div class="header-actions">
-            <button class="icon-btn-ghost" id="bAddPlugin" title="Add plugin / إضافة ملحق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2.5">
+            <button class="icon-btn-ghost" id="bAddPlugin" title="Add plugin / إضافة ملحق"><svg viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M12 5v14M5 12h14" />
               </svg></button>
-            <button class="icon-btn-ghost" id="bBrowseOfficialPlugins" title="Browse Verified Plugins (Tayyar Ecosystem)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
+            <button class="icon-btn-ghost" id="bBrowseOfficialPlugins"
+              title="Browse Verified Plugins (Tayyar Ecosystem)"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path
                   d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
               </svg></button>
-            <button class="icon-btn-ghost" id="bRefreshPlugins" title="Refresh / تحديث"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
+            <button class="icon-btn-ghost" id="bRefreshPlugins" title="Refresh / تحديث"><svg viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
               </svg></button>
-            <button class="icon-btn-ghost" id="bSearchPlugins" title="Search / بحث"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
+            <button class="icon-btn-ghost" id="bSearchPlugins" title="Search / بحث"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="6" />
                 <path d="M20 20l-4.5-4.5" />
               </svg></button>
@@ -664,7 +686,8 @@
 
         <!-- Search bar -->
         <div id="pluginSearchWrap" class="plugin-search-wrap" hidden>
-          <input type="text" id="pluginSearchInput" class="probe-input" placeholder="Search installed or available plugins...">
+          <input type="text" id="pluginSearchInput" class="probe-input"
+            placeholder="Search installed or available plugins...">
         </div>
 
         <!-- Trust notice banner -->
@@ -1190,13 +1213,16 @@
             Games-ROMs).</div>
         </label>
 
-        <div class="settings-group-title" style="margin-top:20px;" data-i="socialEngineTitle">Social Media & Video Downloader</div>
+        <div class="settings-group-title" style="margin-top:20px;" data-i="socialEngineTitle">Social Media & Video
+          Downloader</div>
         <div class="setting-toggle-row">
           <div>
             <span data-i="socialNoWatermark">No Watermark for TikTok & Shorts</span>
-            <div class="row-hint" data-i="socialNoWatermarkHint">Automatically extract watermark-free HD video for TikTok, Shorts, and Reels.</div>
+            <div class="row-hint" data-i="socialNoWatermarkHint">Automatically extract watermark-free HD video for
+              TikTok, Shorts, and Reels.</div>
           </div>
-          <label class="switch-toggle"><input type="checkbox" id="cfgSocialNoWatermark" checked><span class="switch-slider"></span></label>
+          <label class="switch-toggle"><input type="checkbox" id="cfgSocialNoWatermark" checked><span
+              class="switch-slider"></span></label>
         </div>
         <div class="setting-toggle-row" style="margin-top:10px;">
           <div>
@@ -1531,7 +1557,7 @@
             </svg>
           </div>
           <div class="about-hero-details">
-            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.11</span></h2>
+            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.12</span></h2>
             <p class="about-tagline" data-i="aboutTagline">Before content collapses, preserve what truly matters, let
               beauty enter your orbit of preservation.</p>
             <div class="about-dev-by">
@@ -1566,7 +1592,8 @@
           <div class="updates-status-row">
             <div>
               <h4 class="update-title" id="updateTitleText" data-i="upToDate">Tayyar is up to date</h4>
-              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.11 is the latest available release.</div>
+              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.12 is the latest available
+                release.</div>
             </div>
             <div class="update-actions">
               <button class="pill-btn light sm" id="bCheckUpdate">
@@ -1577,7 +1604,12 @@
                 <span data-i="check">Check</span>
               </button>
               <button class="pill-btn primary sm" id="bInstallUpdate" style="display:none;">
-                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" style="width:13px;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                  style="width:13px;margin-right:4px;">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
                 <span id="bInstallUpdateText">Update Now</span>
               </button>
               <select class="styled-select sm" id="cfgChannel">
@@ -1588,15 +1620,22 @@
           </div>
 
           <!-- Direct In-App Update Progress & Actions -->
-          <div id="updateProgressWrap" class="update-progress-card" style="display:none;margin-top:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:14px 16px;">
+          <div id="updateProgressWrap" class="update-progress-card"
+            style="display:none;margin-top:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:14px 16px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <span id="updateProgressStatus" style="font-size:13px;font-weight:600;color:#fff;">Downloading update directly...</span>
-              <span id="updateProgressPct" style="font-size:13px;font-family:monospace;font-weight:700;color:var(--color-cyan);">0%</span>
+              <span id="updateProgressStatus" style="font-size:13px;font-weight:600;color:#fff;">Downloading update
+                directly...</span>
+              <span id="updateProgressPct"
+                style="font-size:13px;font-family:monospace;font-weight:700;color:var(--color-cyan);">0%</span>
             </div>
-            <div class="progress-bar-bg" style="height:7px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden;">
-              <div id="updateProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg, #06b6d4, #10b981);box-shadow:0 0 10px rgba(6,182,212,0.5);transition:width 0.15s ease;"></div>
+            <div class="progress-bar-bg"
+              style="height:7px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden;">
+              <div id="updateProgressBar"
+                style="height:100%;width:0%;background:linear-gradient(90deg, #06b6d4, #10b981);box-shadow:0 0 10px rgba(6,182,212,0.5);transition:width 0.15s ease;">
+              </div>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11.5px;color:var(--text-muted);">
+            <div
+              style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11.5px;color:var(--text-muted);">
               <span id="updateProgressSpeed">0 KB/s</span>
               <span id="updateProgressSize">0 MB / 0 MB</span>
             </div>
@@ -1671,10 +1710,15 @@
             <span class="switch-slider"></span>
           </label>
           <button type="button" class="icon-btn-ghost" id="bCopyPluginUrl" title="Share plugin link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+            </svg>
           </button>
           <button type="button" class="icon-btn-ghost" id="bReloadPlugin" title="Reload plugin">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+            </svg>
           </button>
           <button type="button" class="icon-btn-ghost modal-close" id="bClosePluginDetail" title="Close">✕</button>
         </div>
@@ -1701,7 +1745,10 @@
             </div>
             <p class="plugin-desc" id="pluginDetailDesc" style="margin-top:12px;font-size:13.5px;line-height:1.6;"></p>
             <div class="plugin-notice-box" id="pluginDetailNotice">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4M12 8h.01" />
+              </svg>
               <span id="pluginDetailNoticeText"></span>
             </div>
             <div class="plugin-info-grid">
@@ -1720,7 +1767,8 @@
                 </div>
               </div>
             </div>
-            <div class="plugin-overview-actions" style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
+            <div class="plugin-overview-actions"
+              style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
               <div style="display:flex;gap:10px;">
                 <button type="button" class="pill-btn outline sm" id="bPluginGoSettings">Configure Settings</button>
                 <button type="button" class="pill-btn outline sm" id="bPluginGoAccess">Permissions & Access</button>
@@ -1742,29 +1790,36 @@
             <div class="setting-toggle-row">
               <div>
                 <div style="font-weight:600;font-size:13.5px;color:#fff;">Read websites & intercept file downloads</div>
-                <div style="font-size:12px;color:var(--text-dim);">Allows the plugin to resolve URLs from supported domains.</div>
+                <div style="font-size:12px;color:var(--text-dim);">Allows the plugin to resolve URLs from supported
+                  domains.</div>
               </div>
-              <label class="switch-toggle"><input type="checkbox" id="permReadWeb" checked><span class="switch-slider"></span></label>
+              <label class="switch-toggle"><input type="checkbox" id="permReadWeb" checked><span
+                  class="switch-slider"></span></label>
             </div>
             <div class="setting-toggle-row">
               <div>
                 <div style="font-weight:600;font-size:13.5px;color:#fff;">File system & storage management</div>
-                <div style="font-size:12px;color:var(--text-dim);">Allows routing files into categories and applying template names.</div>
+                <div style="font-size:12px;color:var(--text-dim);">Allows routing files into categories and applying
+                  template names.</div>
               </div>
-              <label class="switch-toggle"><input type="checkbox" id="permStorage" checked><span class="switch-slider"></span></label>
+              <label class="switch-toggle"><input type="checkbox" id="permStorage" checked><span
+                  class="switch-slider"></span></label>
             </div>
             <div class="setting-toggle-row">
               <div>
                 <div style="font-weight:600;font-size:13.5px;color:#fff;">Clipboard monitoring</div>
                 <div style="font-size:12px;color:var(--text-dim);">Automatically resolve copied media links.</div>
               </div>
-              <label class="switch-toggle"><input type="checkbox" id="permClipboard" checked><span class="switch-slider"></span></label>
+              <label class="switch-toggle"><input type="checkbox" id="permClipboard" checked><span
+                  class="switch-slider"></span></label>
             </div>
 
-            <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;">
+            <div
+              style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;">
               <div>
                 <div style="font-size:13px;font-weight:600;color:var(--color-red);">Uninstall plugin</div>
-                <div style="font-size:12px;color:var(--text-dim);">Remove plugin and revert to default download handling.</div>
+                <div style="font-size:12px;color:var(--text-dim);">Remove plugin and revert to default download
+                  handling.</div>
               </div>
               <button type="button" class="pill-btn danger sm" id="bUninstallPlugin">Uninstall</button>
             </div>
@@ -1784,10 +1839,12 @@
       <div class="modal-body">
         <label class="field-label">
           <span>GitHub Repository or Plugin Manifest URL</span>
-          <input type="text" id="pluginInstallUrlInput" class="probe-input" placeholder="e.g. tayyar/plugin-filename-template or https://...">
+          <input type="text" id="pluginInstallUrlInput" class="probe-input"
+            placeholder="e.g. tayyar/plugin-filename-template or https://...">
         </label>
         <div style="margin-top:12px;font-size:12.5px;color:var(--text-dim);line-height:1.5;">
-          You can install verified Tayyar extensions or provide any compatible <code>.moext</code> bundle or GitHub release repository.
+          You can install verified Tayyar extensions or provide any compatible <code>.moext</code> bundle or GitHub
+          release repository.
         </div>
       </div>
       <div class="modal-foot">
@@ -1803,7 +1860,9 @@
     <div class="mfs-body">
       <div class="mfs-title" id="mfsTitle" data-i="downloadingStatus">Downloading...</div>
       <div class="mfs-meta" id="mfsMeta">0% • 0 KB/s</div>
-      <div class="mfs-track"><div class="mfs-fill" id="mfsFill" style="width:0%"></div></div>
+      <div class="mfs-track">
+        <div class="mfs-fill" id="mfsFill" style="width:0%"></div>
+      </div>
     </div>
   </div>
 
@@ -1811,23 +1870,43 @@
   <nav class="mobile-bottom-nav" id="mobileBottomNav">
     <div class="liquid-indicator" id="liquidNavIndicator"></div>
     <button class="mobile-nav-btn active" data-view="dashboard" id="mNavDashboard">
-      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
       <span data-i="mNavHome">Home</span>
     </button>
     <button class="mobile-nav-btn" data-view="social" id="mNavSocial">
-      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+      </svg>
       <span data-i="mNavVideo">Video</span>
     </button>
     <button class="mobile-nav-btn" data-view="downloads" id="mNavDownloads">
-      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
       <span data-i="mNavDownloads">Downloads</span>
     </button>
     <button class="mobile-nav-btn" data-view="plugins" id="mNavPlugins">
-      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+      </svg>
       <span data-i="mNavPlugins">Plugins</span>
     </button>
     <button class="mobile-nav-btn" data-view="settings" id="mNavSettings">
-      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path
+          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+        </path>
+      </svg>
       <span data-i="mNavSettings">Settings</span>
     </button>
   </nav>

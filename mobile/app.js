@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.11';
+  const APP_VERSION = '1.0.12';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -16,9 +16,15 @@
     en: {
       appTitle: 'Tayyar',
       tabHomeTitle: 'Tayyar',
-      homeSubtitle: 'Universal Liquid Glass Downloader',
+      homeSubtitle: 'Media & File Downloader',
+      quickDownloadLbl: 'Quick Download',
+      supportedSources: 'Supported Sources',
+      totalFilesLbl: 'Files',
+      totalSizeLbl: 'Saved Size',
+      searchSubtitle: 'Filter saved files or paste any URL',
+      addFirstBtn: 'Add Download',
       engineReady: 'Turbo Engine Ready',
-      urlPlaceholder: 'Paste TikTok, YouTube, Instagram, or file link...',
+      urlPlaceholder: 'Paste video or direct file URL...',
       paste: 'Paste',
       extractBtn: 'Analyze & Download',
       statActive: 'Active',
@@ -117,9 +123,15 @@
     ar: {
       appTitle: 'تيّار',
       tabHomeTitle: 'تيّار',
-      homeSubtitle: 'منزّل الفيديوهات والملفات بتصميم Apple Liquid Glass',
-      engineReady: 'المحرك التوربيني جاهز',
-      urlPlaceholder: 'الصق رابط تيك توك، يوتيوب، انستجرام، أو أي ملف...',
+      homeSubtitle: 'منزّل الوسائط والملفات',
+      quickDownloadLbl: 'تحميل سريع',
+      supportedSources: 'المنصات المدعومة',
+      totalFilesLbl: 'الملفات',
+      totalSizeLbl: 'الحجم المحفوظ',
+      searchSubtitle: 'ابحث في الملفات أو الصق أي رابط',
+      addFirstBtn: 'إضافة تحميل',
+      engineReady: 'المحرك جاهز',
+      urlPlaceholder: 'الصق رابط فيديو أو ملف مباشر...',
       paste: 'لصق',
       extractBtn: 'فحص وتحميل',
       statActive: 'نشط',
@@ -946,7 +958,7 @@
     return `
       <div class="dl-card" data-id="${d.id}">
         <div class="dl-row-top">
-          <div class="dl-thumb-ic">${d.platformIcon || '🎬'}</div>
+          <div class="dl-thumb-ic">${getMediaTypeSvg(d.filename)}</div>
           <div class="dl-info">
             <div class="dl-name">${escapeHtml(d.filename)}</div>
             <div class="dl-meta">
@@ -956,8 +968,8 @@
           </div>
           <div class="dl-actions">
             ${isRun
-              ? `<button type="button" class="dl-ic-btn" data-act="cancel" data-id="${d.id}" aria-label="Cancel">✕</button>`
-              : `<button type="button" class="dl-ic-btn" data-act="remove" data-id="${d.id}" aria-label="Delete">🗑</button>`}
+              ? `<button type="button" class="dl-ic-btn" data-act="cancel" data-id="${d.id}" aria-label="Cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`
+              : `<button type="button" class="dl-ic-btn" data-act="remove" data-id="${d.id}" aria-label="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`}
           </div>
         </div>
         <div class="dl-bar-track">
@@ -966,6 +978,20 @@
       </div>
     `;
   }
+
+  function getMediaTypeSvg(filename) {
+    const low = String(filename || '').toLowerCase();
+    if (low.endsWith('.mp3') || low.endsWith('.m4a') || low.endsWith('.wav')) {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+    }
+    if (low.endsWith('.mp4') || low.endsWith('.mkv') || low.endsWith('.webm') || low.endsWith('.mov')) {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10 9 15 12 10 15 10 9" fill="currentColor" stroke="none"/></svg>';
+    }
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>';
+  }
+
+  const EMPTY_DL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  const EMPTY_SEARCH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7.5"/><line x1="20.5" y1="20.5" x2="16.4" y2="16.4"/></svg>';
 
   function escapeHtml(s) {
     return String(s || '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
@@ -976,13 +1002,24 @@
     const done = state.downloads.filter((d) => d.status === 'completed');
     const failed = state.downloads.filter((d) => d.status === 'error');
     const totalSpeed = active.reduce((sum, d) => sum + (d.speed || 0), 0);
+    const totalSavedBytes = done.reduce((sum, d) => sum + (d.total || d.downloaded || 0), 0);
+    const speedStr = fmtSpeed(totalSpeed);
 
     const elAct = $('#statActive');
     const elDone = $('#statDone');
     const elSpd = $('#statSpeed');
+    const topSpd = $('#topSpeedReadout');
     if (elAct) elAct.textContent = String(active.length);
     if (elDone) elDone.textContent = String(done.length);
-    if (elSpd) elSpd.textContent = fmtSpeed(totalSpeed);
+    if (elSpd) elSpd.textContent = speedStr;
+    if (topSpd) topSpd.textContent = speedStr;
+
+    const sFiles = $('#sumTotalFiles');
+    const sSize = $('#sumTotalSize');
+    const sSpd = $('#sumActiveSpeed');
+    if (sFiles) sFiles.textContent = String(done.length);
+    if (sSize) sSize.textContent = fmtBytes(totalSavedBytes);
+    if (sSpd) sSpd.textContent = speedStr;
 
     const cAll = $('#cntAll');
     const cAct = $('#cntActive');
@@ -999,13 +1036,12 @@
       badge.textContent = String(active.length);
     }
 
-    // Floating Mini-Bar (Quranify Mini-Player style)
     const miniBar = $('#miniBar');
     if (miniBar) {
       const top = active[0];
       if (top) {
         miniBar.hidden = false;
-        $('#miniArt').textContent = top.platformIcon || '🎬';
+        $('#miniArt').innerHTML = getMediaTypeSvg(top.filename);
         $('#miniTitle').textContent = top.filename;
         $('#miniSub').textContent = `${top.percent || 0}% • ${fmtSpeed(top.speed)}`;
         $('#miniProgressFill').style.width = `${top.percent || 0}%`;
@@ -1023,7 +1059,7 @@
     if (recent.length === 0) {
       wrap.innerHTML = `
         <div class="empty-state-box">
-          <div class="empty-state-ic">📥</div>
+          <div class="empty-svg-circle">${EMPTY_DL_SVG}</div>
           <div class="empty-state-title">${t('emptyRecentTitle')}</div>
           <div class="empty-state-sub">${t('emptyRecentSub')}</div>
         </div>
@@ -1044,11 +1080,16 @@
     if (items.length === 0) {
       wrap.innerHTML = `
         <div class="empty-state-box">
-          <div class="empty-state-ic">✨</div>
+          <div class="empty-svg-circle">${EMPTY_DL_SVG}</div>
           <div class="empty-state-title">${t('emptyListTitle')}</div>
           <div class="empty-state-sub">${t('emptyListSub')}</div>
+          <button type="button" class="empty-cta-btn" id="emptyAddFirstBtn">${t('addFirstBtn')}</button>
         </div>
       `;
+      $('#emptyAddFirstBtn')?.addEventListener('click', () => {
+        switchTab('home');
+        setTimeout(() => urlInput?.focus(), 160);
+      });
       return;
     }
     wrap.innerHTML = items.map(buildDownloadCardHTML).join('');
@@ -1062,7 +1103,7 @@
     if (!q) {
       wrap.innerHTML = `
         <div class="empty-state-box">
-          <div class="empty-state-ic">🔍</div>
+          <div class="empty-svg-circle">${EMPTY_SEARCH_SVG}</div>
           <div class="empty-state-title">${t('emptySearchTitle')}</div>
           <div class="empty-state-sub">${t('emptySearchSub')}</div>
         </div>
@@ -1072,9 +1113,9 @@
 
     if (/^https?:\/\//i.test(q)) {
       wrap.innerHTML = `
-        <div class="glass-card" style="display:flex;flex-direction:column;gap:12px;">
-          <div style="font-size:13px;color:var(--text-secondary);word-break:break-all;">${escapeHtml(q)}</div>
-          <button type="button" class="glass-btn primary full" id="btnSearchQuickGo">${t('openOrAnalyze')}</button>
+        <div class="pro-glass-card" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:13px;color:var(--text-2);word-break:break-all;">${escapeHtml(q)}</div>
+          <button type="button" class="cta-primary-btn" style="margin-top:0;" id="btnSearchQuickGo">${t('openOrAnalyze')}</button>
         </div>
       `;
       const goBtn = $('#btnSearchQuickGo');
@@ -1094,7 +1135,7 @@
     if (matches.length === 0) {
       wrap.innerHTML = `
         <div class="empty-state-box">
-          <div class="empty-state-ic">🔍</div>
+          <div class="empty-svg-circle">${EMPTY_SEARCH_SVG}</div>
           <div class="empty-state-title">${t('emptyListTitle')}</div>
           <div class="empty-state-sub">${escapeHtml(q)}</div>
         </div>
@@ -1147,8 +1188,7 @@
       } else {
         thumb.style.display = 'none';
         if (fallback) {
-          fallback.style.display = 'block';
-          fallback.textContent = data.platformIcon || '🎬';
+          fallback.style.display = 'flex';
         }
       }
     } catch (e) {
@@ -1230,10 +1270,10 @@
   $('#btnDlVideo')?.addEventListener('click', () => triggerResolvedDownload(false));
   $('#btnDlAudio')?.addEventListener('click', () => triggerResolvedDownload(true));
 
-  // Platform quick selection (from Carousel & Mesh Bento Tiles)
+  // Platform quick selection (from Source Chips & Platforms Grid)
   $$('[data-plat]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const pName = btn.querySelector('.tile-title, .plat-name')?.textContent || btn.dataset.plat;
+      const pName = btn.querySelector('.plat-card-name, .chip-name')?.textContent || btn.dataset.plat;
       switchTab('home');
       setTimeout(() => {
         if (urlInput) urlInput.focus();
@@ -1244,6 +1284,21 @@
 
   $('#btnSeeAllPlatforms')?.addEventListener('click', () => switchTab('platforms'));
   $('#btnSeeAllDownloads')?.addEventListener('click', () => switchTab('downloads'));
+  $('#btnAddNewFromDl')?.addEventListener('click', () => {
+    switchTab('home');
+    setTimeout(() => urlInput?.focus(), 160);
+  });
+
+  // Spotlight quick filter chips in Search tab
+  $$('#spotlightChips .spot-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const si = $('#searchInput');
+      if (si) {
+        si.value = chip.dataset.q || '';
+        renderSearchResults();
+      }
+    });
+  });
 
   // Mini-Bar tap & cancel
   $('#miniBarTap')?.addEventListener('click', () => switchTab('downloads'));
