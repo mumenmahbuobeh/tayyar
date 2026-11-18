@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.13';
+  const APP_VERSION = '1.0.14';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -49,19 +49,19 @@
       tileDirectDesc: 'APK, ZIP, PDF, Any File',
       directFiles: 'Direct Files',
       downloadsTitle: 'Downloads',
-      downloadsSubtitle: 'Saved directly to Downloads/Tayyar & Gallery',
+      downloadsSubtitle: 'Gallery (Movies/Tayyar) & Downloads',
       clearCompleted: 'Clear Completed',
       filterAll: 'All',
       filterActive: 'Active',
       filterCompleted: 'Saved',
       filterFailed: 'Failed',
       settingsTitle: 'Settings',
-      identitySub: 'Apple Liquid Glass Edition • Native Android & iOS',
+      identitySub: 'Universal Media & Story Downloader',
       grpGeneral: 'Language & Appearance',
       languageLbl: 'Language',
       languageHint: 'Switch between full English & Arabic',
-      auraThemeLbl: 'Liquid Glass Aura',
-      auraThemeHint: 'Top atmospheric glow color',
+      auraThemeLbl: 'Top Accent Glow',
+      auraThemeHint: 'Pure OLED Black or subtle top tint',
       spatialPhysicsLbl: 'Antigravity 3D Physics',
       spatialPhysicsHint: 'Weightless floating inertia, tilt & glass refraction',
       grpDownload: 'Download Preferences',
@@ -184,14 +184,14 @@
       tileDirectDesc: 'APK، ZIP، PDF، وأي ملف',
       directFiles: 'ملفات مباشرة',
       downloadsTitle: 'التحميلات',
-      downloadsSubtitle: 'تُحفظ مباشرة في مجلد Downloads/Tayyar والاستوديو',
+      downloadsSubtitle: 'تُحفظ مباشرة في الاستوديو (Movies/Tayyar) والتحميلات',
       clearCompleted: 'مسح المكتملة',
       filterAll: 'الكل',
       filterActive: 'النشطة',
       filterCompleted: 'المحفوظة',
       filterFailed: 'فشلت',
       settingsTitle: 'الإعدادات',
-      identitySub: 'إصدار Apple Liquid Glass • مخصص لأندرويد وآيفون',
+      identitySub: 'منزّل الوسائط والستوريات الشامل',
       grpGeneral: 'اللغة والمظهر',
       languageLbl: 'اللغة',
       languageHint: 'التبديل بين العربية الكاملة والإنجليزية الكاملة',
@@ -673,8 +673,8 @@
             let music = j.data.music || '';
             if (music && !music.startsWith('http')) music = 'https://www.tikwm.com' + music;
             const formats = [];
-            if (play) formats.push({ id: 'video', ext: 'mp4', url: play, directUrl: play });
-            if (music) formats.push({ id: 'audio', ext: 'mp3', url: music, directUrl: music });
+            if (play) formats.push({ id: 'video', ext: 'mp4', url: play, directUrl: play, referer: 'https://www.tiktok.com/' });
+            if (music) formats.push({ id: 'audio', ext: 'mp3', url: music, directUrl: music, referer: 'https://www.tiktok.com/' });
             if (formats.length) {
               return {
                 ok: true,
@@ -690,30 +690,71 @@
           }
         }
       } catch (_) {}
+      try {
+        const r2 = await fetch(`https://nntech-free-tt-api.vercel.app/api/tiktok/mp4?url=${encodeURIComponent(cleanUrl)}`);
+        if (r2.ok) {
+          const j2 = await r2.json();
+          if (j2?.download && j2.download.startsWith('http')) {
+            return {
+              ok: true,
+              platform: 'TikTok',
+              platformId: 'tiktok',
+              platformIcon: '⚡',
+              title: j2.title || 'TikTok Video',
+              author: 'TikTok',
+              thumbnail: '',
+              formats: [{ id: 'video', ext: 'mp4', url: j2.download, directUrl: j2.download, referer: 'https://www.tiktok.com/' }],
+            };
+          }
+        }
+      } catch (_) {}
     }
 
     if (plat.id === 'youtube') {
-      const m = cleanUrl.match(/(?:watch\?v=|shorts\/|live\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      const m = cleanUrl.match(/(?:watch\?v=|shorts\/|live\/|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
       if (m) {
         const vidId = m[1];
-        const hosts = [
-          'https://api.piped.private.coffee/streams/',
-          'https://pipedapi.ducks.party/streams/',
-        ];
-        for (const h of hosts) {
-          try {
-            const r = await fetch(h + vidId);
-            if (!r.ok) continue;
-            const d = await r.json();
+        // Primary: YouTube Official InnerTube ANDROID_VR (direct progressive MP4 with FULL AUDIO!)
+        try {
+          const ytUa = 'com.google.android.apps.youtube.vr.oculus/1.60.19 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip';
+          const rYt = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'User-Agent': ytUa },
+            body: JSON.stringify({
+              videoId: vidId,
+              context: {
+                client: {
+                  clientName: 'ANDROID_VR',
+                  clientVersion: '1.60.19',
+                  deviceMake: 'Oculus',
+                  deviceModel: 'Quest 3',
+                  osName: 'Android',
+                  osVersion: '12L',
+                  androidSdkVersion: 32,
+                  hl: 'en',
+                  gl: 'US',
+                },
+              },
+              contentCheckOk: true,
+              racyCheckOk: true,
+            }),
+          });
+          if (rYt.ok) {
+            const ytJson = await rYt.json();
             const formats = [];
-            if (Array.isArray(d.formatStreams) && d.formatStreams.length) {
-              formats.push({ id: 'video', ext: 'mp4', url: d.formatStreams[0].url, directUrl: d.formatStreams[0].url });
-            } else if (Array.isArray(d.videoStreams)) {
-              const mp4 = d.videoStreams.find((v) => v.url && v.format === 'MP4');
-              if (mp4) formats.push({ id: 'video', ext: 'mp4', url: mp4.url, directUrl: mp4.url });
+            const prog = ytJson?.streamingData?.formats || [];
+            for (let i = prog.length - 1; i >= 0; i--) {
+              if (prog[i]?.url) {
+                formats.push({ id: 'video', ext: 'mp4', url: prog[i].url, directUrl: prog[i].url, userAgent: ytUa });
+                break;
+              }
             }
-            if (Array.isArray(d.audioStreams) && d.audioStreams[0]?.url) {
-              formats.push({ id: 'audio', ext: 'm4a', url: d.audioStreams[0].url, directUrl: d.audioStreams[0].url });
+            const adaptive = ytJson?.streamingData?.adaptiveFormats || [];
+            const bestAud = adaptive
+              .filter((f) => f?.url && String(f.mimeType || '').toLowerCase().startsWith('audio/mp4'))
+              .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
+            if (bestAud?.url) {
+              formats.push({ id: 'audio', ext: 'm4a', url: bestAud.url, directUrl: bestAud.url, userAgent: ytUa });
             }
             if (formats.length) {
               return {
@@ -721,15 +762,72 @@
                 platform: 'YouTube',
                 platformId: 'youtube',
                 platformIcon: '▶',
-                title: d.title || 'YouTube Video',
-                author: d.uploader || 'YouTube Channel',
-                thumbnail: d.thumbnailUrl || '',
+                title: ytJson?.videoDetails?.title || 'YouTube Video',
+                author: ytJson?.videoDetails?.author || 'YouTube',
+                thumbnail: `https://i.ytimg.com/vi/${vidId}/hqdefault.jpg`,
                 formats,
               };
             }
-          } catch (_) {}
-        }
+          }
+        } catch (_) {}
       }
+    }
+
+    if (plat.id === 'facebook') {
+      try {
+        const rFb = await fetch('https://fdown.co.in/ajax', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Origin: 'https://fdown.co.in', Referer: 'https://fdown.co.in/' },
+          body: JSON.stringify({ url: cleanUrl }),
+        });
+        if (rFb.ok) {
+          const jFb = await rFb.json();
+          if (jFb?.success && jFb.links) {
+            const entries = Object.entries(jFb.links).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
+            if (entries.length) {
+              const best = entries.find(([k]) => /hd|1080|720/i.test(k)) || entries[0];
+              return {
+                ok: true,
+                platform: 'Facebook',
+                platformId: 'facebook',
+                platformIcon: '📘',
+                title: jFb.title || 'Facebook Video',
+                author: jFb.uploader || 'Facebook',
+                thumbnail: jFb.thumbnail || '',
+                formats: [{ id: 'video', ext: 'mp4', url: best[1], directUrl: best[1] }],
+              };
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (plat.id === 'instagram') {
+      try {
+        const sc = cleanUrl.match(/\/(?:p|reel|tv)\/([A-Za-z0-9_-]+)/);
+        if (sc) {
+          const rIg = await fetch(`https://www.instagram.com/p/${sc[1]}/embed/captioned/`);
+          if (rIg.ok) {
+            const html = await rIg.text();
+            const mv = html.match(/"video_url"\s*:\s*"(https:[^"\\]+)"/);
+            const mi = html.match(/"display_url"\s*:\s*"(https:[^"\\]+)"/);
+            const vUrl = mv ? mv[1].replace(/\\u0026/g, '&').replace(/\\\//g, '/').replace(/\\u002F/g, '/') : '';
+            const iUrl = mi ? mi[1].replace(/\\u0026/g, '&').replace(/\\\//g, '/').replace(/\\u002F/g, '/') : '';
+            if (vUrl || iUrl) {
+              return {
+                ok: true,
+                platform: 'Instagram',
+                platformId: 'instagram',
+                platformIcon: '📷',
+                title: `Instagram_${sc[1]}`,
+                author: 'Instagram',
+                thumbnail: iUrl,
+                formats: [{ id: vUrl ? 'video' : 'image', ext: vUrl ? 'mp4' : 'jpg', url: vUrl || iUrl, directUrl: vUrl || iUrl }],
+              };
+            }
+          }
+        }
+      } catch (_) {}
     }
 
     if (plat.id === 'twitter') {
@@ -811,7 +909,7 @@
     return `${clean}.${fallbackExt}`;
   }
 
-  async function startDownload({ url, filename, referer = '', platformIcon = '🎬', isAudio = false }) {
+  async function startDownload({ url, filename, referer = '', userAgent = '', platformIcon = '🎬', isAudio = false }) {
     const id = `dl_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
     const item = {
       id,
@@ -834,13 +932,13 @@
     renderAllViews();
     showToast(isAudio ? t('dlStartedAudio') : (filename.endsWith('.mp4') ? t('dlStartedVideo') : t('dlStartedFile')));
 
-    // 1. Android Native Java Background Thread Downloader (MediaStore + Gallery)
+    // 1. Android Native Java Background Thread Downloader (MediaStore Gallery + Downloads)
     const native = getNativeEngine();
     if (native && typeof native.startDownload === 'function') {
       try {
-        const res = await native.startDownload({ url, filename, referer });
+        const res = await native.startDownload({ url, filename, referer, userAgent });
         if (res && res.downloadId) {
-          item.nativeId = res.downloadId;
+          item.nativeId = String(res.downloadId);
           saveDownloads();
           pollNativeDownload(item);
           return;
@@ -850,59 +948,66 @@
       }
     }
 
-    // 2. iOS / Web Native Stream Download + iOS Share Sheet / File Save
+    // 2. iOS / Web Native Binary Download (XHR responseType='blob' routes through Capacitor native proxy without Base64 corruption!)
     try {
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const cl = parseInt(resp.headers.get('content-length') || '0', 10);
-      if (cl > 0) item.total = cl;
-
-      let blob;
-      if (resp.body && typeof resp.body.getReader === 'function') {
-        const reader = resp.body.getReader();
-        const chunks = [];
-        let received = 0;
+      const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'blob';
         let lastT = Date.now();
         let lastB = 0;
 
-        while (true) {
+        xhr.onprogress = (ev) => {
           if (item.status === 'cancelled') {
-            try { reader.cancel(); } catch (_) {}
+            try { xhr.abort(); } catch (_) {}
             return;
           }
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-          received += value.length;
-          item.downloaded = received;
-
+          item.downloaded = ev.loaded || 0;
+          if (ev.lengthComputable && ev.total > 0) {
+            item.total = ev.total;
+            item.percent = Math.min(99, Math.round((ev.loaded / ev.total) * 100));
+          }
           const now = Date.now();
           if (now - lastT >= 300) {
-            item.speed = Math.round(((received - lastB) / ((now - lastT) / 1000)) || 0);
-            item.percent = item.total > 0 ? Math.min(100, Math.round((received / item.total) * 100)) : 50;
+            item.speed = Math.round(((item.downloaded - lastB) / ((now - lastT) / 1000)) || 0);
             lastT = now;
-            lastB = received;
+            lastB = item.downloaded;
             renderAllViews();
           }
-        }
-        blob = new Blob(chunks);
-      } else {
-        blob = await resp.blob();
-        item.downloaded = blob.size;
-        item.total = blob.size;
-      }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 400 && xhr.response && xhr.response.size > 0) {
+            const ct = String(xhr.getResponseHeader('Content-Type') || xhr.response.type || '').toLowerCase();
+            if (ct.includes('text/html') && /\.(mp4|mp3|m4a|jpg|jpeg|png)$/i.test(filename)) {
+              reject(new Error('Could not extract direct media stream'));
+              return;
+            }
+            resolve(xhr.response);
+          } else {
+            reject(new Error(`HTTP ${xhr.status || 'Network Error'}`));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.onabort = () => reject(new Error('Cancelled'));
+        xhr.send();
+      });
+
+      if (item.status === 'cancelled') return;
 
       item.status = 'completed';
       item.percent = 100;
       item.speed = 0;
+      item.downloaded = blob.size;
       if (item.total <= 0) item.total = blob.size;
       saveDownloads();
       renderAllViews();
       showToast(t('dlDoneToast'));
 
-      // Native iOS Share Sheet (Save Video / Save to Files) or Blob download
+      // Native iOS Share Sheet ("Save Video" -> Apple Photos / Save to Files) or Blob download
       try {
-        const fileObj = new File([blob], filename, { type: blob.type || (isAudio ? 'audio/mpeg' : 'video/mp4') });
+        const mime = isAudio ? 'audio/mpeg' : (filename.endsWith('.jpg') ? 'image/jpeg' : 'video/mp4');
+        const fileObj = new File([blob], filename, { type: blob.type || mime });
         if (navigator.canShare && navigator.canShare({ files: [fileObj] })) {
           await navigator.share({ files: [fileObj], title: filename });
           return;
@@ -916,8 +1021,9 @@
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(() => URL.revokeObjectURL(objUrl), 5000);
+      setTimeout(() => URL.revokeObjectURL(objUrl), 8000);
     } catch (err) {
+      if (item.status === 'cancelled') return;
       item.status = 'error';
       item.speed = 0;
       item.error = err.message || 'Network error';
@@ -1240,7 +1346,16 @@
       state.currentResolved = data;
       if (analyzeLoader) analyzeLoader.hidden = true;
 
-      if (previewCard) previewCard.hidden = false;
+      // If it's a direct downloadable file URL, start downloading IMMEDIATELY!
+      if (data.platformId === 'direct' && /\.(mp4|mp3|m4a|mkv|webm|apk|zip|rar|7z|pdf|jpg|jpeg|png|webp|exe|dmg|iso)(\?.*)?$/i.test(raw)) {
+        await triggerResolvedDownload(false);
+        return;
+      }
+
+      if (previewCard) {
+        previewCard.hidden = false;
+        setTimeout(() => previewCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+      }
       $('#previewTitle').textContent = data.title || data.platform || 'Media';
       $('#previewAuthor').textContent = data.author || data.platform || '';
       $('#previewPlatTag').textContent = data.platform || 'Media';
@@ -1287,6 +1402,7 @@
       url: dlUrl,
       filename,
       referer: chosen?.referer || '',
+      userAgent: chosen?.userAgent || '',
       platformIcon: res?.platformIcon || '🎬',
       isAudio,
     });
@@ -1705,6 +1821,7 @@
       const urls = /^https?:\/\//i.test(clean)
         ? [clean]
         : [
+            `https://www.snapchat.com/@${encodeURIComponent(user)}`,
             `https://www.snapchat.com/add/${encodeURIComponent(user)}`,
             `https://story.snapchat.com/s/${encodeURIComponent(user)}`,
           ];

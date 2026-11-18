@@ -751,6 +751,7 @@ async function resolveSnapchatStories(input) {
   } else {
     username = clean.replace(/^@/, '').split(/[/?#]/)[0].trim();
     if (!username) return { ok: false, platform: 'Snapchat', stories: [], error: 'Invalid Snapchat username or URL' };
+    targetUrls.push(`https://www.snapchat.com/@${encodeURIComponent(username)}`);
     targetUrls.push(`https://www.snapchat.com/add/${encodeURIComponent(username)}`);
     targetUrls.push(`https://story.snapchat.com/s/${encodeURIComponent(username)}`);
   }

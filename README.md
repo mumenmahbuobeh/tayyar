@@ -21,17 +21,17 @@
 
 ## 📥 Downloads & Binary Releases
 
-Download the official ready-to-run packages directly from [GitHub Releases v1.0.13](https://github.com/mumenmahbuobeh/tayyar/releases/tag/v1.0.13):
+Download the official ready-to-run packages directly from [GitHub Releases v1.0.14](https://github.com/mumenmahbuobeh/tayyar/releases/tag/v1.0.14):
 
 | Platform | Format | Direct Download / Package | Release Status |
 | :--- | :--- | :--- | :--- |
-| **Windows** | `.exe` (Installer) | [📥 Download Tayyar-Setup-1.0.13.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.13/Tayyar-Setup-1.0.13.exe) | ✅ Available |
-| **Windows** | `.exe` (Portable) | [📥 Download Tayyar-1.0.13.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.13/Tayyar-1.0.13.exe) | ✅ Available |
-| **Android** | `.apk` (Mobile) | [📱 Download Tayyar-Android-v1.0.13.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.13/Tayyar-Android-v1.0.13.apk) | ✅ Available |
-| **iOS** | `.ipa` (iPhone/iPad) | [🍏 Download Tayyar-iOS-v1.0.13.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.13/Tayyar-iOS-v1.0.13.ipa) | ✅ Available |
-| **macOS** | `.dmg` (Universal) | [🍎 Download Tayyar-1.0.13.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.13/Tayyar-1.0.13.dmg) | ✅ Available |
-| **Linux** | `.AppImage` | [🐧 Download Tayyar-1.0.13.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.13/Tayyar-1.0.13.AppImage) | ✅ Available |
-| **Linux** | `.deb` (Debian/Ubuntu) | [📦 Download tayyar_1.0.13_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.13/tayyar_1.0.13_amd64.deb) | ✅ Available |
+| **Windows** | `.exe` (Installer) | [📥 Download Tayyar-Setup-1.0.14.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-Setup-1.0.14.exe) | ✅ Available |
+| **Windows** | `.exe` (Portable) | [📥 Download Tayyar-1.0.14.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-1.0.14.exe) | ✅ Available |
+| **Android** | `.apk` (Mobile) | [📱 Download Tayyar-Android-v1.0.14.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-Android-v1.0.14.apk) | ✅ Available |
+| **iOS** | `.ipa` (iPhone/iPad) | [🍏 Download Tayyar-iOS-v1.0.14.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-iOS-v1.0.14.ipa) | ✅ Available |
+| **macOS** | `.dmg` (Universal) | [🍎 Download Tayyar-1.0.14.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-1.0.14.dmg) | ✅ Available |
+| **Linux** | `.AppImage` | [🐧 Download Tayyar-1.0.14.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-1.0.14.AppImage) | ✅ Available |
+| **Linux** | `.deb` (Debian/Ubuntu) | [📦 Download tayyar_1.0.14_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/tayyar_1.0.14_amd64.deb) | ✅ Available |
 
 ---
 
