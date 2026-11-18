@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.15';
+  const APP_VERSION = '1.0.16';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -156,6 +156,17 @@
       batchStartedToast: 'Downloading selected stories:',
       batchSavedToast: 'Saved selected statuses to Gallery:',
       selectAtLeastOne: 'Select at least 1 story to download',
+      updPopTitle: 'New Update Available',
+      updWhatsNew: "What's New",
+      updDownloading: 'Downloading update...',
+      updNowDirect: 'Update Now',
+      updInstallNow: 'Install Update',
+      updReadyInstall: 'Ready to install!',
+      updLaterBtn: 'Later',
+      updSkipBtn: 'Skip Version',
+      updStableBadge: 'Stable',
+      updBetaBadge: 'Beta',
+      updSkippedToast: 'Skipped version',
     },
     ar: {
       appTitle: 'تيّار',
@@ -300,6 +311,17 @@
       batchStartedToast: 'بدأ تحميل الستوريات المحددة:',
       batchSavedToast: 'تم حفظ الحالات المحددة في المعرض:',
       selectAtLeastOne: 'اختر ستوري واحد على الأقل للتحميل',
+      updPopTitle: 'يتوفر تحديث جديد',
+      updWhatsNew: 'الجديد في هذا الإصدار',
+      updDownloading: 'جاري تحميل التحديث مباشرة...',
+      updNowDirect: 'تحديث الآن',
+      updInstallNow: 'تثبيت التحديث',
+      updReadyInstall: 'اكتمل التحميل! جاهز للتثبيت.',
+      updLaterBtn: 'لاحقاً',
+      updSkipBtn: 'تخطي الإصدار',
+      updStableBadge: 'مستقر',
+      updBetaBadge: 'تجريبي',
+      updSkippedToast: 'تم تخطي الإصدار',
     },
   };
 
@@ -1574,12 +1596,17 @@
     });
   }
 
-  // Strict Stable-Default Update Checker (NEVER updates when already on latest!)
+  // Strict Stable-Default Update Checker + Pro Update Arrival Popup (Stable & Beta)
+  const STORAGE_KEY_SKIPPED_VER = 'tayyar_skipped_update_ver';
   const cfgUpdateChannel = $('#cfgUpdateChannel');
   const betaChannelNote = $('#betaChannelNote');
   const updActionRow = $('#updActionRow');
   const btnCheckUpdate = $('#btnCheckUpdate');
   const btnDownloadUpdate = $('#btnDownloadUpdate');
+  const updPopupOverlay = $('#updPopupOverlay');
+
+  let downloadedUpdateApkPath = '';
+  let updPollTimer = null;
 
   function semverCompare(a, b) {
     const pa = (a || '0').replace(/^v/, '').split('-')[0].split('.').map(Number);
@@ -1589,6 +1616,161 @@
       if ((pa[i] || 0) < (pb[i] || 0)) return -1;
     }
     return 0;
+  }
+
+  function extractReleaseHighlights(bodyText) {
+    const raw = String(bodyText || '');
+    const lines = raw.split(/\r?\n/).map((l) => l.trim());
+    const bullets = [];
+    for (const l of lines) {
+      if (/^[*•-]\s+/.test(l) && !/releases\/download/i.test(l) && !/^\*\*(Windows|Android|iOS|macOS|Linux)/i.test(l.replace(/^[*•-]\s+/, ''))) {
+        const clean = l.replace(/^[*•-]\s+/, '').replace(/\*\*/g, '').replace(/`/g, '').trim();
+        if (clean.length > 6) bullets.push(`• ${clean}`);
+      }
+      if (bullets.length >= 6) break;
+    }
+    if (bullets.length) return bullets.join('\n');
+    return state.lang === 'ar'
+      ? '• تحسينات جديدة في الأداء والاستقرار ومحرك التحميل.\n• تحديث مباشر وسريع بضغطة واحدة.'
+      : '• Performance, stability & download engine improvements.\n• Fast 1-tap direct update.';
+  }
+
+  function getMobileReleaseAsset(rel) {
+    const assets = rel?.assets || [];
+    const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    return isIos
+      ? assets.find((a) => a.name.endsWith('.ipa'))
+      : assets.find((a) => a.name.endsWith('.apk'));
+  }
+
+  function showUpdatePopup(rel) {
+    if (!rel || !updPopupOverlay) return;
+    const latest = (rel.tag_name || '').replace(/^v/, '');
+    const isBeta = !!rel.prerelease || (cfgUpdateChannel?.value === 'beta' && /beta|alpha|rc/i.test(rel.tag_name || ''));
+    const asset = getMobileReleaseAsset(rel);
+
+    const badge = $('#updPopChannelBadge');
+    if (badge) {
+      badge.className = `upd-channel-pill ${isBeta ? 'beta' : 'stable'}`;
+      badge.textContent = isBeta ? t('updBetaBadge') : t('updStableBadge');
+    }
+    if ($('#updPopOldVer')) $('#updPopOldVer').textContent = `v${APP_VERSION}`;
+    if ($('#updPopNewVer')) $('#updPopNewVer').textContent = `v${latest}`;
+    if ($('#updPopSize')) $('#updPopSize').textContent = asset?.size ? `• ${fmtBytes(asset.size)}` : '';
+    if ($('#updPopNotes')) $('#updPopNotes').textContent = extractReleaseHighlights(rel.body);
+
+    const progBox = $('#updPopProgress');
+    const btnNow = $('#btnUpdPopNow');
+    const txtNow = $('#updPopNowText');
+    if (!downloadedUpdateApkPath) {
+      if (progBox) progBox.hidden = true;
+      if (btnNow) btnNow.disabled = false;
+      if (txtNow) txtNow.textContent = t('updNowDirect');
+    } else {
+      if (txtNow) txtNow.textContent = t('updInstallNow');
+    }
+
+    updPopupOverlay.hidden = false;
+  }
+
+  function hideUpdatePopup() {
+    if (updPopupOverlay) updPopupOverlay.hidden = true;
+  }
+
+  async function runDirectMobileUpdate() {
+    if (!state.hasNewerUpdate || !state.updateRelease) {
+      showToast(t('alreadyLatestToast'));
+      hideUpdatePopup();
+      return;
+    }
+
+    const native = getNativeEngine();
+
+    // If APK already downloaded on Android, launch installer immediately!
+    if (downloadedUpdateApkPath && native && typeof native.installApk === 'function') {
+      try {
+        await native.installApk({ path: downloadedUpdateApkPath });
+        return;
+      } catch (e) {
+        showToast(e.message || t('dlFailToast'));
+      }
+    }
+
+    const asset = getMobileReleaseAsset(state.updateRelease);
+    if (!asset?.browser_download_url) {
+      if (state.updateRelease.html_url) window.open(state.updateRelease.html_url, '_blank');
+      return;
+    }
+
+    const progBox = $('#updPopProgress');
+    const progFill = $('#updPopProgFill');
+    const progPct = $('#updPopProgPct');
+    const progSpd = $('#updPopProgSpeed');
+    const progBytes = $('#updPopProgBytes');
+    const progStatus = $('#updPopProgStatus');
+    const btnNow = $('#btnUpdPopNow');
+    const txtNow = $('#updPopNowText');
+
+    if (progBox) progBox.hidden = false;
+    if (progStatus) progStatus.textContent = t('updDownloading');
+    if (btnNow) btnNow.disabled = true;
+
+    // Android Native Direct APK Download + Auto-Launch Package Installer!
+    if (isAndroidNative() && native && typeof native.startDownload === 'function') {
+      try {
+        const res = await native.startDownload({
+          url: asset.browser_download_url,
+          filename: asset.name,
+          forUpdate: true,
+        });
+        if (res && res.downloadId) {
+          const dlId = String(res.downloadId);
+          if (updPollTimer) clearInterval(updPollTimer);
+          updPollTimer = setInterval(async () => {
+            try {
+              const q = await native.queryDownload({ downloadId: dlId });
+              if (!q) return;
+              const pctVal = q.percent || (q.total > 0 ? Math.min(99, Math.round((q.downloaded / q.total) * 100)) : 0);
+              if (progFill) progFill.style.width = `${pctVal}%`;
+              if (progPct) progPct.textContent = `${pctVal}%`;
+              if (progSpd) progSpd.textContent = fmtSpeed(q.speed || 0);
+              if (progBytes) progBytes.textContent = `${fmtBytes(q.downloaded || 0)}${q.total > 0 ? ' / ' + fmtBytes(q.total) : ''}`;
+
+              if (q.status === 'completed') {
+                clearInterval(updPollTimer);
+                updPollTimer = null;
+                downloadedUpdateApkPath = q.path || '';
+                if (progFill) progFill.style.width = '100%';
+                if (progPct) progPct.textContent = '100%';
+                if (progStatus) progStatus.textContent = t('updReadyInstall');
+                if (btnNow) btnNow.disabled = false;
+                if (txtNow) txtNow.textContent = t('updInstallNow');
+                if (downloadedUpdateApkPath && typeof native.installApk === 'function') {
+                  native.installApk({ path: downloadedUpdateApkPath }).catch(() => {});
+                }
+              } else if (q.status === 'error') {
+                clearInterval(updPollTimer);
+                updPollTimer = null;
+                if (progStatus) progStatus.textContent = `${t('dlFailToast')}: ${q.error || ''}`;
+                if (btnNow) btnNow.disabled = false;
+              }
+            } catch (_) {}
+          }, 360);
+          return;
+        }
+      } catch (e) {
+        console.warn('Direct APK update fallback:', e);
+      }
+    }
+
+    // iOS / Web fallback: download directly via startDownload
+    hideUpdatePopup();
+    startDownload({
+      url: asset.browser_download_url,
+      filename: asset.name,
+      isAudio: false,
+    });
+    switchTab('downloads');
   }
 
   function syncChannelUI() {
@@ -1611,7 +1793,9 @@
       const r = await fetch(url, { headers: { Accept: 'application/vnd.github.v3+json' } });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const payload = await r.json();
-      const rel = Array.isArray(payload) ? payload.find((x) => !x.draft) : (!payload.draft ? payload : null);
+      const rel = Array.isArray(payload)
+        ? payload.find((x) => !x.draft)
+        : (!payload.draft && (ch === 'beta' || !payload.prerelease) ? payload : null);
       if (!rel?.tag_name) throw new Error('No release');
 
       const latest = rel.tag_name.replace(/^v/, '');
@@ -1623,9 +1807,15 @@
         $('#updStatusTitle').textContent = `${t('newVerAvailable')} v${latest}`;
         $('#updStatusDesc').textContent = `v${APP_VERSION} → v${latest}`;
         if (updActionRow) updActionRow.hidden = false;
-        if (interactive) showToast(`${t('newVerAvailable')} v${latest}`);
+
+        let skipped = '';
+        try { skipped = localStorage.getItem(STORAGE_KEY_SKIPPED_VER) || ''; } catch (_) {}
+        if (interactive || skipped !== latest) {
+          showUpdatePopup(rel);
+        }
       } else {
         state.updateRelease = null;
+        downloadedUpdateApkPath = '';
         $('#updStatusTitle').textContent = t('upToDate');
         $('#updStatusDesc').textContent = t('upToDateDesc');
         if (updActionRow) updActionRow.hidden = true;
@@ -1652,30 +1842,27 @@
   });
 
   btnCheckUpdate?.addEventListener('click', () => checkUpdates(true));
-
   btnDownloadUpdate?.addEventListener('click', () => {
-    if (!state.hasNewerUpdate || !state.updateRelease) {
+    if (state.hasNewerUpdate && state.updateRelease) {
+      showUpdatePopup(state.updateRelease);
+    } else {
       showToast(t('alreadyLatestToast'));
-      if (updActionRow) updActionRow.hidden = true;
-      return;
     }
-    const assets = state.updateRelease.assets || [];
-    const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const asset = isIos
-      ? assets.find((a) => a.name.endsWith('.ipa'))
-      : assets.find((a) => a.name.endsWith('.apk'));
+  });
 
-    if (asset?.browser_download_url) {
-      startDownload({
-        url: asset.browser_download_url,
-        filename: asset.name,
-        platformIcon: isIos ? '🍏' : '📱',
-        isAudio: false,
-      });
-      switchTab('downloads');
-    } else if (state.updateRelease.html_url) {
-      window.open(state.updateRelease.html_url, '_blank');
+  $('#btnUpdPopNow')?.addEventListener('click', runDirectMobileUpdate);
+  $('#btnUpdPopClose')?.addEventListener('click', hideUpdatePopup);
+  $('#btnUpdPopLater')?.addEventListener('click', hideUpdatePopup);
+  $('#btnUpdPopSkip')?.addEventListener('click', () => {
+    const latest = (state.updateRelease?.tag_name || '').replace(/^v/, '');
+    if (latest) {
+      try { localStorage.setItem(STORAGE_KEY_SKIPPED_VER, latest); } catch (_) {}
+      showToast(`${t('updSkippedToast')} v${latest}`);
     }
+    hideUpdatePopup();
+  });
+  updPopupOverlay?.addEventListener('click', (e) => {
+    if (e.target === updPopupOverlay) hideUpdatePopup();
   });
 
   /* ==================== UNIVERSAL STORIES & STATUS SAVER (WA / SNAP / IG / FB) ==================== */
@@ -2260,6 +2447,9 @@
 
     renderAllViews();
     requestAnimationFrame(() => snapLiquidLens(state.activeTab, false));
+
+    // Automatic background update check (pops up sleek Update Arrival Popup only when newer release exists!)
+    setTimeout(() => checkUpdates(false), 2200);
   }
 
   init();

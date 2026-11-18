@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.15 is the latest available release.',
+      upToDateDesc: 'Version 1.0.16 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -212,6 +212,13 @@
       storyPickCountLbl: 'Number of stories to download:',
       selectAllBtn: 'All',
       clearSelBtn: 'Clear',
+      updPopTitle: 'New Update Available',
+      updPopSub: 'A newer version of Tayyar is ready for direct installation.',
+      updWhatsNew: "What's New",
+      updDownloading: 'Downloading update...',
+      updNowDirect: 'Update Now',
+      updLaterBtn: 'Later',
+      updSkipBtn: 'Skip Version',
     },
     ar: {
       dashboard: 'لوحة التحكم',
@@ -342,7 +349,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.15 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.16 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -420,6 +427,13 @@
       storyPickCountLbl: 'عدد الستوريات المطلوب تحميلها:',
       selectAllBtn: 'الكل',
       clearSelBtn: 'مسح',
+      updPopTitle: 'يتوفر تحديث جديد',
+      updPopSub: 'إصدار أحدث من تيّار جاهز للتحميل والتثبيت المباشر.',
+      updWhatsNew: 'الجديد في هذا الإصدار',
+      updDownloading: 'جاري تحميل التحديث مباشرة...',
+      updNowDirect: 'تحديث الآن',
+      updLaterBtn: 'لاحقاً',
+      updSkipBtn: 'تخطي الإصدار',
     },
   };
 
@@ -1002,7 +1016,7 @@
       author: 'griciaisl12',
       short: 'MS',
       color: 'avatar-blue',
-      version: 'v1.0.15',
+      version: 'v1.0.16',
       desc: 'Resolves GitHub repository release, file links, Google Drive/Docs into real downloads with mirror acceleration.',
       installed: false,
       enabled: false,
@@ -1546,7 +1560,7 @@
         author: 'User',
         short: name.slice(0, 2).toUpperCase(),
         color: 'avatar-blue',
-        version: 'v1.0.15',
+        version: 'v1.0.16',
         desc: `Installed from ${val}`,
         installed: true,
         enabled: true,
@@ -2932,7 +2946,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases — Stable Default) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.15';
+  const CURRENT_APP_VERSION = '1.0.16';
   let availableUpdateRelease = null;
   let isNewerUpdateAvailable = false;
   let updateDownloadTaskId = null;
@@ -3026,8 +3040,10 @@
           bInstall.className = 'pill-btn primary sm';
           if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'تحديث الآن' : 'Update Now';
         }
-        if (interactive) {
-          toast(S.lang === 'ar' ? `يتوفر إصدار جديد v${latestTag}` : `New version v${latestTag} available!`);
+        let skippedVer = '';
+        try { skippedVer = localStorage.getItem('tayyar_skipped_update_ver') || ''; } catch (_) {}
+        if (interactive || skippedVer !== latestTag) {
+          showDeskUpdatePopup(rel, channel);
         }
       } else {
         availableUpdateRelease = null;
@@ -3115,6 +3131,13 @@
     if (bInstall) bInstall.disabled = true;
     if (progressStatus) progressStatus.textContent = S.lang === 'ar' ? 'جاري تحميل التحديث مباشرة...' : 'Downloading update directly...';
 
+    const deskProg = $('#deskUpdProgress');
+    const deskBtnNow = $('#btnDeskUpdNow');
+    const deskProgStatus = $('#deskUpdProgStatus');
+    if (deskProg) deskProg.hidden = false;
+    if (deskBtnNow) deskBtnNow.disabled = true;
+    if (deskProgStatus) deskProgStatus.textContent = S.lang === 'ar' ? 'جاري تحميل التحديث مباشرة...' : 'Downloading update directly...';
+
     try {
       if (window.tayyar?.add) {
         const res = await window.tayyar.add({
@@ -3155,8 +3178,112 @@
       if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'تثبيت التحديث وإعادة التشغيل' : 'Install & Restart';
     }
 
-    toast(S.lang === 'ar' ? 'اكتمل تحميل التحديث! انقر لتثبيته فوراً.' : 'Update ready! Click Install & Restart.');
+    const deskFill = $('#deskUpdProgFill');
+    const deskPct = $('#deskUpdProgPct');
+    const deskStat = $('#deskUpdProgStatus');
+    const deskBtnNow = $('#btnDeskUpdNow');
+    const deskNowTxt = $('#deskUpdNowText');
+    if (deskFill) deskFill.style.width = '100%';
+    if (deskPct) deskPct.textContent = '100%';
+    if (deskStat) {
+      deskStat.innerHTML = `<span style="color:#34d399;">✓ ${S.lang === 'ar' ? 'اكتمل التحميل! جاري تشغيل التثبيت...' : 'Download complete! Launching installer...'}</span>`;
+    }
+    if (deskBtnNow) deskBtnNow.disabled = false;
+    if (deskNowTxt) deskNowTxt.textContent = S.lang === 'ar' ? 'تثبيت وإعادة التشغيل' : 'Install & Restart';
+
+    toast(S.lang === 'ar' ? 'اكتمل تحميل التحديث! جاري تشغيل المثبّت...' : 'Update ready! Launching installer...');
+    // Auto-launch the installer immediately for true direct updating!
+    if (window.tayyar?.installUpdate && filePath) {
+      setTimeout(() => window.tayyar.installUpdate(filePath), 600);
+    }
   }
+
+  function extractDeskReleaseHighlights(bodyText) {
+    const lines = String(bodyText || '').split(/\r?\n/).map((l) => l.trim());
+    const out = [];
+    for (const l of lines) {
+      if (/^[*•-]\s+/.test(l) && !/releases\/download/i.test(l) && !/^\*\*(Windows|Android|iOS|macOS|Linux)/i.test(l.replace(/^[*•-]\s+/, ''))) {
+        const clean = l.replace(/^[*•-]\s+/, '').replace(/\*\*/g, '').replace(/`/g, '').trim();
+        if (clean.length > 6) out.push(`• ${clean}`);
+      }
+      if (out.length >= 7) break;
+    }
+    if (out.length) return out.join('\n');
+    return S.lang === 'ar'
+      ? '• تحسينات شاملة في الأداء وسرعة التحميل واستقرار البرنامج.\n• تحديث مباشر بضغطة واحدة.'
+      : '• Performance, stability & download engine enhancements.\n• Direct 1-click installation.';
+  }
+
+  async function showDeskUpdatePopup(rel, channel) {
+    const overlay = $('#deskUpdOverlay');
+    if (!overlay || !rel) return;
+
+    const latestTag = (rel.tag_name || '').replace(/^v/, '');
+    const isBeta = !!rel.prerelease || (channel === 'beta' && /beta|alpha|rc/i.test(rel.tag_name || ''));
+
+    const chBadge = $('#deskUpdChannelBadge');
+    if (chBadge) {
+      chBadge.className = `desk-upd-ch-pill ${isBeta ? 'beta' : 'stable'}`;
+      chBadge.textContent = isBeta
+        ? (S.lang === 'ar' ? 'نسخة تجريبية (Beta)' : 'Beta Release')
+        : (S.lang === 'ar' ? 'نسخة مستقرة (Stable)' : 'Stable Release');
+    }
+
+    const verPill = $('#deskUpdVerPill');
+    if (verPill) verPill.textContent = `v${CURRENT_APP_VERSION} → v${latestTag}`;
+
+    // Show size of the matching platform installer
+    const sizePill = $('#deskUpdSizePill');
+    if (sizePill) {
+      try {
+        const plat = window.tayyar?.platform ? await window.tayyar.platform() : 'win32';
+        const assets = rel.assets || [];
+        let matched = null;
+        if (plat === 'darwin') matched = assets.find((a) => a.name.endsWith('.dmg'));
+        else if (plat === 'linux') matched = assets.find((a) => a.name.endsWith('.AppImage') || a.name.endsWith('.deb'));
+        else matched = assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe')) || assets.find((a) => a.name.endsWith('.exe'));
+        sizePill.textContent = matched?.size ? `• ${fmtBytes(matched.size)}` : '';
+      } catch (_) {
+        sizePill.textContent = '';
+      }
+    }
+
+    const notesEl = $('#deskUpdNotes');
+    if (notesEl) notesEl.textContent = extractDeskReleaseHighlights(rel.body);
+
+    const progEl = $('#deskUpdProgress');
+    const btnNow = $('#btnDeskUpdNow');
+    const nowTxt = $('#deskUpdNowText');
+    if (!downloadedUpdatePath) {
+      if (progEl) progEl.hidden = true;
+      if (btnNow) btnNow.disabled = false;
+      if (nowTxt) nowTxt.textContent = S.lang === 'ar' ? 'تحديث الآن' : 'Update Now';
+    } else {
+      if (nowTxt) nowTxt.textContent = S.lang === 'ar' ? 'تثبيت وإعادة التشغيل' : 'Install & Restart';
+    }
+
+    overlay.hidden = false;
+  }
+
+  function hideDeskUpdatePopup() {
+    const overlay = $('#deskUpdOverlay');
+    if (overlay) overlay.hidden = true;
+  }
+
+  $('#btnDeskUpdClose')?.addEventListener('click', hideDeskUpdatePopup);
+  $('#btnDeskUpdLater')?.addEventListener('click', hideDeskUpdatePopup);
+  $('#btnDeskUpdNow')?.addEventListener('click', () => startInAppUpdate());
+  $('#btnDeskUpdSkip')?.addEventListener('click', () => {
+    const latestTag = (availableUpdateRelease?.tag_name || '').replace(/^v/, '');
+    if (latestTag) {
+      try { localStorage.setItem('tayyar_skipped_update_ver', latestTag); } catch (_) {}
+      toast(S.lang === 'ar' ? `تم تخطي الإصدار v${latestTag}` : `Skipped version v${latestTag}`);
+    }
+    hideDeskUpdatePopup();
+  });
+  $('#deskUpdOverlay')?.addEventListener('click', (e) => {
+    if (e.target === $('#deskUpdOverlay')) hideDeskUpdatePopup();
+  });
 
   const bCheckUpdate = $('#bCheckUpdate');
   if (bCheckUpdate) {
@@ -4256,10 +4383,21 @@
           const ps = $('#updateProgressSpeed');
           const pz = $('#updateProgressSize');
           const percent = pct(b);
+          const spdStr = fmtBytes(b.speed || 0) + '/s';
+          const szStr = `${fmtBytes(b.downloaded || 0)} / ${fmtBytes(b.totalSize || b.size || 0)}`;
           if (pb) pb.style.width = percent + '%';
           if (pp) pp.textContent = percent + '%';
-          if (ps) ps.textContent = fmtBytes(b.speed || 0) + '/s';
-          if (pz) pz.textContent = `${fmtBytes(b.downloaded || 0)} / ${fmtBytes(b.totalSize || 0)}`;
+          if (ps) ps.textContent = spdStr;
+          if (pz) pz.textContent = szStr;
+
+          const dpb = $('#deskUpdProgFill');
+          const dpp = $('#deskUpdProgPct');
+          const dps = $('#deskUpdProgSpeed');
+          const dpz = $('#deskUpdProgSize');
+          if (dpb) dpb.style.width = percent + '%';
+          if (dpp) dpp.textContent = percent + '%';
+          if (dps) dps.textContent = spdStr;
+          if (dpz) dpz.textContent = szStr;
         }
       }
       if (updated) {

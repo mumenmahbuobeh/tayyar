@@ -19,6 +19,7 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import androidx.activity.result.ActivityResult;
+import androidx.core.content.FileProvider;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -818,6 +819,7 @@ public class TayyarMobilePlugin extends Plugin {
             final String mimeType = getMimeTypeForName(safeFilename);
             final boolean isAudio = mimeType.startsWith("audio/");
             final boolean isMedia = mimeType.startsWith("video/") || mimeType.startsWith("audio/") || mimeType.startsWith("image/");
+            final boolean forUpdate = Boolean.TRUE.equals(call.getBoolean("forUpdate", false));
 
             // String downloadId avoids all JS Number <-> Java Long deserialization mismatches!
             final String downloadId = "dl_" + System.currentTimeMillis() + "_" + taskSeq.incrementAndGet();
@@ -893,8 +895,15 @@ public class TayyarMobilePlugin extends Plugin {
                         task.total = conn.getContentLengthLong();
                         is = conn.getInputStream();
 
-                        // 3. Save directly to MediaStore (Movies/Pictures/Music/Downloads) so it appears IMMEDIATELY in Gallery!
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        // 3. Save directly to MediaStore (Movies/Pictures/Music/Downloads) OR app-private external dir for direct APK install!
+                        if (forUpdate) {
+                            File updDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+                            if (updDir != null && !updDir.exists()) updDir.mkdirs();
+                            directFile = new File(updDir, safeFilename);
+                            if (directFile.exists()) directFile.delete();
+                            os = new FileOutputStream(directFile);
+                            task.savedPath = directFile.getAbsolutePath();
+                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             ContentResolver resolver = context.getContentResolver();
                             mediaStoreUri = insertMediaStoreEntry(resolver, task.filename, task.mimeType, false);
                             if (mediaStoreUri != null) {
@@ -1063,6 +1072,39 @@ public class TayyarMobilePlugin extends Plugin {
             call.resolve(ret);
         } catch (Exception e) {
             call.reject(e.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void installApk(PluginCall call) {
+        try {
+            String path = call.getString("path", "");
+            if (path == null || path.trim().isEmpty()) {
+                call.reject("APK path required");
+                return;
+            }
+            File apkFile = new File(path);
+            if (!apkFile.exists()) {
+                call.reject("APK file not found: " + path);
+                return;
+            }
+            Context context = getContext();
+            Uri apkUri = FileProvider.getUriForFile(
+                context,
+                context.getPackageName() + ".fileprovider",
+                apkFile
+            );
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+
+            JSObject ret = new JSObject();
+            ret.put("ok", true);
+            call.resolve(ret);
+        } catch (Exception e) {
+            Log.e(TAG, "installApk error", e);
+            call.reject("Could not launch installer: " + e.getMessage());
         }
     }
 

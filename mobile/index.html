@@ -60,7 +60,7 @@
             <div class="pro-glass-card command-card">
               <div class="command-head">
                 <span class="command-label" data-i="quickDownloadLbl">Quick Download</span>
-                <span class="command-ver">v1.0.15</span>
+                <span class="command-ver">v1.0.16</span>
               </div>
 
               <!-- Sleek URL Input with Inline Paste Button -->
@@ -602,7 +602,7 @@
               </svg>
             </div>
             <div class="identity-body">
-              <div class="identity-name">Tayyar <span class="ver-pill">v1.0.15</span></div>
+              <div class="identity-name">Tayyar <span class="ver-pill">v1.0.16</span></div>
               <div class="identity-sub" data-i="identitySub">Universal Media & Story Downloader</div>
             </div>
           </div>
@@ -712,7 +712,7 @@
                 </span>
                 <div>
                   <div class="ios-row-title" id="updStatusTitle" data-i="upToDate">Tayyar is up to date</div>
-                  <div class="ios-row-hint" id="updStatusDesc" data-i="upToDateDesc">Version 1.0.15 is the latest stable release.</div>
+                  <div class="ios-row-hint" id="updStatusDesc" data-i="upToDateDesc">Version 1.0.16 is the latest stable release.</div>
                 </div>
               </div>
               <button type="button" class="pill-action-btn" id="btnCheckUpdate" data-i="check">Check</button>
@@ -881,6 +881,66 @@
       <span data-i="navSearch">Search</span>
     </button>
   </nav>
+
+  <!-- ==================== PRO UPDATE ARRIVAL POPUP (STABLE & BETA) ==================== -->
+  <div class="upd-popup-overlay" id="updPopupOverlay" hidden>
+    <div class="upd-popup-card" role="dialog" aria-modal="true" aria-labelledby="updPopTitle">
+      <button type="button" class="upd-pop-close" id="btnUpdPopClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+
+      <div class="upd-pop-hero">
+        <div class="upd-pop-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5"/>
+            <path d="M5 19.5h14"/>
+          </svg>
+        </div>
+        <span class="upd-channel-pill stable" id="updPopChannelBadge">Stable</span>
+      </div>
+
+      <h2 class="upd-pop-title" id="updPopTitle" data-i="updPopTitle">New Update Available</h2>
+      <div class="upd-pop-ver-row">
+        <span class="upd-ver-old" id="updPopOldVer">v1.0.16</span>
+        <span class="upd-ver-arrow">→</span>
+        <span class="upd-ver-new" id="updPopNewVer">v1.0.17</span>
+        <span class="upd-ver-size" id="updPopSize"></span>
+      </div>
+
+      <div class="upd-pop-notes-wrap" id="updPopNotesWrap">
+        <div class="upd-pop-notes-hdr" data-i="updWhatsNew">What's New</div>
+        <div class="upd-pop-notes" id="updPopNotes"></div>
+      </div>
+
+      <!-- Inline Direct Download Progress -->
+      <div class="upd-pop-progress" id="updPopProgress" hidden>
+        <div class="upd-prog-top">
+          <span id="updPopProgStatus" data-i="updDownloading">Downloading update...</span>
+          <span id="updPopProgPct">0%</span>
+        </div>
+        <div class="upd-prog-track"><div class="upd-prog-fill" id="updPopProgFill" style="width:0%"></div></div>
+        <div class="upd-prog-foot">
+          <span id="updPopProgSpeed">0 KB/s</span>
+          <span id="updPopProgBytes">0 MB</span>
+        </div>
+      </div>
+
+      <div class="upd-pop-actions">
+        <button type="button" class="cta-primary-btn upd-pop-primary" id="btnUpdPopNow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span id="updPopNowText" data-i="updNowDirect">Update Now</span>
+        </button>
+        <div class="upd-pop-sec-row">
+          <button type="button" class="upd-pop-sec-btn" id="btnUpdPopLater" data-i="updLaterBtn">Later</button>
+          <button type="button" class="upd-pop-sec-btn" id="btnUpdPopSkip" data-i="updSkipBtn">Skip Version</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Liquid Glass Toast Pill -->
   <div class="liquid-toast" id="liquidToast" hidden></div>
