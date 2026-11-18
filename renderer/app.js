@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.6 is the latest available release.',
+      upToDateDesc: 'Version 1.0.7 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -292,7 +292,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.6 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.7 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -461,14 +461,71 @@
   }
 
   /* ---------------- NAVIGATION / VIEW SWITCHING ---------------- */
+  function positionLiquidNavIndicator(activeBtn) {
+    const nav = $('#mobileBottomNav');
+    const indicator = $('#liquidNavIndicator');
+    if (!nav || !indicator || !activeBtn) return;
+
+    requestAnimationFrame(() => {
+      const navRect = nav.getBoundingClientRect();
+      const btnRect = activeBtn.getBoundingClientRect();
+      if (navRect.width === 0 || btnRect.width === 0) return;
+
+      const leftOffset = btnRect.left - navRect.left + (btnRect.width - 60) / 2;
+      indicator.style.left = `${leftOffset}px`;
+      indicator.style.transform = 'translateY(-50%) scale(0.88, 1.14)';
+      setTimeout(() => {
+        indicator.style.transform = 'translateY(-50%) scale(1, 1)';
+      }, 220);
+    });
+  }
+
+  function updateMobileFloatingStatus(item) {
+    const pill = $('#mobileFloatingStatus');
+    if (!pill) return;
+    if (!item || item.status === 'completed' || item.status === 'error') {
+      if (item && item.status === 'completed') {
+        const title = $('#mfsTitle');
+        const meta = $('#mfsMeta');
+        const fill = $('#mfsFill');
+        if (title) title.textContent = item.filename || 'Video';
+        if (meta) meta.textContent = S.lang === 'ar' ? '✅ اكتمل التحميل وحُفظ في الاستوديو' : '✅ Saved to Gallery & Downloads';
+        if (fill) fill.style.width = '100%';
+        pill.hidden = false;
+        setTimeout(() => { pill.hidden = true; }, 4000);
+      } else {
+        pill.hidden = true;
+      }
+      return;
+    }
+
+    pill.hidden = false;
+    const title = $('#mfsTitle');
+    const meta = $('#mfsMeta');
+    const fill = $('#mfsFill');
+    const icon = $('#mfsIcon');
+
+    const pct = item.size > 0 ? Math.min(100, Math.round((item.downloaded / item.size) * 100)) : (item.percent || 0);
+    const spd = fmtSpeed(item.speed || 0);
+    if (title) title.textContent = item.filename || 'Media Download';
+    if (meta) meta.textContent = `${pct}% • ${spd}`;
+    if (fill) fill.style.width = `${pct}%`;
+    if (icon) icon.textContent = item.filename?.endsWith('.mp3') || item.filename?.endsWith('.m4a') ? '🎵' : '🎬';
+  }
+
   function switchView(viewName) {
     S.activeView = viewName;
     $$('.nav-item').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.view === viewName);
     });
-    $$('.mobile-nav-btn, .mobile-nav-fab').forEach((btn) => {
-      btn.classList.toggle('active', btn.dataset.view === viewName);
+    let activeMobileBtn = null;
+    $$('.mobile-nav-btn').forEach((btn) => {
+      const isAct = btn.dataset.view === viewName;
+      btn.classList.toggle('active', isAct);
+      if (isAct) activeMobileBtn = btn;
     });
+    if (activeMobileBtn) positionLiquidNavIndicator(activeMobileBtn);
+
     $$('.view-panel').forEach((panel) => {
       panel.classList.remove('active');
     });
@@ -488,11 +545,16 @@
     }
   }
 
-  $$('.nav-item, .mobile-nav-btn, .mobile-nav-fab').forEach((btn) => {
+  $$('.nav-item, .mobile-nav-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const v = btn.dataset.view;
       if (v) switchView(v);
     });
+  });
+
+  window.addEventListener('resize', () => {
+    const activeBtn = $('.mobile-nav-btn.active');
+    if (activeBtn) positionLiquidNavIndicator(activeBtn);
   });
 
   /* ---------------- HEATMAP GENERATOR ---------------- */
@@ -798,7 +860,7 @@
       author: 'griciaisl12',
       short: 'MS',
       color: 'avatar-blue',
-      version: 'v1.0.6',
+      version: 'v1.0.7',
       desc: 'Resolves GitHub repository release, file links, Google Drive/Docs into real downloads with mirror acceleration.',
       installed: false,
       enabled: false,
@@ -1342,7 +1404,7 @@
         author: 'User',
         short: name.slice(0, 2).toUpperCase(),
         color: 'avatar-blue',
-        version: 'v1.0.6',
+        version: 'v1.0.7',
         desc: `Installed from ${val}`,
         installed: true,
         enabled: true,
@@ -2492,7 +2554,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.6';
+  const CURRENT_APP_VERSION = '1.0.7';
   let availableUpdateRelease = null;
   let updateDownloadTaskId = null;
   let downloadedUpdatePath = null;
@@ -2528,7 +2590,7 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const rel = await res.json();
       availableUpdateRelease = rel;
-      const latestTag = (rel.tag_name || 'v1.0.6').replace(/^v/, '');
+      const latestTag = (rel.tag_name || 'v1.0.7').replace(/^v/, '');
 
       const isNewer = semverCompare(latestTag, CURRENT_APP_VERSION) > 0;
 
@@ -2557,7 +2619,7 @@
       }
     } catch (err) {
       console.warn('Update check failed:', err);
-      if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? 'برنامج تيّار (v1.0.6)' : 'Tayyar (v1.0.6)';
+      if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? 'برنامج تيّار (v1.0.7)' : 'Tayyar (v1.0.7)';
       if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? 'تعذّر الاتصال بخادم التحديثات حالياً.' : 'Could not reach update server at this moment.';
       if (bInstall) {
         bInstall.style.display = 'inline-flex';
@@ -2604,22 +2666,22 @@
 
     if (platform === 'android') {
       const apk = assets.find((a) => a.name.endsWith('.apk'));
-      targetAssetUrl = apk ? apk.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-Android-v1.0.6.apk';
-      targetFilename = 'Tayyar-Android-v1.0.6.apk';
+      targetAssetUrl = apk ? apk.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.7/Tayyar-Android-v1.0.7.apk';
+      targetFilename = 'Tayyar-Android-v1.0.7.apk';
     } else if (platform === 'darwin') {
       const dmg = assets.find((a) => a.name.endsWith('.dmg'));
-      targetAssetUrl = dmg ? dmg.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-1.0.6.dmg';
-      targetFilename = 'Tayyar-1.0.6.dmg';
+      targetAssetUrl = dmg ? dmg.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.7/Tayyar-1.0.7.dmg';
+      targetFilename = 'Tayyar-1.0.7.dmg';
     } else if (platform === 'linux') {
       const appImage = assets.find((a) => a.name.endsWith('.AppImage') || a.name.endsWith('.deb'));
-      targetAssetUrl = appImage ? appImage.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-1.0.6.AppImage';
-      targetFilename = 'Tayyar-1.0.6.AppImage';
+      targetAssetUrl = appImage ? appImage.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.7/Tayyar-1.0.7.AppImage';
+      targetFilename = 'Tayyar-1.0.7.AppImage';
     } else {
       const setupExe = assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe') && !a.name.includes('blockmap') && (a.size > 80 * 1024 * 1024)) ||
                        assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe') && !a.name.includes('blockmap')) ||
                        assets.find((a) => a.name.endsWith('.exe') && !a.name.includes('blockmap'));
-      targetAssetUrl = setupExe ? setupExe.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.6/Tayyar-Setup-1.0.6.exe';
-      targetFilename = setupExe ? setupExe.name : 'Tayyar-Setup-1.0.6.exe';
+      targetAssetUrl = setupExe ? setupExe.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.7/Tayyar-Setup-1.0.7.exe';
+      targetFilename = setupExe ? setupExe.name : 'Tayyar-Setup-1.0.7.exe';
     }
 
     if (progressWrap) progressWrap.style.display = 'block';
@@ -2971,25 +3033,31 @@
 
           if (res.downloaded > 0) d.downloaded = res.downloaded;
           if (res.total > 0) d.size = res.total;
-          d.speed = Math.round(speed);
+          if (res.percent > 0) d.percent = res.percent;
+          d.speed = res.speed > 0 ? Math.round(res.speed) : Math.round(speed);
           d.eta = d.speed > 1 && d.size > d.downloaded ? Math.round((d.size - d.downloaded) / d.speed) : -1;
 
           if (res.status === 'completed') {
             d.status = 'completed';
             d.completedAt = Date.now();
             d.speed = 0;
+            d.percent = 100;
+            if (res.path) d.path = res.path;
             if (d.size > 0) d.downloaded = d.size;
             clearInterval(timer);
             activePolling.delete(id);
             saveStoredDownloads([...mobileDownloads.values()]);
             emit('dl:update', d);
+            toast(S.lang === 'ar' ? `✅ تم الحفظ في الاستوديو: ${d.filename}` : `✅ Saved to Gallery: ${d.filename}`);
           } else if (res.status === 'error') {
             d.status = 'error';
+            d.error = res.error || 'Download error';
             d.speed = 0;
             clearInterval(timer);
             activePolling.delete(id);
             saveStoredDownloads([...mobileDownloads.values()]);
             emit('dl:update', d);
+            toast(S.lang === 'ar' ? `❌ فشل التحميل: ${d.error}` : `❌ Download failed: ${d.error}`);
           } else {
             d.status = 'downloading';
             emit('dl:progress', [d]);
@@ -3455,6 +3523,10 @@
                            /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (isMobileDevice) {
       document.body.classList.add('is-mobile');
+      setTimeout(() => {
+        const activeBtn = $('.mobile-nav-btn.active');
+        if (activeBtn) positionLiquidNavIndicator(activeBtn);
+      }, 180);
     }
 
     initHeatmap();
@@ -3492,6 +3564,7 @@
 
       updateDashboard();
       renderDownloadsList();
+      if (document.body.classList.contains('is-mobile')) updateMobileFloatingStatus(d);
     });
 
     window.tayyar.on('dl:progress', (batchOrItem) => {
@@ -3507,6 +3580,7 @@
           S.items.set(b.id, b);
           updated = true;
         }
+        if (document.body.classList.contains('is-mobile')) updateMobileFloatingStatus(it || b);
 
         if (updateDownloadTaskId && b.id === updateDownloadTaskId) {
           const pb = $('#updateProgressBar');

@@ -243,7 +243,7 @@
             </div>
             <div class="card-main-val" id="engineStatusVal" data-i="ready">Ready</div>
             <div class="card-footer">
-              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.6</span>
+              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.7</span>
               <span class="status-indicator online" id="engineStatusDot"></span>
             </div>
           </div>
@@ -1525,7 +1525,7 @@
             </svg>
           </div>
           <div class="about-hero-details">
-            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.6</span></h2>
+            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.7</span></h2>
             <p class="about-tagline" data-i="aboutTagline">Before content collapses, preserve what truly matters, let
               beauty enter your orbit of preservation.</p>
             <div class="about-dev-by">
@@ -1560,7 +1560,7 @@
           <div class="updates-status-row">
             <div>
               <h4 class="update-title" id="updateTitleText" data-i="upToDate">Tayyar is up to date</h4>
-              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.6 is the latest available release.</div>
+              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.7 is the latest available release.</div>
             </div>
             <div class="update-actions">
               <button class="pill-btn light sm" id="bCheckUpdate">
@@ -1791,25 +1791,34 @@
     </div>
   </dialog>
 
+  <!-- ================= MOBILE APPLE LIQUID GLASS FLOATING STATUS PILL ================= -->
+  <div class="mobile-floating-status" id="mobileFloatingStatus" hidden>
+    <div class="mfs-icon" id="mfsIcon">🎬</div>
+    <div class="mfs-body">
+      <div class="mfs-title" id="mfsTitle">جاري التحميل...</div>
+      <div class="mfs-meta" id="mfsMeta">0% • 0 KB/s</div>
+      <div class="mfs-track"><div class="mfs-fill" id="mfsFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
   <!-- ================= MOBILE APPLE LIQUID GLASS BOTTOM NAVIGATION ================= -->
   <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <div class="liquid-indicator" id="liquidNavIndicator"></div>
     <button class="mobile-nav-btn active" data-view="dashboard" id="mNavDashboard">
-      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
       <span>الرئيسية</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="social" id="mNavSocial">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+      <span>الفيديو</span>
     </button>
     <button class="mobile-nav-btn" data-view="downloads" id="mNavDownloads">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
       <span>التحميلات</span>
     </button>
-    <button class="mobile-nav-fab" data-view="social" id="mNavSocial" title="منزل الفيديوهات">
-      <div class="fab-inner">
-        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-      </div>
-      <span>فيديو</span>
-    </button>
-    <button class="mobile-nav-btn" data-view="trackers" id="mNavTrackers">
-      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M4.93 4.93a10 10 0 0114.14 0M7.76 7.76a6 6 0 018.48 0M12 12m-2 0a2 2 0 104 0 2 2 0 10-4 0M12 14v7"></path></svg>
-      <span>التتبع</span>
+    <button class="mobile-nav-btn" data-view="plugins" id="mNavPlugins">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
+      <span>الإضافات</span>
     </button>
     <button class="mobile-nav-btn" data-view="settings" id="mNavSettings">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>

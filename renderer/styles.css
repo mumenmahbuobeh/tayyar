@@ -3470,8 +3470,9 @@ html[dir="rtl"] .glass-island-player {
   padding: 16px 20px;
 }
 
-/* ================= MOBILE BOTTOM NAVIGATION DOCK ================= */
-.mobile-bottom-nav {
+/* ================= APPLE LIQUID GLASS FLOATING DOCK & STATUS PILL ================= */
+.mobile-bottom-nav,
+.mobile-floating-status {
   display: none;
 }
 
@@ -3487,99 +3488,193 @@ html[dir="rtl"] .glass-island-player {
   }
 
   .main-content {
-    padding-bottom: calc(84px + env(safe-area-inset-bottom, 16px)) !important;
+    padding-bottom: calc(120px + env(safe-area-inset-bottom, 16px)) !important;
     padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
     height: 100% !important;
     overflow-y: auto !important;
   }
 
+  /* Floating Apple Liquid Glass Status Pill (above dock, like Quranify mini-player) */
+  .mobile-floating-status {
+    display: flex !important;
+    position: fixed !important;
+    bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 16px !important;
+    right: 16px !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    padding: 10px 14px !important;
+    align-items: center !important;
+    gap: 12px !important;
+    background: rgba(24, 27, 40, 0.72) !important;
+    backdrop-filter: blur(36px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(36px) saturate(210%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 26px !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6),
+                inset 0 1px 1.5px rgba(255, 255, 255, 0.35) !important;
+    z-index: 9999 !important;
+    animation: slideUpLiquid 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .mobile-floating-status[hidden] {
+    display: none !important;
+  }
+
+  @keyframes slideUpLiquid {
+    from { opacity: 0; transform: translateY(18px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .mfs-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(79, 172, 254, 0.25));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .mfs-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mfs-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mfs-meta {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.68);
+    margin-top: 2px;
+  }
+
+  .mfs-track {
+    height: 4px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .mfs-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00f2fe, #4facfe);
+    border-radius: 4px;
+    transition: width 0.25s ease;
+    box-shadow: 0 0 8px rgba(0, 242, 254, 0.7);
+  }
+
+  /* Apple Liquid Glass Floating Capsule Dock */
   .mobile-bottom-nav {
     display: flex !important;
     position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: calc(64px + env(safe-area-inset-bottom, 12px)) !important;
-    padding: 6px 12px calc(env(safe-area-inset-bottom, 12px)) !important;
-    background: rgba(14, 15, 20, 0.92) !important;
-    backdrop-filter: blur(32px) saturate(190%) !important;
-    -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6) !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 16px !important;
+    right: 16px !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    height: 70px !important;
+    padding: 0 8px !important;
+    background: rgba(20, 22, 34, 0.72) !important;
+    backdrop-filter: blur(42px) saturate(220%) contrast(105%) !important;
+    -webkit-backdrop-filter: blur(42px) saturate(220%) contrast(105%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 40px !important;
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.75),
+                inset 0 1.5px 2px rgba(255, 255, 255, 0.42),
+                inset 0 -1.5px 2px rgba(0, 0, 0, 0.4) !important;
     z-index: 10000 !important;
     justify-content: space-around !important;
     align-items: center !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    overflow: visible !important;
+  }
+
+  /* Sliding Circular Liquid Glass Bubble / Lens (Quranify signature effect) */
+  .liquid-indicator {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.12) 48%, rgba(0, 242, 254, 0.18) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.36);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.48),
+                0 0 18px rgba(0, 242, 254, 0.22),
+                inset 0 1.5px 2.5px rgba(255, 255, 255, 0.65),
+                inset 0 -1.5px 2px rgba(0, 0, 0, 0.32);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transition: left 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    z-index: 1;
   }
 
   .mobile-nav-btn {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 3px;
+    width: 62px;
+    height: 62px;
     background: transparent;
     border: none;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.56);
     font-size: 10px;
     font-weight: 500;
-    padding: 4px 10px;
-    border-radius: 12px;
+    padding: 0;
+    border-radius: 50%;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: color 0.3s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    -webkit-tap-highlight-color: transparent;
   }
 
   .mobile-nav-btn svg {
-    width: 22px;
-    height: 22px;
+    width: 23px;
+    height: 23px;
     stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
   }
 
   .mobile-nav-btn.active {
-    color: var(--accent) !important;
+    color: #ffffff !important;
   }
 
   .mobile-nav-btn.active svg {
-    filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.6));
+    stroke: #ffffff;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 18px rgba(0, 242, 254, 0.65));
+    transform: scale(1.08);
   }
 
-  .mobile-nav-fab {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    margin-top: -24px;
-    gap: 2px;
-  }
-
-  .mobile-nav-fab .fab-inner {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 24px rgba(0, 242, 254, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.6);
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .mobile-nav-fab .fab-inner svg {
-    width: 26px;
-    height: 26px;
-    stroke: #000000;
-    fill: none;
-  }
-
-  .mobile-nav-fab span {
-    font-size: 10px;
-    font-weight: 600;
+  .mobile-nav-btn.active span {
     color: #ffffff;
+    font-weight: 600;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
   }
 
-  .mobile-nav-fab:active .fab-inner {
-    transform: scale(0.9);
+  .mobile-nav-btn:active {
+    transform: scale(0.88);
   }
 }
 
