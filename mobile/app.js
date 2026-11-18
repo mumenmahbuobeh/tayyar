@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.14';
+  const APP_VERSION = '1.0.15';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -147,6 +147,15 @@
       storySavedToast: 'Story saved to Downloads/Tayyar/Stories & Gallery!',
       storiesFoundCount: 'stories found',
       waGrantedToast: 'WhatsApp folder connected!',
+      typeVideos: 'Videos',
+      typePhotos: 'Photos',
+      storyPickCountLbl: 'Number of stories to download',
+      selectAllBtn: 'All',
+      clearSelBtn: 'Clear',
+      downloadSelectedBtn: 'Download Selected',
+      batchStartedToast: 'Downloading selected stories:',
+      batchSavedToast: 'Saved selected statuses to Gallery:',
+      selectAtLeastOne: 'Select at least 1 story to download',
     },
     ar: {
       appTitle: 'تيّار',
@@ -282,6 +291,15 @@
       storySavedToast: 'تم حفظ الستوري في Downloads/Tayyar/Stories والمعرض!',
       storiesFoundCount: 'ستوريات متاحة',
       waGrantedToast: 'تم ربط مجلد حالات واتساب بنجاح!',
+      typeVideos: 'فيديو',
+      typePhotos: 'صور',
+      storyPickCountLbl: 'عدد الستوريات المطلوب تحميلها',
+      selectAllBtn: 'الكل',
+      clearSelBtn: 'مسح',
+      downloadSelectedBtn: 'تحميل المحدد',
+      batchStartedToast: 'بدأ تحميل الستوريات المحددة:',
+      batchSavedToast: 'تم حفظ الحالات المحددة في المعرض:',
+      selectAtLeastOne: 'اختر ستوري واحد على الأقل للتحميل',
     },
   };
 
@@ -305,7 +323,11 @@
     waStatuses: [],
     waNeedsSaf: false,
     waLoadedOnce: false,
+    waFilter: 'all',
+    waSelected: new Set(),
     socialStories: [],
+    socialFilter: 'all',
+    socialSelected: new Set(),
   };
 
   function t(key) {
@@ -1660,6 +1682,42 @@
   const STORY_DL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
   const STORY_PLAY_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>';
   const STORY_IMG_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+  const STORY_CHK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  function getFilteredItems(list, typeFilter) {
+    if (typeFilter === 'video') return list.filter((it) => it.type === 'video');
+    if (typeFilter === 'image') return list.filter((it) => it.type !== 'video');
+    return list;
+  }
+
+  function applySelectionCount(list, typeFilter, selectedSet, count) {
+    const visible = getFilteredItems(list, typeFilter);
+    const n = Math.max(0, Math.min(visible.length, Number(count) || 0));
+    selectedSet.clear();
+    for (let i = 0; i < n; i++) {
+      selectedSet.add(visible[i]._uid);
+    }
+  }
+
+  function syncSelectorControls({ list, typeFilter, selectedSet, barEl, badgeEl, inputEl, rangeEl, dlBtnEl, dlTextEl }) {
+    const visible = getFilteredItems(list, typeFilter);
+    const total = visible.length;
+    if (barEl) barEl.hidden = list.length === 0;
+    if (list.length === 0) return;
+
+    const selCount = visible.filter((it) => selectedSet.has(it._uid)).length;
+    if (badgeEl) badgeEl.textContent = `${selCount} / ${total}`;
+    if (inputEl) {
+      inputEl.max = String(total);
+      inputEl.value = String(selCount);
+    }
+    if (rangeEl) {
+      rangeEl.max = String(Math.max(1, total));
+      rangeEl.value = String(selCount);
+    }
+    if (dlBtnEl) dlBtnEl.disabled = selCount === 0;
+    if (dlTextEl) dlTextEl.textContent = `${t('downloadSelectedBtn')} (${selCount} / ${total})`;
+  }
 
   function isAndroidNative() {
     try {
@@ -1688,18 +1746,54 @@
     }
   }
 
+  async function saveSingleWhatsAppStatus(entry, silent = false) {
+    const eng = getNativeEngine();
+    if (!entry || !eng || typeof eng.saveWhatsAppStatus !== 'function') return false;
+    try {
+      const res = await eng.saveWhatsAppStatus({
+        uri: entry.uri || '',
+        path: entry.path || '',
+        name: entry.name || `Status_${Date.now()}.${entry.type === 'video' ? 'mp4' : 'jpg'}`,
+      });
+      if (res && res.ok) {
+        entry._saved = true;
+        state.downloads.unshift({
+          id: `wa_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
+          url: entry.uri || entry.path || 'whatsapp://status',
+          filename: res.filename || entry.name,
+          status: 'completed',
+          downloaded: res.size || entry.size || 0,
+          total: res.size || entry.size || 0,
+          percent: 100,
+          speed: 0,
+          addedAt: Date.now(),
+        });
+        saveDownloads();
+        if (!silent) {
+          renderAllViews();
+          showToast(t('storySavedToast'));
+        }
+        return true;
+      }
+    } catch (err) {
+      if (!silent) showToast(`${t('dlFailToast')}: ${err.message || ''}`);
+    }
+    return false;
+  }
+
   function renderWhatsAppStatusesGrid() {
     const grid = $('#waStatusGrid');
+    const bar = $('#waSelectorBar');
     if (!grid) return;
 
     const native = getNativeEngine();
     const canNativeWa = isAndroidNative() && native && typeof native.listWhatsAppStatuses === 'function';
 
-    // Hide Android-only toolbar buttons on iOS / Web
     const waToolbar = $('.wa-toolbar');
     if (waToolbar) waToolbar.hidden = !canNativeWa;
 
     if (!canNativeWa) {
+      if (bar) bar.hidden = true;
       grid.innerHTML = `
         <div class="story-empty-card">
           <div class="story-empty-title">${t('waIosTitle')}</div>
@@ -1710,6 +1804,7 @@
     }
 
     if (state.waNeedsSaf && state.waStatuses.length === 0) {
+      if (bar) bar.hidden = true;
       grid.innerHTML = `
         <div class="story-empty-card">
           <div class="story-empty-title">${t('waNeedPermTitle')}</div>
@@ -1720,6 +1815,7 @@
     }
 
     if (state.waStatuses.length === 0) {
+      if (bar) bar.hidden = true;
       grid.innerHTML = `
         <div class="story-empty-card">
           <div class="story-empty-title">${t('waEmptyTitle')}</div>
@@ -1729,52 +1825,51 @@
       return;
     }
 
-    grid.innerHTML = state.waStatuses.map((item, idx) => `
-      <div class="story-tile">
-        ${item.thumbnail
-          ? `<img class="story-tile-img" src="${item.thumbnail}" alt="" />`
-          : `<div class="story-tile-fallback">${item.type === 'video' ? STORY_PLAY_SVG : STORY_IMG_SVG}</div>`}
-        <span class="story-type-pill">${item.type === 'video' ? 'MP4' : 'IMG'}</span>
-        <button type="button" class="story-save-btn" data-wa-idx="${idx}">
-          ${STORY_DL_SVG}
-          <span>${item._saved ? t('savedBtn') : t('saveBtn')}</span>
-        </button>
-      </div>
-    `).join('');
+    syncSelectorControls({
+      list: state.waStatuses,
+      typeFilter: state.waFilter,
+      selectedSet: state.waSelected,
+      barEl: bar,
+      badgeEl: $('#waSelectedBadge'),
+      inputEl: $('#waCountInput'),
+      rangeEl: $('#waCountRange'),
+      dlBtnEl: $('#btnWaDownloadSelected'),
+      dlTextEl: $('#waDlSelectedText'),
+    });
 
-    $$('.story-save-btn[data-wa-idx]', grid).forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const idx = Number(btn.dataset.waIdx);
-        const entry = state.waStatuses[idx];
-        if (!entry) return;
-        const eng = getNativeEngine();
-        if (!eng || typeof eng.saveWhatsAppStatus !== 'function') return;
-        try {
-          const res = await eng.saveWhatsAppStatus({
-            uri: entry.uri || '',
-            path: entry.path || '',
-            name: entry.name || `Status_${Date.now()}.${entry.type === 'video' ? 'mp4' : 'jpg'}`,
-          });
-          if (res && res.ok) {
-            entry._saved = true;
-            state.downloads.unshift({
-              id: `wa_${Date.now()}_${idx}`,
-              url: entry.uri || entry.path || 'whatsapp://status',
-              filename: res.filename || entry.name,
-              status: 'completed',
-              downloaded: res.size || entry.size || 0,
-              total: res.size || entry.size || 0,
-              percent: 100,
-              speed: 0,
-              addedAt: Date.now(),
-            });
-            saveDownloads();
-            renderAllViews();
-            showToast(t('storySavedToast'));
-          }
-        } catch (err) {
-          showToast(`${t('dlFailToast')}: ${err.message || ''}`);
-        }
+    const visible = getFilteredItems(state.waStatuses, state.waFilter);
+    grid.innerHTML = visible.map((item, idx) => {
+      const isSel = state.waSelected.has(item._uid);
+      return `
+        <div class="story-tile ${isSel ? 'selected' : ''}" data-wa-uid="${escapeHtml(item._uid)}">
+          ${item.thumbnail
+            ? `<img class="story-tile-img" src="${item.thumbnail}" alt="" />`
+            : `<div class="story-tile-fallback">${item.type === 'video' ? STORY_PLAY_SVG : STORY_IMG_SVG}</div>`}
+          <span class="story-type-pill">#${idx + 1} • ${item.type === 'video' ? 'MP4' : 'IMG'}</span>
+          <span class="story-check-circle">${STORY_CHK_SVG}</span>
+          <button type="button" class="story-save-btn" data-wa-save="${escapeHtml(item._uid)}">
+            ${STORY_DL_SVG}
+            <span>${item._saved ? t('savedBtn') : t('saveBtn')}</span>
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    $$('.story-tile[data-wa-uid]', grid).forEach((tile) => {
+      tile.addEventListener('click', (e) => {
+        if (e.target.closest('.story-save-btn')) return;
+        const uid = tile.dataset.waUid;
+        if (state.waSelected.has(uid)) state.waSelected.delete(uid);
+        else state.waSelected.add(uid);
+        renderWhatsAppStatusesGrid();
+      });
+    });
+
+    $$('.story-save-btn[data-wa-save]', grid).forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const entry = state.waStatuses.find((x) => x._uid === btn.dataset.waSave);
+        await saveSingleWhatsAppStatus(entry, false);
       });
     });
   }
@@ -1788,8 +1883,11 @@
     }
     try {
       const res = await native.listWhatsAppStatuses();
-      state.waStatuses = Array.isArray(res?.items) ? res.items : [];
+      const items = Array.isArray(res?.items) ? res.items : [];
+      state.waStatuses = items.map((it, i) => ({ ...it, _uid: it.id || `wa_${i}` }));
       state.waNeedsSaf = !!res?.needsSaf;
+      // Pre-select all loaded statuses by default so user can dial down or pick exact count immediately
+      applySelectionCount(state.waStatuses, state.waFilter, state.waSelected, state.waStatuses.length);
       renderWhatsAppStatusesGrid();
     } catch (_) {
       renderWhatsAppStatusesGrid();
@@ -1912,7 +2010,6 @@
   function renderSocialStoriesGrid(emptyMode = 'prompt') {
     const grid = $('#socialStoriesGrid');
     const resBar = $('#storyResultsBar');
-    const countLbl = $('#storyCountLbl');
     if (!grid) return;
 
     if (state.socialStories.length === 0) {
@@ -1927,25 +2024,50 @@
       return;
     }
 
-    if (resBar) resBar.hidden = false;
-    if (countLbl) countLbl.textContent = `${state.socialStories.length} ${t('storiesFoundCount')}`;
+    syncSelectorControls({
+      list: state.socialStories,
+      typeFilter: state.socialFilter,
+      selectedSet: state.socialSelected,
+      barEl: resBar,
+      badgeEl: $('#storyCountLbl'),
+      inputEl: $('#socialCountInput'),
+      rangeEl: $('#socialCountRange'),
+      dlBtnEl: $('#btnSaveAllStories'),
+      dlTextEl: $('#socialDlSelectedText'),
+    });
 
-    grid.innerHTML = state.socialStories.map((st, idx) => `
-      <div class="story-tile">
-        ${st.thumbnail
-          ? `<img class="story-tile-img" src="${escapeHtml(st.thumbnail)}" alt="" />`
-          : `<div class="story-tile-fallback">${st.type === 'video' ? STORY_PLAY_SVG : STORY_IMG_SVG}</div>`}
-        <span class="story-type-pill">${st.type === 'video' ? 'MP4' : 'JPG'}</span>
-        <button type="button" class="story-save-btn" data-story-idx="${idx}">
-          ${STORY_DL_SVG}
-          <span>${t('saveBtn')}</span>
-        </button>
-      </div>
-    `).join('');
+    const visible = getFilteredItems(state.socialStories, state.socialFilter);
+    grid.innerHTML = visible.map((st, idx) => {
+      const isSel = state.socialSelected.has(st._uid);
+      return `
+        <div class="story-tile ${isSel ? 'selected' : ''}" data-story-uid="${escapeHtml(st._uid)}">
+          ${st.thumbnail
+            ? `<img class="story-tile-img" src="${escapeHtml(st.thumbnail)}" alt="" />`
+            : `<div class="story-tile-fallback">${st.type === 'video' ? STORY_PLAY_SVG : STORY_IMG_SVG}</div>`}
+          <span class="story-type-pill">#${idx + 1} • ${st.type === 'video' ? 'MP4' : 'JPG'}</span>
+          <span class="story-check-circle">${STORY_CHK_SVG}</span>
+          <button type="button" class="story-save-btn" data-story-save="${escapeHtml(st._uid)}">
+            ${STORY_DL_SVG}
+            <span>${t('saveBtn')}</span>
+          </button>
+        </div>
+      `;
+    }).join('');
 
-    $$('.story-save-btn[data-story-idx]', grid).forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const st = state.socialStories[Number(btn.dataset.storyIdx)];
+    $$('.story-tile[data-story-uid]', grid).forEach((tile) => {
+      tile.addEventListener('click', (e) => {
+        if (e.target.closest('.story-save-btn')) return;
+        const uid = tile.dataset.storyUid;
+        if (state.socialSelected.has(uid)) state.socialSelected.delete(uid);
+        else state.socialSelected.add(uid);
+        renderSocialStoriesGrid('ok');
+      });
+    });
+
+    $$('.story-save-btn[data-story-save]', grid).forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const st = state.socialStories.find((x) => x._uid === btn.dataset.storySave);
         if (!st || !st.url) return;
         startDownload({
           url: st.url,
@@ -1965,6 +2087,7 @@
     const loader = $('#storyLoader');
     if (loader) loader.hidden = false;
     state.socialStories = [];
+    state.socialSelected.clear();
     renderSocialStoriesGrid('prompt');
 
     let result = null;
@@ -1979,7 +2102,11 @@
     }
 
     if (loader) loader.hidden = true;
-    state.socialStories = Array.isArray(result?.stories) ? result.stories : [];
+    const rawList = Array.isArray(result?.stories) ? result.stories : [];
+    state.socialStories = rawList.map((st, i) => ({ ...st, _uid: st.id || `st_${i}` }));
+    state.socialFilter = 'all';
+    $$('#socialTypeFilter .ssb-chip').forEach((c) => c.classList.toggle('active', c.dataset.stype === 'all'));
+    applySelectionCount(state.socialStories, state.socialFilter, state.socialSelected, state.socialStories.length);
     renderSocialStoriesGrid(state.socialStories.length ? 'ok' : 'notfound');
   }
 
@@ -1996,6 +2123,80 @@
   $('#btnWaGrantNormal')?.addEventListener('click', () => requestWhatsAppFolder(false));
   $('#btnWaGrantBiz')?.addEventListener('click', () => requestWhatsAppFolder(true));
   $('#btnWaRefresh')?.addEventListener('click', () => loadWhatsAppStatuses());
+
+  // WhatsApp Selector Controls (Filter, Stepper, Slider, Presets, Batch Save)
+  $$('#waTypeFilter .ssb-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      state.waFilter = chip.dataset.stype;
+      $$('#waTypeFilter .ssb-chip').forEach((c) => c.classList.toggle('active', c === chip));
+      const vis = getFilteredItems(state.waStatuses, state.waFilter);
+      applySelectionCount(state.waStatuses, state.waFilter, state.waSelected, vis.length);
+      renderWhatsAppStatusesGrid();
+    });
+  });
+
+  const setWaCount = (n) => {
+    applySelectionCount(state.waStatuses, state.waFilter, state.waSelected, n);
+    renderWhatsAppStatusesGrid();
+  };
+  $('#btnWaCountDec')?.addEventListener('click', () => setWaCount((Number($('#waCountInput')?.value) || 0) - 1));
+  $('#btnWaCountInc')?.addEventListener('click', () => setWaCount((Number($('#waCountInput')?.value) || 0) + 1));
+  $('#waCountInput')?.addEventListener('input', (e) => setWaCount(e.target.value));
+  $('#waCountRange')?.addEventListener('input', (e) => setWaCount(e.target.value));
+  $$('#waPresets .ssb-preset').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const p = btn.dataset.preset;
+      const vis = getFilteredItems(state.waStatuses, state.waFilter);
+      if (p === 'all') setWaCount(vis.length);
+      else if (p === 'none') setWaCount(0);
+      else setWaCount(Number(p));
+    });
+  });
+
+  $('#btnWaDownloadSelected')?.addEventListener('click', async () => {
+    const visible = getFilteredItems(state.waStatuses, state.waFilter);
+    const chosen = visible.filter((it) => state.waSelected.has(it._uid));
+    if (!chosen.length) {
+      showToast(t('selectAtLeastOne'));
+      return;
+    }
+    let savedOk = 0;
+    for (const entry of chosen) {
+      const ok = await saveSingleWhatsAppStatus(entry, true);
+      if (ok) savedOk++;
+    }
+    renderAllViews();
+    showToast(`${t('batchSavedToast')} ${savedOk}`);
+  });
+
+  // Social Stories Selector Controls (Filter, Stepper, Slider, Presets, Batch Download)
+  $$('#socialTypeFilter .ssb-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      state.socialFilter = chip.dataset.stype;
+      $$('#socialTypeFilter .ssb-chip').forEach((c) => c.classList.toggle('active', c === chip));
+      const vis = getFilteredItems(state.socialStories, state.socialFilter);
+      applySelectionCount(state.socialStories, state.socialFilter, state.socialSelected, vis.length);
+      renderSocialStoriesGrid('ok');
+    });
+  });
+
+  const setSocialCount = (n) => {
+    applySelectionCount(state.socialStories, state.socialFilter, state.socialSelected, n);
+    renderSocialStoriesGrid('ok');
+  };
+  $('#btnSocialCountDec')?.addEventListener('click', () => setSocialCount((Number($('#socialCountInput')?.value) || 0) - 1));
+  $('#btnSocialCountInc')?.addEventListener('click', () => setSocialCount((Number($('#socialCountInput')?.value) || 0) + 1));
+  $('#socialCountInput')?.addEventListener('input', (e) => setSocialCount(e.target.value));
+  $('#socialCountRange')?.addEventListener('input', (e) => setSocialCount(e.target.value));
+  $$('#socialPresets .ssb-preset').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const p = btn.dataset.preset;
+      const vis = getFilteredItems(state.socialStories, state.socialFilter);
+      if (p === 'all') setSocialCount(vis.length);
+      else if (p === 'none') setSocialCount(0);
+      else setSocialCount(Number(p));
+    });
+  });
 
   $('#btnStoryPaste')?.addEventListener('click', async () => {
     try {
@@ -2018,14 +2219,21 @@
   });
 
   $('#btnSaveAllStories')?.addEventListener('click', () => {
-    state.socialStories.forEach((st) => {
-      if (st && st.url) {
+    const visible = getFilteredItems(state.socialStories, state.socialFilter);
+    const chosen = visible.filter((st) => state.socialSelected.has(st._uid) && st.url);
+    if (!chosen.length) {
+      showToast(t('selectAtLeastOne'));
+      return;
+    }
+    showToast(`${t('batchStartedToast')} ${chosen.length}`);
+    chosen.forEach((st, idx) => {
+      setTimeout(() => {
         startDownload({
           url: st.url,
-          filename: st.filename || sanitizeName(`Story_${Date.now()}`, st.ext || 'mp4'),
+          filename: st.filename || sanitizeName(`Story_${Date.now()}_${idx + 1}`, st.ext || 'mp4'),
           isAudio: false,
         });
-      }
+      }, idx * 240);
     });
   });
 

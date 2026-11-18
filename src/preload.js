@@ -5,7 +5,7 @@ const EVENTS = ['dl:update', 'dl:progress', 'dl:removed', 'settings', 'ui:add-ur
 const inv = (name) => (...args) => ipcRenderer.invoke(name, ...args);
 
 const bridge = {
-  version: '1.0.14',
+  version: '1.0.15',
   list: inv('list'),
   platform: inv('platform'),
   settings: {

@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.14 is the latest available release.',
+      upToDateDesc: 'Version 1.0.15 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -207,6 +207,11 @@
       waDeskTitle: 'WhatsApp Status Saver (Desktop)',
       waDeskDesc: 'Install the Tayyar Browser Extension, open WhatsApp Web, and hover over any Status photo or video to click "Save WhatsApp Story" — it saves directly to Downloads/Tayyar/Stories in original HD!',
       openWaWebBtn: 'Open WhatsApp Web',
+      typeVideos: 'Videos',
+      typePhotos: 'Photos',
+      storyPickCountLbl: 'Number of stories to download:',
+      selectAllBtn: 'All',
+      clearSelBtn: 'Clear',
     },
     ar: {
       dashboard: 'لوحة التحكم',
@@ -337,7 +342,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.14 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.15 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -410,6 +415,11 @@
       waDeskTitle: 'حافظ حالات واتساب (سطح المكتب)',
       waDeskDesc: 'ثبّت إضافة متصفح تيّار وافتح واتساب ويب، ثم مرّر الفأرة فوق أي حالة (صورة أو فيديو) واضغط "Save WhatsApp Story" ليتم حفظها فوراً في مجلد Downloads/Tayyar/Stories بأعلى جودة أصلية!',
       openWaWebBtn: 'فتح واتساب ويب',
+      typeVideos: 'فيديو',
+      typePhotos: 'صور',
+      storyPickCountLbl: 'عدد الستوريات المطلوب تحميلها:',
+      selectAllBtn: 'الكل',
+      clearSelBtn: 'مسح',
     },
   };
 
@@ -992,7 +1002,7 @@
       author: 'griciaisl12',
       short: 'MS',
       color: 'avatar-blue',
-      version: 'v1.0.14',
+      version: 'v1.0.15',
       desc: 'Resolves GitHub repository release, file links, Google Drive/Docs into real downloads with mirror acceleration.',
       installed: false,
       enabled: false,
@@ -1536,7 +1546,7 @@
         author: 'User',
         short: name.slice(0, 2).toUpperCase(),
         color: 'avatar-blue',
-        version: 'v1.0.14',
+        version: 'v1.0.15',
         desc: `Installed from ${val}`,
         installed: true,
         enabled: true,
@@ -2922,7 +2932,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases — Stable Default) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.14';
+  const CURRENT_APP_VERSION = '1.0.15';
   let availableUpdateRelease = null;
   let isNewerUpdateAvailable = false;
   let updateDownloadTaskId = null;
@@ -3935,6 +3945,24 @@
 
     let deskStoryPlat = 'snapchat';
     let deskStoriesList = [];
+    let deskStoryFilter = 'all';
+    const deskStorySelected = new Set();
+
+    function getDeskFilteredStories() {
+      if (deskStoryFilter === 'video') return deskStoriesList.filter((s) => s.type === 'video');
+      if (deskStoryFilter === 'image') return deskStoriesList.filter((s) => s.type !== 'video');
+      return deskStoriesList;
+    }
+
+    function setDeskStorySelectionCount(n) {
+      const visible = getDeskFilteredStories();
+      const clamped = Math.max(0, Math.min(visible.length, Number(n) || 0));
+      deskStorySelected.clear();
+      for (let i = 0; i < clamped; i++) {
+        deskStorySelected.add(visible[i]._uid);
+      }
+      renderDeskStories();
+    }
 
     function switchSocialMode(mode) {
       const isStories = mode === 'stories';
@@ -4000,28 +4028,57 @@
         }
         return;
       }
+
+      const visible = getDeskFilteredStories();
+      const total = visible.length;
+      const selCount = visible.filter((s) => deskStorySelected.has(s._uid)).length;
+
       if (deskStoryResBar) deskStoryResBar.hidden = false;
-      if (deskStoryCountLbl) {
-        deskStoryCountLbl.textContent = S.lang === 'ar'
-          ? `${deskStoriesList.length} ستوريات جاهزة للتحميل`
-          : `${deskStoriesList.length} active stories ready`;
+      if (deskStoryCountLbl) deskStoryCountLbl.textContent = `${selCount} / ${total}`;
+
+      const inpNum = $('#deskStoryCountInput');
+      const inpRng = $('#deskStoryCountRange');
+      const dlBtn = $('#btnDeskSaveAllStories');
+      const dlTxt = $('#deskDlSelectedText');
+      if (inpNum) { inpNum.max = String(total); inpNum.value = String(selCount); }
+      if (inpRng) { inpRng.max = String(Math.max(1, total)); inpRng.value = String(selCount); }
+      if (dlBtn) dlBtn.disabled = selCount === 0;
+      if (dlTxt) {
+        dlTxt.textContent = S.lang === 'ar'
+          ? `تحميل المحدد (${selCount} / ${total})`
+          : `Download Selected (${selCount} / ${total})`;
       }
 
-      deskStoryGrid.innerHTML = deskStoriesList.map((st, idx) => `
-        <div class="desk-story-card">
-          ${st.thumbnail
-            ? `<img src="${st.thumbnail}" alt="" />`
-            : `<div class="desk-story-fallback">${st.type === 'video' ? '▶' : '▣'}</div>`}
-          <span class="desk-story-type">${st.type === 'video' ? 'MP4' : 'JPG'}</span>
-          <button type="button" class="desk-story-dl-btn" data-dstory-idx="${idx}">
-            ${S.lang === 'ar' ? 'تحميل' : 'Download'}
-          </button>
-        </div>
-      `).join('');
+      deskStoryGrid.innerHTML = visible.map((st, idx) => {
+        const isSel = deskStorySelected.has(st._uid);
+        return `
+          <div class="desk-story-card ${isSel ? 'selected' : ''}" data-dstory-uid="${st._uid}">
+            ${st.thumbnail
+              ? `<img src="${st.thumbnail}" alt="" />`
+              : `<div class="desk-story-fallback">${st.type === 'video' ? '▶' : '▣'}</div>`}
+            <span class="desk-story-type">#${idx + 1} • ${st.type === 'video' ? 'MP4' : 'JPG'}</span>
+            <span class="desk-story-check">✓</span>
+            <button type="button" class="desk-story-dl-btn" data-dstory-save="${st._uid}">
+              ${S.lang === 'ar' ? 'تحميل' : 'Download'}
+            </button>
+          </div>
+        `;
+      }).join('');
 
-      $$('.desk-story-dl-btn', deskStoryGrid).forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const st = deskStoriesList[Number(btn.dataset.dstoryIdx)];
+      $$('.desk-story-card[data-dstory-uid]', deskStoryGrid).forEach((card) => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.desk-story-dl-btn')) return;
+          const uid = card.dataset.dstoryUid;
+          if (deskStorySelected.has(uid)) deskStorySelected.delete(uid);
+          else deskStorySelected.add(uid);
+          renderDeskStories();
+        });
+      });
+
+      $$('.desk-story-dl-btn[data-dstory-save]', deskStoryGrid).forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const st = deskStoriesList.find((x) => x._uid === btn.dataset.dstorySave);
           if (!st || !st.url) return;
           window.tayyar?.add?.({
             url: st.url,
@@ -4043,6 +4100,7 @@
       if (deskStoryLoader) deskStoryLoader.hidden = false;
       if (deskStoryResBar) deskStoryResBar.hidden = true;
       deskStoriesList = [];
+      deskStorySelected.clear();
       renderDeskStories();
 
       try {
@@ -4050,8 +4108,10 @@
         const res = await window.tayyar?.storiesResolve?.(inp, deskStoryPlat, { browserCookies: cookies });
         if (deskStoryLoader) deskStoryLoader.hidden = true;
         if (res && res.ok && Array.isArray(res.stories) && res.stories.length > 0) {
-          deskStoriesList = res.stories;
-          renderDeskStories();
+          deskStoriesList = res.stories.map((st, i) => Object.assign({}, st, { _uid: st.id || `dst_${i}` }));
+          deskStoryFilter = 'all';
+          $$('#deskStoryTypeFilter .dssb-chip').forEach((c) => c.classList.toggle('active', c.dataset.dstype === 'all'));
+          setDeskStorySelectionCount(deskStoriesList.length);
         } else {
           const msg = res?.error || (S.lang === 'ar'
             ? 'لم يتم العثور على ستوريات عامة. للستوريات الخاصة اختر المتصفح (Chrome / Edge / Firefox) من جلسة المتصفح بالأعلى.'
@@ -4064,24 +4124,51 @@
       }
     }
 
+    // Desktop Story Filter, Stepper, Slider & Presets
+    $$('#deskStoryTypeFilter .dssb-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        deskStoryFilter = chip.dataset.dstype;
+        $$('#deskStoryTypeFilter .dssb-chip').forEach((c) => c.classList.toggle('active', c === chip));
+        setDeskStorySelectionCount(getDeskFilteredStories().length);
+      });
+    });
+
+    $('#btnDeskCountDec')?.addEventListener('click', () => setDeskStorySelectionCount((Number($('#deskStoryCountInput')?.value) || 0) - 1));
+    $('#btnDeskCountInc')?.addEventListener('click', () => setDeskStorySelectionCount((Number($('#deskStoryCountInput')?.value) || 0) + 1));
+    $('#deskStoryCountInput')?.addEventListener('input', (e) => setDeskStorySelectionCount(e.target.value));
+    $('#deskStoryCountRange')?.addEventListener('input', (e) => setDeskStorySelectionCount(e.target.value));
+    $$('#deskStoryPresets .dssb-preset').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const p = btn.dataset.preset;
+        if (p === 'all') setDeskStorySelectionCount(getDeskFilteredStories().length);
+        else if (p === 'none') setDeskStorySelectionCount(0);
+        else setDeskStorySelectionCount(Number(p));
+      });
+    });
+
     $('#btnDeskFetchStories')?.addEventListener('click', fetchDeskStories);
     deskStoryInput?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') fetchDeskStories();
     });
 
     $('#btnDeskSaveAllStories')?.addEventListener('click', () => {
-      if (!deskStoriesList.length) return;
-      deskStoriesList.forEach((st) => {
-        if (st && st.url) {
+      const visible = getDeskFilteredStories();
+      const chosen = visible.filter((st) => deskStorySelected.has(st._uid) && st.url);
+      if (!chosen.length) {
+        toast(S.lang === 'ar' ? 'اختر ستوري واحد على الأقل للتحميل' : 'Select at least 1 story to download');
+        return;
+      }
+      chosen.forEach((st, idx) => {
+        setTimeout(() => {
           window.tayyar?.add?.({
             url: st.url,
-            filename: st.filename || `Story_${Date.now()}.${st.ext || 'mp4'}`,
-            userFileName: st.filename || `Story_${Date.now()}.${st.ext || 'mp4'}`,
+            filename: st.filename || `Story_${Date.now()}_${idx + 1}.${st.ext || 'mp4'}`,
+            userFileName: st.filename || `Story_${Date.now()}_${idx + 1}.${st.ext || 'mp4'}`,
             isSocial: false,
           });
-        }
+        }, idx * 200);
       });
-      toast(S.lang === 'ar' ? `بدأ تحميل ${deskStoriesList.length} ستوريات!` : `Downloading ${deskStoriesList.length} stories!`);
+      toast(S.lang === 'ar' ? `بدأ تحميل ${chosen.length} ستوريات محددة!` : `Downloading ${chosen.length} selected stories!`);
     });
   }
 

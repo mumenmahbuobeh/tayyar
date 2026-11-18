@@ -60,7 +60,7 @@
             <div class="pro-glass-card command-card">
               <div class="command-head">
                 <span class="command-label" data-i="quickDownloadLbl">Quick Download</span>
-                <span class="command-ver">v1.0.14</span>
+                <span class="command-ver">v1.0.15</span>
               </div>
 
               <!-- Sleek URL Input with Inline Paste Button -->
@@ -308,6 +308,43 @@
                 <span data-i="refresh">Refresh</span>
               </button>
             </div>
+
+            <!-- Pro Batch Count & Multi-Select Bar (WhatsApp Statuses) -->
+            <div class="story-selector-bar" id="waSelectorBar" hidden>
+              <div class="ssb-top-row">
+                <div class="ssb-filter-group" id="waTypeFilter">
+                  <button type="button" class="ssb-chip active" data-stype="all" data-i="filterAll">All</button>
+                  <button type="button" class="ssb-chip" data-stype="video" data-i="typeVideos">Videos</button>
+                  <button type="button" class="ssb-chip" data-stype="image" data-i="typePhotos">Photos</button>
+                </div>
+                <span class="ssb-badge" id="waSelectedBadge">0 / 0</span>
+              </div>
+
+              <div class="ssb-count-row">
+                <span class="ssb-count-title" data-i="storyPickCountLbl">Download count</span>
+                <div class="ssb-stepper">
+                  <button type="button" class="ssb-step-btn" id="btnWaCountDec" aria-label="Decrease">−</button>
+                  <input type="number" class="ssb-count-num" id="waCountInput" min="0" max="50" value="0" />
+                  <button type="button" class="ssb-step-btn" id="btnWaCountInc" aria-label="Increase">+</button>
+                </div>
+              </div>
+
+              <input type="range" class="ssb-range" id="waCountRange" min="0" max="1" value="0" />
+
+              <div class="ssb-presets-row" id="waPresets">
+                <button type="button" class="ssb-preset" data-preset="3">3</button>
+                <button type="button" class="ssb-preset" data-preset="5">5</button>
+                <button type="button" class="ssb-preset" data-preset="10">10</button>
+                <button type="button" class="ssb-preset" data-preset="all" data-i="selectAllBtn">All</button>
+                <button type="button" class="ssb-preset" data-preset="none" data-i="clearSelBtn">Clear</button>
+              </div>
+
+              <button type="button" class="cta-primary-btn ssb-dl-cta" id="btnWaDownloadSelected">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span id="waDlSelectedText">Download Selected (0)</span>
+              </button>
+            </div>
+
             <div class="story-grid" id="waStatusGrid"></div>
           </div>
 
@@ -340,9 +377,40 @@
               <span data-i="fetchingStories">Scanning active stories...</span>
             </div>
 
-            <div class="story-results-bar" id="storyResultsBar" hidden>
-              <span class="story-count-lbl" id="storyCountLbl">0 stories</span>
-              <button type="button" class="pill-action-btn" id="btnSaveAllStories" data-i="saveAllStories">Save All</button>
+            <!-- Pro Batch Count & Multi-Select Bar (Snapchat / Instagram / Facebook) -->
+            <div class="story-selector-bar" id="storyResultsBar" hidden>
+              <div class="ssb-top-row">
+                <div class="ssb-filter-group" id="socialTypeFilter">
+                  <button type="button" class="ssb-chip active" data-stype="all" data-i="filterAll">All</button>
+                  <button type="button" class="ssb-chip" data-stype="video" data-i="typeVideos">Videos</button>
+                  <button type="button" class="ssb-chip" data-stype="image" data-i="typePhotos">Photos</button>
+                </div>
+                <span class="ssb-badge" id="storyCountLbl">0 / 0</span>
+              </div>
+
+              <div class="ssb-count-row">
+                <span class="ssb-count-title" data-i="storyPickCountLbl">Download count</span>
+                <div class="ssb-stepper">
+                  <button type="button" class="ssb-step-btn" id="btnSocialCountDec" aria-label="Decrease">−</button>
+                  <input type="number" class="ssb-count-num" id="socialCountInput" min="0" max="100" value="0" />
+                  <button type="button" class="ssb-step-btn" id="btnSocialCountInc" aria-label="Increase">+</button>
+                </div>
+              </div>
+
+              <input type="range" class="ssb-range" id="socialCountRange" min="0" max="1" value="0" />
+
+              <div class="ssb-presets-row" id="socialPresets">
+                <button type="button" class="ssb-preset" data-preset="3">3</button>
+                <button type="button" class="ssb-preset" data-preset="5">5</button>
+                <button type="button" class="ssb-preset" data-preset="10">10</button>
+                <button type="button" class="ssb-preset" data-preset="all" data-i="selectAllBtn">All</button>
+                <button type="button" class="ssb-preset" data-preset="none" data-i="clearSelBtn">Clear</button>
+              </div>
+
+              <button type="button" class="cta-primary-btn ssb-dl-cta" id="btnSaveAllStories">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span id="socialDlSelectedText">Download Selected (0)</span>
+              </button>
             </div>
 
             <div class="story-grid" id="socialStoriesGrid"></div>
@@ -534,7 +602,7 @@
               </svg>
             </div>
             <div class="identity-body">
-              <div class="identity-name">Tayyar <span class="ver-pill">v1.0.14</span></div>
+              <div class="identity-name">Tayyar <span class="ver-pill">v1.0.15</span></div>
               <div class="identity-sub" data-i="identitySub">Universal Media & Story Downloader</div>
             </div>
           </div>
@@ -644,7 +712,7 @@
                 </span>
                 <div>
                   <div class="ios-row-title" id="updStatusTitle" data-i="upToDate">Tayyar is up to date</div>
-                  <div class="ios-row-hint" id="updStatusDesc" data-i="upToDateDesc">Version 1.0.14 is the latest stable release.</div>
+                  <div class="ios-row-hint" id="updStatusDesc" data-i="upToDateDesc">Version 1.0.15 is the latest stable release.</div>
                 </div>
               </div>
               <button type="button" class="pill-action-btn" id="btnCheckUpdate" data-i="check">Check</button>

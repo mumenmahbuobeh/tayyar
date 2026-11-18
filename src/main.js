@@ -82,7 +82,7 @@ function startBridge() {
 
     if (req.method === 'GET' && (req.url === '/ping' || req.url === '/status')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: '1.0.14', bridge: true, stories: true }));
+      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: '1.0.15', bridge: true, stories: true }));
     }
 
     // Receive Story/Status media blob (WhatsApp Web, Instagram/Facebook/Snapchat Web Stories)

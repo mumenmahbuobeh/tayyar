@@ -3975,6 +3975,176 @@ html[dir="rtl"] .glass-island-player {
   line-height: 1.6;
 }
 
+/* Pro Desktop Story Count & Multi-Select Bar */
+.desk-story-selector-bar {
+  margin: 18px 0 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dssb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dssb-filters {
+  display: inline-flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dssb-chip {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dssb-chip.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.dssb-badge {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.28);
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dssb-count-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dssb-label {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.dssb-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 2px;
+}
+
+.dssb-step-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: none;
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dssb-step-btn:hover {
+  background: #2563eb;
+}
+
+.dssb-count-input {
+  width: 46px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 800;
+}
+
+.dssb-range {
+  width: 150px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.dssb-presets {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.dssb-preset {
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dssb-preset:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: #3b82f6;
+}
+
+.desk-story-card {
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.14s ease;
+}
+
+.desk-story-card.selected {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.45);
+}
+
+.desk-story-check {
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.58);
+  border: 1.8px solid rgba(255, 255, 255, 0.55);
+  color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  z-index: 3;
+  transition: all 0.15s ease;
+}
+
+.desk-story-card.selected .desk-story-check {
+  background: #3b82f6;
+  border-color: #60a5fa;
+  color: #ffffff;
+}
+
+
 
 
 

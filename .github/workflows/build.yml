@@ -84,11 +84,11 @@ jobs:
         with:
           name: tayyar-desktop-${{ matrix.os }}
           path: |
-            dist/Tayyar-Setup-1.0.14.exe
-            dist/Tayyar-1.0.14.exe
-            dist/Tayyar-1.0.14.dmg
-            dist/Tayyar-1.0.14.AppImage
-            dist/tayyar_1.0.14_amd64.deb
+            dist/Tayyar-Setup-1.0.15.exe
+            dist/Tayyar-1.0.15.exe
+            dist/Tayyar-1.0.15.dmg
+            dist/Tayyar-1.0.15.AppImage
+            dist/tayyar_1.0.15_amd64.deb
             dist/latest*.yml
           if-no-files-found: ignore
 
@@ -155,7 +155,7 @@ jobs:
           mkdir -p build-apk
           APK_FILE=$(find android/app/build/outputs/apk -type f -name "*.apk" | head -n 1)
           if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
-            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.14.apk
+            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.15.apk
           else
             echo "Error: APK file not found!" && exit 1
           fi
@@ -164,7 +164,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-android-apk
-          path: build-apk/Tayyar-Android-v1.0.14.apk
+          path: build-apk/Tayyar-Android-v1.0.15.apk
 
   build-ios:
     name: Build iOS Package
@@ -195,7 +195,7 @@ jobs:
           APP_PATH=$(find build/Build/Products -name "*.app" -type d | head -n 1)
           if [ -n "$APP_PATH" ] && [ -d "$APP_PATH" ]; then
             cp -r "$APP_PATH" build/Payload/
-            cd build && zip -r ../../../Tayyar-iOS-v1.0.14.ipa Payload
+            cd build && zip -r ../../../Tayyar-iOS-v1.0.15.ipa Payload
           else
             echo "Error: iOS .app bundle not found!" && exit 1
           fi
@@ -204,13 +204,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-ios-ipa
-          path: Tayyar-iOS-v1.0.14.ipa
+          path: Tayyar-iOS-v1.0.15.ipa
 
       - name: Attach iOS IPA to Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.14
-          files: Tayyar-iOS-v1.0.14.ipa
+          tag_name: v1.0.15
+          files: Tayyar-iOS-v1.0.15.ipa
           fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -238,7 +238,7 @@ jobs:
           cd final-release
           # Strip any blockmap files, old version assets, and duplicate space-separated filenames
           rm -f *.blockmap 2>/dev/null || true
-          rm -f *1.0.0* *1.0.5* *1.0.6* *1.0.7* *1.0.8* *1.0.9* *1.0.10* *1.0.11* *1.0.12* *1.0.13* 2>/dev/null || true
+          rm -f *1.0.0* *1.0.5* *1.0.6* *1.0.7* *1.0.8* *1.0.9* *1.0.10* *1.0.11* *1.0.12* *1.0.13* *1.0.14* 2>/dev/null || true
           find . -type f -name "* *" -delete 2>/dev/null || true
           echo "Curated Final Release Assets (Strictly 1 Clean Binary per Platform):"
           ls -la
@@ -249,7 +249,7 @@ jobs:
         run: |
           echo "Scanning GitHub releases for obsolete or duplicate assets..."
           curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases" | \
-          jq -r '.[] | .assets[]? | select((.name | test("1\\.0\\.14") | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
+          jq -r '.[] | .assets[]? | select((.name | test("1\\.0\\.15") | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
             if [ -n "$asset_id" ] && [ -n "$asset_name" ]; then
               echo "Withdrawing & deleting unwanted release asset: $asset_name (ID: $asset_id)"
               curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" || true
@@ -259,37 +259,32 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.14
-          name: "Tayyar v1.0.14 — Fixed Mobile Native Download Engine & Gallery Saver"
+          tag_name: v1.0.15
+          name: "Tayyar v1.0.15 — Pro Story Count & Multi-Select Downloader (All Platforms)"
           body: |
-            ## 🚀 Tayyar Download Manager v1.0.14
+            ## 🚀 Tayyar Download Manager v1.0.15
 
-            Universal high-speed multi-connection download manager & Stories Saver designed and developed by **Mu'men Mahbuobeh**.
+            Universal high-speed multi-connection download manager & Pro Stories Saver designed and developed by **Mu'men Mahbuobeh**.
 
             ### 📦 Download Packages (Official & Clean Binaries)
             * **Windows:**
-              * [Tayyar-Setup-1.0.14.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-Setup-1.0.14.exe) (Installer with Bundled Media Engine)
-              * [Tayyar-1.0.14.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-1.0.14.exe) (Portable Executable)
+              * [Tayyar-Setup-1.0.15.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.15/Tayyar-Setup-1.0.15.exe) (Installer with Bundled Media Engine)
+              * [Tayyar-1.0.15.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.15/Tayyar-1.0.15.exe) (Portable Executable)
             * **Android:**
-              * [Tayyar-Android-v1.0.14.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-Android-v1.0.14.apk) (Fixed Native Android Download Engine, Instant Gallery Save & Stories Saver)
+              * [Tayyar-Android-v1.0.15.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.15/Tayyar-Android-v1.0.15.apk) (Pro Story Count & Multi-Select + Native Gallery Saver)
             * **iOS (Apple iPhone/iPad):**
-              * [Tayyar-iOS-v1.0.14.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-iOS-v1.0.14.ipa) (Fixed Binary Stream Download & Native Photos Share Sheet)
+              * [Tayyar-iOS-v1.0.15.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.15/Tayyar-iOS-v1.0.15.ipa) (Pro Story Count & Multi-Select + Photos Share Sheet)
             * **macOS:**
-              * [Tayyar-1.0.14.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-1.0.14.dmg) (Apple Silicon & Intel)
+              * [Tayyar-1.0.15.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.15/Tayyar-1.0.15.dmg) (Apple Silicon & Intel)
             * **Linux:**
-              * [Tayyar-1.0.14.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/Tayyar-1.0.14.AppImage)
-              * [tayyar_1.0.14_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.14/tayyar_1.0.14_amd64.deb)
+              * [Tayyar-1.0.15.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.15/Tayyar-1.0.15.AppImage)
+              * [tayyar_1.0.15_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.15/tayyar_1.0.15_amd64.deb)
 
-            ### ✨ Key Fixes & Improvements in v1.0.14
-            * **Fixed Android Native Download Engine:** Replaced `Long` task IDs with String IDs (eliminating silent `queryDownload` failures), added direct `MediaStore.Video` / `MediaStore.Images` / `MediaStore.Audio` routing so downloaded media appears **instantly** in Android Gallery (`Movies/Tayyar` & `Pictures/Tayyar`), and added strict HTML-rejection checks.
-            * **Upgraded Mobile Stream Extractors (Android & iOS):**
-              * **YouTube:** Official InnerTube `ANDROID_VR` direct progressive MP4 (full audio+video) + M4A audio stream.
-              * **Facebook:** Live `fdown.co.in` HD `fbcdn.net` MP4 extractor + mobile HTML fallback.
-              * **TikTok:** TikWM + NNTech + SSSTik (live token) no-watermark extractors.
-              * **Instagram:** Public embed + JSON + SnapInsta extractor.
-              * **Snapchat:** Updated `/@username` & 308 redirect support for active public stories.
-            * **Fixed iOS Binary Stream Saving:** Switched iOS downloads to native XHR `blob` mode + iOS Share Sheet ("Save Video") with zero Base64 corruption.
-            * **Cleaned Mobile Settings Identity:** Removed the `"Apple Liquid Glass Edition • Native Android & iOS"` text as requested.
+            ### ✨ What's New in v1.0.15
+            * **Pro Story Count & Multi-Select Control (All Platforms — Windows, macOS, Linux, Android, iOS):**
+              * When multiple active stories exist (e.g. 20 stories on WhatsApp, Snapchat, Instagram, or Facebook), choose the exact number to download using the interactive **− / + Stepper**, **Range Slider**, or **Quick Presets (`3`, `5`, `10`, `All`, `Clear`)**.
+              * **Media Type Filter:** Instantly filter stories by **All**, **Videos Only**, or **Photos Only**.
+              * **Tap-to-Toggle Multi-Select:** Numbered story cards (`#1`, `#2`, ...) with live checkmark badges let you hand-pick any exact combination, with a dynamic **Download Selected (`N / Total`)** CTA.
           files: final-release/*
           fail_on_unmatched_files: false
           draft: false
