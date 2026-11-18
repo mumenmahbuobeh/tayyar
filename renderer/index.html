@@ -86,7 +86,7 @@
                   <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
                 </svg>
               </span>
-              <span class="nav-label" data-i="socialVideoSaver">منزل الفيديوهات</span>
+              <span class="nav-label" data-i="socialVideoSaver">Video Downloader</span>
             </button>
           </li>
           <li>
@@ -203,23 +203,29 @@
                 </svg>
               </button>
               <div class="dropdown-popover" id="presetPopover" hidden>
-                <div class="dropdown-item" data-preset="balanced">Balanced</div>
-                <div class="dropdown-item" data-preset="task">Task Focus</div>
-                <div class="dropdown-item" data-preset="speed">Speed Focus</div>
-                <div class="dropdown-item active" data-preset="compact">Compact <svg viewBox="0 0 24 24" fill="none"
+                <div class="dropdown-item" data-preset="balanced"><span data-i="presetBalanced">Balanced</span></div>
+                <div class="dropdown-item" data-preset="task"><span data-i="presetTask">Task Focus</span></div>
+                <div class="dropdown-item" data-preset="speed"><span data-i="presetSpeed">Speed Focus</span></div>
+                <div class="dropdown-item active" data-preset="compact"><span data-i="presetCompact">Compact</span> <svg viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2.5" class="check-ic">
                     <path d="M20 6L9 17l-5-5" />
                   </svg></div>
               </div>
             </div>
-            <button class="icon-btn-round" id="bAddWidget" title="Add Card"><svg viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2.5" fill="none">
-                <path d="M12 5v14M5 12h14" />
-              </svg></button>
+            <div class="custom-dropdown-wrap">
+              <button class="icon-btn-round" id="bAddWidget" data-i-title="addCardTitle" title="Manage Cards"><svg viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2.5" fill="none">
+                  <path d="M12 5v14M5 12h14" />
+                </svg></button>
+              <div class="dropdown-popover widget-picker-popover" id="widgetPickerPopover" hidden>
+                <div class="widget-picker-title" data-i="manageWidgets">Dashboard Widgets</div>
+                <div id="widgetPickerList"></div>
+              </div>
+            </div>
           </div>
 
           <div class="header-actions" id="standardDashActions">
-            <button class="icon-btn-ghost" id="bToggleCustomize" title="Customize Layout">
+            <button class="icon-btn-ghost" id="bToggleCustomize" data-i-title="customizeLayout" title="Customize Layout">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
               </svg>
@@ -243,7 +249,7 @@
             </div>
             <div class="card-main-val" id="engineStatusVal" data-i="ready">Ready</div>
             <div class="card-footer">
-              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.7</span>
+              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.8</span>
               <span class="status-indicator online" id="engineStatusDot"></span>
             </div>
           </div>
@@ -476,8 +482,8 @@
       <section class="view-panel" id="viewSocial">
         <header class="view-header">
           <div>
-            <h1 class="view-title" data-i="socialVideoSaver">منزل الفيديوهات ومواقع التواصل</h1>
-            <p class="view-subtitle" data-i="socialHubSubtitle">تنزيل الفيديوهات ومقاطع الريلز والشورتس بدون علامة مائية وبأعلى دقة مع دمج الصوت الكامل</p>
+            <h1 class="view-title" data-i="socialHubTitle">Social Video Downloader</h1>
+            <p class="view-subtitle" data-i="socialHubSubtitle">Download videos, Reels, and Shorts without watermarks in ultra-HD with full audio merging</p>
           </div>
         </header>
 
@@ -495,22 +501,22 @@
         <!-- Input Glass Card -->
         <div class="social-input-card glass-panel">
           <div class="social-input-group">
-            <input type="text" id="socialHubUrlInput" class="social-url-field" placeholder="الصق رابط الفيديو من يوتيوب، تيك توك، انستجرام، فيسبوك..." />
-            <button type="button" id="btnSocialHubPaste" class="pill-btn glass-btn" title="لصق من الحافظة">
+            <input type="text" id="socialHubUrlInput" class="social-url-field" data-i-placeholder="socialUrlPlaceholder" placeholder="Paste video link from YouTube, TikTok, Instagram, Facebook..." />
+            <button type="button" id="btnSocialHubPaste" class="pill-btn glass-btn" data-i-title="pasteTitle" title="Paste from clipboard">
               <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-              <span>لصق</span>
+              <span data-i="paste">Paste</span>
             </button>
           </div>
           <button type="button" id="btnSocialHubAnalyze" class="pill-btn primary full-width">
             <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <span id="btnSocialHubAnalyzeText">فحص واستخراج الفيديو</span>
+            <span id="btnSocialHubAnalyzeText" data-i="analyzeExtractBtn">Analyze & Extract Video</span>
           </button>
         </div>
 
         <!-- Analyzing Spinner -->
         <div class="social-loader-card glass-panel" id="socialHubLoader" hidden>
           <div class="spinner"></div>
-          <p id="socialHubLoaderText">جاري فحص الرابط واستخراج البث عالي الدقة...</p>
+          <p id="socialHubLoaderText" data-i="analyzingStream">Analyzing link and extracting high-definition stream...</p>
         </div>
 
         <!-- Video Preview Result Card -->
@@ -520,17 +526,17 @@
           </div>
           <div class="preview-details">
             <span class="preview-platform-badge" id="socialHubPlatformBadge">TikTok</span>
-            <h3 class="preview-title" id="socialHubTitle">عنوان الفيديو</h3>
-            <p class="preview-author" id="socialHubAuthor">اسم القناة أو الناشر</p>
+            <h3 class="preview-title" id="socialHubTitle" data-i="videoTitlePlaceholder">Video Title</h3>
+            <p class="preview-author" id="socialHubAuthor" data-i="creatorPlaceholder">Channel or Creator</p>
 
             <div class="preview-actions">
               <button type="button" id="btnDownloadFullVideo" class="pill-btn primary">
                 <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>🎬 تحميل الفيديو كامل (صوت + صورة MP4)</span>
+                <span data-i="downloadFullVideo">🎬 Download Full Video (Audio + Video MP4)</span>
               </button>
               <button type="button" id="btnDownloadAudioOnly" class="pill-btn secondary">
                 <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                <span>🎵 تحميل الصوت فقط (MP3 نقي)</span>
+                <span data-i="downloadAudioOnly">🎵 Download Audio Only (Pure MP3)</span>
               </button>
             </div>
           </div>
@@ -539,7 +545,7 @@
         <!-- In-Progress Download Status Bar -->
         <div class="social-progress-card glass-panel" id="socialHubProgressCard" hidden>
           <div class="sp-header">
-            <span id="spStatusLabel">جاري التحميل...</span>
+            <span id="spStatusLabel" data-i="downloadingStatus">Downloading...</span>
             <span id="spSpeedLabel">0 KB/s</span>
           </div>
           <div class="progress-bar-bg">
@@ -553,11 +559,11 @@
 
         <!-- Quick Tips Card -->
         <div class="social-tips-card glass-panel">
-          <h4 style="margin:0 0 8px 0; font-size:14px; color:var(--accent);">💡 مميزات التنزيل مع تيّار:</h4>
+          <h4 style="margin:0 0 8px 0; font-size:14px; color:var(--accent);" data-i="socialTipsTitle">💡 Tayyar Download Highlights:</h4>
           <ul style="margin:0; padding-inline-start:18px; font-size:12.5px; color:var(--text-dim); line-height:1.7;">
-            <li><strong>بدون علامة مائية:</strong> تنزيل مباشر من تيك توك، انستجرام، فيسبوك، وسناب شات بدون أي شعارات أو علامات.</li>
-            <li><strong>دمج الصوت التلقائي:</strong> يتم دمج الصوت والفيديو تلقائياً بأعلى جودة Full HD و 4K Ultra HD.</li>
-            <li><strong>حفظ في المعرض فوراً:</strong> على أندرويد يتم حفظ الفيديو مباشرة في مجلد التحميلات والاستوديو.</li>
+            <li><strong data-i="socialTip1Title">No Watermark:</strong> <span data-i="socialTip1Desc">Direct downloads from TikTok, Instagram, Facebook, and Snapchat without logos or watermarks.</span></li>
+            <li><strong data-i="socialTip2Title">Auto Audio Merging:</strong> <span data-i="socialTip2Desc">Lossless automatic video & audio muxing up to Full HD and 4K Ultra HD.</span></li>
+            <li><strong data-i="socialTip3Title">Instant Gallery Save:</strong> <span data-i="socialTip3Desc">On Android, downloaded videos are saved directly to Downloads and indexed in your Gallery.</span></li>
           </ul>
         </div>
       </section>
@@ -855,7 +861,7 @@
           </svg>
         </div>
         <div class="island-info">
-          <div class="island-title" id="islandTitle">Tayyar Turbo Engine</div>
+          <div class="island-title" id="islandTitle" data-i="turboEngineTitle">Tayyar Turbo Engine</div>
           <div class="island-subtitle" id="islandSubtitle">Ready • 0 B/s</div>
         </div>
       </div>
@@ -1525,7 +1531,7 @@
             </svg>
           </div>
           <div class="about-hero-details">
-            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.7</span></h2>
+            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.8</span></h2>
             <p class="about-tagline" data-i="aboutTagline">Before content collapses, preserve what truly matters, let
               beauty enter your orbit of preservation.</p>
             <div class="about-dev-by">
@@ -1560,7 +1566,7 @@
           <div class="updates-status-row">
             <div>
               <h4 class="update-title" id="updateTitleText" data-i="upToDate">Tayyar is up to date</h4>
-              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.7 is the latest available release.</div>
+              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.8 is the latest available release.</div>
             </div>
             <div class="update-actions">
               <button class="pill-btn light sm" id="bCheckUpdate">
@@ -1575,8 +1581,8 @@
                 <span id="bInstallUpdateText">Update Now</span>
               </button>
               <select class="styled-select sm" id="cfgChannel">
-                <option value="stable">Stable</option>
-                <option value="beta" selected>Beta ▾</option>
+                <option value="stable" selected data-i="channelStable">Stable</option>
+                <option value="beta" data-i="channelBeta">Beta</option>
               </select>
             </div>
           </div>
@@ -1596,8 +1602,8 @@
             </div>
           </div>
 
-          <!-- Warning box -->
-          <div class="about-warning-box">
+          <!-- Warning box (only shown when Beta channel is selected) -->
+          <div class="about-warning-box" id="betaWarningBox" style="display:none;">
             <span data-i="betaWarning">Beta may be less stable. You'll also receive newer stable releases. Switching
               back stops beta updates without downgrading.</span>
           </div>
@@ -1795,7 +1801,7 @@
   <div class="mobile-floating-status" id="mobileFloatingStatus" hidden>
     <div class="mfs-icon" id="mfsIcon">🎬</div>
     <div class="mfs-body">
-      <div class="mfs-title" id="mfsTitle">جاري التحميل...</div>
+      <div class="mfs-title" id="mfsTitle" data-i="downloadingStatus">Downloading...</div>
       <div class="mfs-meta" id="mfsMeta">0% • 0 KB/s</div>
       <div class="mfs-track"><div class="mfs-fill" id="mfsFill" style="width:0%"></div></div>
     </div>
@@ -1806,23 +1812,23 @@
     <div class="liquid-indicator" id="liquidNavIndicator"></div>
     <button class="mobile-nav-btn active" data-view="dashboard" id="mNavDashboard">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-      <span>الرئيسية</span>
+      <span data-i="mNavHome">Home</span>
     </button>
     <button class="mobile-nav-btn" data-view="social" id="mNavSocial">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-      <span>الفيديو</span>
+      <span data-i="mNavVideo">Video</span>
     </button>
     <button class="mobile-nav-btn" data-view="downloads" id="mNavDownloads">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-      <span>التحميلات</span>
+      <span data-i="mNavDownloads">Downloads</span>
     </button>
     <button class="mobile-nav-btn" data-view="plugins" id="mNavPlugins">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
-      <span>الإضافات</span>
+      <span data-i="mNavPlugins">Plugins</span>
     </button>
     <button class="mobile-nav-btn" data-view="settings" id="mNavSettings">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-      <span>الإعدادات</span>
+      <span data-i="mNavSettings">Settings</span>
     </button>
   </nav>
 

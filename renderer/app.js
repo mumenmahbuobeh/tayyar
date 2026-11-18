@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.7 is the latest available release.',
+      upToDateDesc: 'Version 1.0.8 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -162,6 +162,40 @@
       socialNoWatermarkHint: 'Automatically extract watermark-free HD video for TikTok, Shorts, and Reels.',
       socialLocalEngine: 'Desktop Core Engine (yt-dlp)',
       socialFormatLbl: 'Quality / Format:',
+      socialHubTitle: 'Social Video Downloader',
+      socialHubSubtitle: 'Download videos, Reels, and Shorts without watermarks in ultra-HD with full audio merging',
+      socialUrlPlaceholder: 'Paste video link from YouTube, TikTok, Instagram, Facebook...',
+      paste: 'Paste',
+      pasteTitle: 'Paste from clipboard',
+      analyzeExtractBtn: 'Analyze & Extract Video',
+      analyzingStream: 'Analyzing link and extracting high-definition stream...',
+      videoTitlePlaceholder: 'Video Title',
+      creatorPlaceholder: 'Channel or Creator',
+      downloadFullVideo: '🎬 Download Full Video (Audio + Video MP4)',
+      downloadAudioOnly: '🎵 Download Audio Only (Pure MP3)',
+      downloadingStatus: 'Downloading...',
+      socialTipsTitle: '💡 Tayyar Download Highlights:',
+      socialTip1Title: 'No Watermark:',
+      socialTip1Desc: 'Direct downloads from TikTok, Instagram, Facebook, and Snapchat without logos or watermarks.',
+      socialTip2Title: 'Auto Audio Merging:',
+      socialTip2Desc: 'Lossless automatic video & audio muxing up to Full HD and 4K Ultra HD.',
+      socialTip3Title: 'Instant Gallery Save:',
+      socialTip3Desc: 'On Android, downloaded videos are saved directly to Downloads and indexed in your Gallery.',
+      mNavHome: 'Home',
+      mNavVideo: 'Video',
+      mNavDownloads: 'Downloads',
+      mNavPlugins: 'Plugins',
+      mNavSettings: 'Settings',
+      turboEngineTitle: 'Tayyar Turbo Engine',
+      presetBalanced: 'Balanced',
+      presetTask: 'Task Focus',
+      presetSpeed: 'Speed Focus',
+      presetCompact: 'Compact',
+      manageWidgets: 'Dashboard Widgets',
+      addCardTitle: 'Manage Cards',
+      customizeLayout: 'Customize Layout',
+      channelStable: 'Stable',
+      channelBeta: 'Beta',
     },
     ar: {
       dashboard: 'لوحة التحكم',
@@ -292,7 +326,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.7 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.8 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -320,6 +354,40 @@
       socialNoWatermarkHint: 'استخراج الفيديو عالي الدقة بدون أي شعار أو علامة مائية لتيك توك والريلز وشورتس.',
       socialLocalEngine: 'المحرك المحلي المدمج للكمبيوتر (yt-dlp)',
       socialFormatLbl: 'الجودة والصيغة:',
+      socialHubTitle: 'منزل الفيديوهات ومواقع التواصل',
+      socialHubSubtitle: 'تنزيل الفيديوهات ومقاطع الريلز والشورتس بدون علامة مائية وبأعلى دقة مع دمج الصوت الكامل',
+      socialUrlPlaceholder: 'الصق رابط الفيديو من يوتيوب، تيك توك، انستجرام، فيسبوك...',
+      paste: 'لصق',
+      pasteTitle: 'لصق من الحافظة',
+      analyzeExtractBtn: 'فحص واستخراج الفيديو',
+      analyzingStream: 'جاري فحص الرابط واستخراج البث عالي الدقة...',
+      videoTitlePlaceholder: 'عنوان الفيديو',
+      creatorPlaceholder: 'اسم القناة أو الناشر',
+      downloadFullVideo: '🎬 تحميل الفيديو كامل (صوت + صورة MP4)',
+      downloadAudioOnly: '🎵 تحميل الصوت فقط (MP3 نقي)',
+      downloadingStatus: 'جاري التحميل...',
+      socialTipsTitle: '💡 مميزات التنزيل مع تيّار:',
+      socialTip1Title: 'بدون علامة مائية:',
+      socialTip1Desc: 'تنزيل مباشر من تيك توك، انستجرام، فيسبوك، وسناب شات بدون أي شعارات أو علامات.',
+      socialTip2Title: 'دمج الصوت التلقائي:',
+      socialTip2Desc: 'يتم دمج الصوت والفيديو تلقائياً بأعلى جودة Full HD و 4K Ultra HD.',
+      socialTip3Title: 'حفظ في المعرض فوراً:',
+      socialTip3Desc: 'على أندرويد يتم حفظ الفيديو مباشرة في مجلد التحميلات والاستوديو.',
+      mNavHome: 'الرئيسية',
+      mNavVideo: 'الفيديو',
+      mNavDownloads: 'التحميلات',
+      mNavPlugins: 'الإضافات',
+      mNavSettings: 'الإعدادات',
+      turboEngineTitle: 'محرك تيّار التوربيني',
+      presetBalanced: 'متوازن',
+      presetTask: 'تركيز المهام',
+      presetSpeed: 'تركيز السرعة',
+      presetCompact: 'مدمج',
+      manageWidgets: 'بطاقات لوحة التحكم',
+      addCardTitle: 'إدارة البطاقات',
+      customizeLayout: 'تخصيص التخطيط',
+      channelStable: 'مستقر (Stable)',
+      channelBeta: 'تجريبي (Beta)',
     },
   };
 
@@ -425,32 +493,74 @@
   }
 
   /* ---------------- LANGUAGE CONTROLLER ---------------- */
-  function applyLanguage(lang) {
-    S.lang = lang;
-    const dict = I18N[lang] || I18N.en;
-    document.documentElement.lang = lang;
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  function applyLanguage(lang, silent = false) {
+    const normalized = lang === 'ar' ? 'ar' : 'en';
+    S.lang = normalized;
+    const dict = I18N[normalized] || I18N.en;
+    document.documentElement.lang = normalized;
+    document.documentElement.dir = normalized === 'ar' ? 'rtl' : 'ltr';
+
+    try { localStorage.setItem('tayyar_lang', normalized); } catch (_) {}
+    if (!silent && window.tayyar?.settings?.set) {
+      window.tayyar.settings.set({ lang: normalized }).catch(() => {});
+    }
 
     const langBtn = $('#langCodeLabel');
-    if (langBtn) langBtn.textContent = lang === 'en' ? 'AR' : 'EN';
+    if (langBtn) langBtn.textContent = normalized === 'en' ? 'AR' : 'EN';
 
-    // Update all elements with data-i
+    // Update all elements with data-i, data-i-placeholder, data-i-title
     $$('[data-i]').forEach((el) => {
       const key = el.dataset.i;
       if (dict[key]) {
         el.textContent = dict[key];
       }
     });
+    $$('[data-i-placeholder]').forEach((el) => {
+      const key = el.dataset.iPlaceholder;
+      if (dict[key]) {
+        el.setAttribute('placeholder', dict[key]);
+      }
+    });
+    $$('[data-i-title]').forEach((el) => {
+      const key = el.dataset.iTitle;
+      if (dict[key]) {
+        el.setAttribute('title', dict[key]);
+      }
+    });
+
+    // Update dynamic preset label
+    const presetKeyMap = {
+      balanced: 'presetBalanced',
+      task: 'presetTask',
+      speed: 'presetSpeed',
+      compact: 'presetCompact',
+    };
+    const curPresetEl = $('#curPresetLabel');
+    if (curPresetEl && presetKeyMap[S.dashPreset] && dict[presetKeyMap[S.dashPreset]]) {
+      curPresetEl.textContent = dict[presetKeyMap[S.dashPreset]];
+    }
 
     // Update settings select
     const langSelect = $('#cfgLang');
-    if (langSelect) langSelect.value = lang;
+    if (langSelect) langSelect.value = normalized;
 
-    // Refresh heatmap with current language
+    // Refresh heatmap, dashboard dynamic texts, widget picker & mobile liquid indicator
     initHeatmap();
+    if (typeof updateDashboard === 'function') {
+      try { updateDashboard(); } catch (_) {}
+    }
+    if (typeof renderWidgetPicker === 'function') {
+      try { renderWidgetPicker(); } catch (_) {}
+    }
+    setTimeout(() => {
+      const activeMobileBtn = $('.mobile-nav-btn.active');
+      if (activeMobileBtn) positionLiquidNavIndicator(activeMobileBtn);
+    }, 60);
 
-    // Toast feedback
-    toast(lang === 'ar' ? 'تم تحويل اللغة إلى العربية' : 'Switched to English');
+    // Toast feedback (only when manually switched)
+    if (!silent) {
+      toast(normalized === 'ar' ? 'تم تحويل اللغة إلى العربية' : 'Switched to English');
+    }
   }
 
   const bLangToggle = $('#bLangToggle');
@@ -860,7 +970,7 @@
       author: 'griciaisl12',
       short: 'MS',
       color: 'avatar-blue',
-      version: 'v1.0.7',
+      version: 'v1.0.8',
       desc: 'Resolves GitHub repository release, file links, Google Drive/Docs into real downloads with mirror acceleration.',
       installed: false,
       enabled: false,
@@ -1404,7 +1514,7 @@
         author: 'User',
         short: name.slice(0, 2).toUpperCase(),
         color: 'avatar-blue',
-        version: 'v1.0.7',
+        version: 'v1.0.8',
         desc: `Installed from ${val}`,
         installed: true,
         enabled: true,
@@ -1644,7 +1754,7 @@
     });
   }
 
-  /* ---------------- CUSTOMIZE MODE (Image 2) ---------------- */
+  /* ---------------- INTERACTIVE DRAG & DROP DASHBOARD CUSTOMIZATION ---------------- */
   const bToggleCustomize = $('#bToggleCustomize');
   const customizeBar = $('#customizeBar');
   const standardDashActions = $('#standardDashActions');
@@ -1652,16 +1762,207 @@
   const bApplyCustom = $('#bApplyCustom');
   const bResetCustom = $('#bResetCustom');
   const bAddWidget = $('#bAddWidget');
+  const widgetPickerPopover = $('#widgetPickerPopover');
+  const widgetPickerList = $('#widgetPickerList');
   const bPresetMenu = $('#bPresetMenu');
   const presetPopover = $('#presetPopover');
   const curPresetLabel = $('#curPresetLabel');
   const bentoGrid = $('#bentoGrid');
 
+  const WIDGET_LABEL_KEYS = {
+    engine: 'engine',
+    nat: 'mapping',
+    upload: 'upload',
+    download: 'download',
+    speedLimit: 'speedLimit',
+    transfer: 'transfer',
+    tasks: 'tasks',
+    activeTasks: 'activeTasks',
+    activity: 'activity',
+  };
+
+  const DEFAULT_WIDGET_ORDER = bentoGrid
+    ? $$('.bento-card', bentoGrid).map((c) => c.dataset.widget).filter(Boolean)
+    : [];
+
+  let draggedCard = null;
+  let preCustomizeSnapshot = null;
+
+  function captureBentoState() {
+    if (!bentoGrid) return null;
+    const cards = $$('.bento-card', bentoGrid);
+    return {
+      preset: S.dashPreset || 'compact',
+      order: cards.map((c) => c.dataset.widget).filter(Boolean),
+      hidden: cards.filter((c) => c.classList.contains('widget-hidden')).map((c) => c.dataset.widget),
+      wide: cards.filter((c) => c.classList.contains('widget-wide')).map((c) => c.dataset.widget),
+      compact: cards.filter((c) => c.classList.contains('widget-compact')).map((c) => c.dataset.widget),
+    };
+  }
+
+  function applyBentoState(state) {
+    if (!bentoGrid || !state) return;
+    if (state.preset) {
+      setPreset(state.preset, true);
+    }
+    if (Array.isArray(state.order) && state.order.length > 0) {
+      state.order.forEach((wId) => {
+        const card = bentoGrid.querySelector(`.bento-card[data-widget="${wId}"]`);
+        if (card) bentoGrid.appendChild(card);
+      });
+    }
+    const hiddenSet = new Set(state.hidden || []);
+    const wideSet = new Set(state.wide || []);
+    const compactSet = new Set(state.compact || []);
+
+    $$('.bento-card', bentoGrid).forEach((card) => {
+      const id = card.dataset.widget;
+      card.classList.toggle('widget-hidden', hiddenSet.has(id));
+      card.classList.toggle('widget-wide', wideSet.has(id));
+      card.classList.toggle('widget-compact', compactSet.has(id));
+    });
+    renderWidgetPicker();
+  }
+
+  function saveBentoLayout() {
+    const state = captureBentoState();
+    if (state) {
+      try { localStorage.setItem('tayyar_bento_layout', JSON.stringify(state)); } catch (_) {}
+    }
+  }
+
+  function loadSavedBentoLayout() {
+    try {
+      const raw = localStorage.getItem('tayyar_bento_layout');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        applyBentoState(parsed);
+      }
+    } catch (_) {}
+  }
+
+  function renderWidgetPicker() {
+    if (!widgetPickerList || !bentoGrid) return;
+    const dict = I18N[S.lang] || I18N.en;
+    const cards = $$('.bento-card', bentoGrid);
+    widgetPickerList.innerHTML = '';
+
+    DEFAULT_WIDGET_ORDER.forEach((wId) => {
+      const card = cards.find((c) => c.dataset.widget === wId);
+      if (!card) return;
+      const isVisible = !card.classList.contains('widget-hidden');
+      const key = WIDGET_LABEL_KEYS[wId];
+      const label = (key && dict[key]) || wId.toUpperCase();
+
+      const row = document.createElement('label');
+      row.className = 'widget-picker-row';
+      row.innerHTML = `<span>${label}</span><input type="checkbox" ${isVisible ? 'checked' : ''} />`;
+      const cb = row.querySelector('input');
+      cb.addEventListener('change', () => {
+        card.classList.toggle('widget-hidden', !cb.checked);
+      });
+      widgetPickerList.appendChild(row);
+    });
+  }
+
+  function setupBentoDragAndControls() {
+    if (!bentoGrid) return;
+    $$('.bento-card', bentoGrid).forEach((card) => {
+      if (!card.querySelector('.widget-edit-controls')) {
+        const ctrl = document.createElement('div');
+        ctrl.className = 'widget-edit-controls';
+        ctrl.innerHTML = `
+          <span class="widget-drag-grip" title="Drag to move">⋮⋮</span>
+          <button type="button" class="widget-ctrl-btn btn-resize-widget" title="Toggle Width">↔</button>
+          <button type="button" class="widget-ctrl-btn btn-hide-widget" title="Hide Card">✕</button>
+        `;
+        const btnResize = ctrl.querySelector('.btn-resize-widget');
+        const btnHide = ctrl.querySelector('.btn-hide-widget');
+
+        btnResize.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (card.classList.contains('widget-wide')) {
+            card.classList.remove('widget-wide');
+            card.classList.add('widget-compact');
+          } else {
+            card.classList.remove('widget-compact');
+            card.classList.add('widget-wide');
+          }
+        });
+
+        btnHide.addEventListener('click', (e) => {
+          e.stopPropagation();
+          card.classList.add('widget-hidden');
+          renderWidgetPicker();
+        });
+
+        card.appendChild(ctrl);
+      }
+
+      card.addEventListener('dragstart', (e) => {
+        if (!bentoGrid.classList.contains('customizing')) {
+          e.preventDefault();
+          return;
+        }
+        draggedCard = card;
+        card.classList.add('dragging');
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', card.dataset.widget || '');
+        }
+      });
+
+      card.addEventListener('dragover', (e) => {
+        if (!bentoGrid.classList.contains('customizing') || !draggedCard || draggedCard === card) return;
+        e.preventDefault();
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+        card.classList.add('drag-over');
+
+        const rect = card.getBoundingClientRect();
+        const midX = rect.left + rect.width / 2;
+        const isRtl = document.documentElement.dir === 'rtl';
+        const insertBefore = isRtl ? e.clientX > midX : e.clientX < midX;
+
+        if (insertBefore) {
+          bentoGrid.insertBefore(draggedCard, card);
+        } else {
+          bentoGrid.insertBefore(draggedCard, card.nextSibling);
+        }
+      });
+
+      card.addEventListener('dragleave', () => {
+        card.classList.remove('drag-over');
+      });
+
+      card.addEventListener('drop', (e) => {
+        if (!bentoGrid.classList.contains('customizing')) return;
+        e.preventDefault();
+        card.classList.remove('drag-over');
+      });
+
+      card.addEventListener('dragend', () => {
+        if (draggedCard) draggedCard.classList.remove('dragging');
+        $$('.bento-card', bentoGrid).forEach((c) => c.classList.remove('drag-over'));
+        draggedCard = null;
+      });
+    });
+  }
+
+  setupBentoDragAndControls();
+
+  const setCardsDraggable = (enabled) => {
+    if (!bentoGrid) return;
+    $$('.bento-card', bentoGrid).forEach((c) => {
+      c.setAttribute('draggable', enabled ? 'true' : 'false');
+    });
+  };
+
   const toggleCustomize = () => {
     const isCustomizing = customizeBar && !customizeBar.hidden && customizeBar.style.display !== 'none';
     if (isCustomizing) {
-      closeCustomize();
+      closeCustomize(true);
     } else {
+      preCustomizeSnapshot = captureBentoState();
       if (customizeBar) {
         customizeBar.hidden = false;
         customizeBar.style.setProperty('display', 'flex', 'important');
@@ -1671,6 +1972,9 @@
         standardDashActions.style.setProperty('display', 'none', 'important');
       }
       if (bentoGrid) bentoGrid.classList.add('customizing');
+      setCardsDraggable(true);
+      renderWidgetPicker();
+      toast(S.lang === 'ar' ? 'اسحب البطاقات بالفأرة لإعادة الترتيب أو تغيير الحجم' : 'Drag cards with your mouse to reorder or resize');
     }
   };
 
@@ -1678,7 +1982,11 @@
     bToggleCustomize.addEventListener('click', toggleCustomize);
   }
 
-  const closeCustomize = () => {
+  const closeCustomize = (revert = false) => {
+    if (revert && preCustomizeSnapshot) {
+      applyBentoState(preCustomizeSnapshot);
+    }
+    preCustomizeSnapshot = null;
     if (customizeBar) {
       customizeBar.hidden = true;
       customizeBar.style.setProperty('display', 'none', 'important');
@@ -1691,32 +1999,57 @@
       presetPopover.hidden = true;
       presetPopover.style.setProperty('display', 'none', 'important');
     }
+    if (widgetPickerPopover) {
+      widgetPickerPopover.hidden = true;
+      widgetPickerPopover.style.setProperty('display', 'none', 'important');
+    }
     if (bentoGrid) bentoGrid.classList.remove('customizing');
+    setCardsDraggable(false);
   };
 
-  if (bCloseCustom) bCloseCustom.addEventListener('click', closeCustomize);
+  if (bCloseCustom) bCloseCustom.addEventListener('click', () => closeCustomize(true));
   if (bApplyCustom) {
     bApplyCustom.addEventListener('click', () => {
-      closeCustomize();
-      toast(S.lang === 'ar' ? 'تم تطبيق تخصيص اللوحة' : 'Layout customization applied');
+      saveBentoLayout();
+      closeCustomize(false);
+      toast(S.lang === 'ar' ? 'تم حفظ وتطبيق تخصيص اللوحة' : 'Layout customization saved & applied');
     });
   }
   if (bResetCustom) {
     bResetCustom.addEventListener('click', () => {
-      setPreset('compact');
+      applyBentoState({
+        preset: 'compact',
+        order: DEFAULT_WIDGET_ORDER,
+        hidden: [],
+        wide: [],
+        compact: [],
+      });
+      saveBentoLayout();
       toast(S.lang === 'ar' ? 'تمت إعادة ضبط اللوحة إلى الوضع الافتراضي' : 'Layout reset to default');
     });
   }
 
-  if (bAddWidget) {
-    bAddWidget.addEventListener('click', () => {
-      toast(S.lang === 'ar' ? 'جميع البطاقات مفعلة حالياً على اللوحة' : 'All widgets are active on dashboard');
+  if (bAddWidget && widgetPickerPopover) {
+    bAddWidget.addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderWidgetPicker();
+      if (presetPopover) {
+        presetPopover.hidden = true;
+        presetPopover.style.display = 'none';
+      }
+      const isHidden = widgetPickerPopover.hidden || widgetPickerPopover.style.display === 'none';
+      widgetPickerPopover.hidden = !isHidden;
+      widgetPickerPopover.style.display = isHidden ? 'block' : 'none';
     });
   }
 
   if (bPresetMenu && presetPopover) {
     bPresetMenu.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (widgetPickerPopover) {
+        widgetPickerPopover.hidden = true;
+        widgetPickerPopover.style.display = 'none';
+      }
       const isHidden = presetPopover.hidden || presetPopover.style.display === 'none';
       presetPopover.hidden = !isHidden;
       presetPopover.style.display = isHidden ? 'block' : 'none';
@@ -1724,23 +2057,36 @@
   }
 
   document.addEventListener('click', (e) => {
-    if (presetPopover && !presetPopover.contains(e.target) && e.target !== bPresetMenu) {
+    if (presetPopover && !presetPopover.contains(e.target) && e.target !== bPresetMenu && !bPresetMenu?.contains(e.target)) {
       presetPopover.hidden = true;
       presetPopover.style.display = 'none';
     }
+    if (widgetPickerPopover && !widgetPickerPopover.contains(e.target) && e.target !== bAddWidget && !bAddWidget?.contains(e.target)) {
+      widgetPickerPopover.hidden = true;
+      widgetPickerPopover.style.display = 'none';
+    }
   });
 
-  function setPreset(presetName) {
+  function setPreset(presetName, keepCustomize = false) {
     S.dashPreset = presetName;
+    const dict = I18N[S.lang] || I18N.en;
+    const presetKeyMap = {
+      balanced: 'presetBalanced',
+      task: 'presetTask',
+      speed: 'presetSpeed',
+      compact: 'presetCompact',
+    };
     if (curPresetLabel) {
-      curPresetLabel.textContent = presetName.charAt(0).toUpperCase() + presetName.slice(1);
+      curPresetLabel.textContent = (presetKeyMap[presetName] && dict[presetKeyMap[presetName]])
+        || (presetName.charAt(0).toUpperCase() + presetName.slice(1));
     }
     $$('.dropdown-item', presetPopover).forEach((item) => {
       item.classList.toggle('active', item.dataset.preset === presetName);
     });
 
     if (bentoGrid) {
-      bentoGrid.className = `bento-grid layout-${presetName}`;
+      const wasCustomizing = keepCustomize || bentoGrid.classList.contains('customizing');
+      bentoGrid.className = `bento-grid layout-${presetName}${wasCustomizing ? ' customizing' : ''}`;
     }
     if (presetPopover) {
       presetPopover.hidden = true;
@@ -1750,7 +2096,7 @@
 
   $$('.dropdown-item', presetPopover).forEach((item) => {
     item.addEventListener('click', () => {
-      setPreset(item.dataset.preset);
+      setPreset(item.dataset.preset, true);
     });
   });
 
@@ -2553,15 +2899,42 @@
     });
   }
 
-  /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.7';
+  /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases — Stable Default) ---------------- */
+  const CURRENT_APP_VERSION = '1.0.8';
   let availableUpdateRelease = null;
+  let isNewerUpdateAvailable = false;
   let updateDownloadTaskId = null;
   let downloadedUpdatePath = null;
 
+  const cfgChannel = $('#cfgChannel');
+  const betaWarningBox = $('#betaWarningBox');
+
+  function syncUpdateChannelUI() {
+    const savedCh = (() => {
+      try { return localStorage.getItem('tayyar_update_channel') || 'stable'; } catch (_) { return 'stable'; }
+    })();
+    const ch = savedCh === 'beta' ? 'beta' : 'stable';
+    if (cfgChannel) cfgChannel.value = ch;
+    if (betaWarningBox) {
+      betaWarningBox.style.display = ch === 'beta' ? 'block' : 'none';
+    }
+  }
+
+  if (cfgChannel) {
+    cfgChannel.addEventListener('change', () => {
+      const ch = cfgChannel.value === 'beta' ? 'beta' : 'stable';
+      try { localStorage.setItem('tayyar_update_channel', ch); } catch (_) {}
+      if (betaWarningBox) {
+        betaWarningBox.style.display = ch === 'beta' ? 'block' : 'none';
+      }
+      checkAppUpdates(true);
+    });
+  }
+  syncUpdateChannelUI();
+
   function semverCompare(a, b) {
-    const pa = (a || '0').replace(/^v/, '').split('.').map(Number);
-    const pb = (b || '0').replace(/^v/, '').split('.').map(Number);
+    const pa = (a || '0').replace(/^v/, '').split('-')[0].split('.').map(Number);
+    const pb = (b || '0').replace(/^v/, '').split('-')[0].split('.').map(Number);
     for (let i = 0; i < 3; i++) {
       const na = pa[i] || 0;
       const nb = pb[i] || 0;
@@ -2577,6 +2950,8 @@
     const updateDesc = $('#updateDescText');
     const bInstall = $('#bInstallUpdate');
     const bInstallText = $('#bInstallUpdateText');
+    const progressWrap = $('#updateProgressWrap');
+    const channel = (cfgChannel && cfgChannel.value === 'beta') ? 'beta' : 'stable';
 
     if (bCheck) {
       bCheck.disabled = true;
@@ -2584,21 +2959,38 @@
     }
 
     try {
-      const res = await fetch('https://api.github.com/repos/mumenmahbuobeh/tayyar/releases/latest', {
+      const endpoint = channel === 'beta'
+        ? 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases'
+        : 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases/latest';
+
+      const res = await fetch(endpoint, {
         headers: { Accept: 'application/vnd.github.v3+json' }
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const rel = await res.json();
-      availableUpdateRelease = rel;
-      const latestTag = (rel.tag_name || 'v1.0.7').replace(/^v/, '');
+      const payload = await res.json();
 
+      let rel = null;
+      if (Array.isArray(payload)) {
+        rel = payload.find((r) => !r.draft) || null;
+      } else if (payload && !payload.draft && (channel === 'beta' || !payload.prerelease)) {
+        rel = payload;
+      }
+
+      if (!rel || !rel.tag_name) {
+        throw new Error('No release metadata');
+      }
+
+      const latestTag = (rel.tag_name || '').replace(/^v/, '');
       const isNewer = semverCompare(latestTag, CURRENT_APP_VERSION) > 0;
+      isNewerUpdateAvailable = isNewer;
 
       if (isNewer) {
+        availableUpdateRelease = rel;
         if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? `تحديث جديد متوفر: v${latestTag}` : `New Update Available: v${latestTag}`;
         if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? 'انقر على "تحديث الآن" للتحميل والتثبيت المباشر من داخل البرنامج.' : 'Click "Update Now" to download and install directly inside Tayyar.';
         if (bInstall) {
           bInstall.style.display = 'inline-flex';
+          bInstall.disabled = false;
           bInstall.className = 'pill-btn primary sm';
           if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'تحديث الآن' : 'Update Now';
         }
@@ -2606,28 +2998,27 @@
           toast(S.lang === 'ar' ? `يتوفر إصدار جديد v${latestTag}` : `New version v${latestTag} available!`);
         }
       } else {
+        availableUpdateRelease = null;
+        downloadedUpdatePath = null;
+        updateDownloadTaskId = null;
         if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? 'برنامج تيّار محدّث لأحدث إصدار' : 'Tayyar is up to date';
-        if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? `الإصدار ${CURRENT_APP_VERSION} هو أحدث إصدار متوفر.` : `Version ${CURRENT_APP_VERSION} is the latest available release.`;
-        if (bInstall) {
-          bInstall.style.display = 'inline-flex';
-          bInstall.className = 'pill-btn outline sm';
-          if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'إعادة تثبيت / تحديث' : 'Reinstall / Update';
-        }
+        if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? `الإصدار ${CURRENT_APP_VERSION} هو أحدث إصدار مستقر متوفر.` : `Version ${CURRENT_APP_VERSION} is the latest available release.`;
+        if (bInstall) bInstall.style.display = 'none';
+        if (progressWrap) progressWrap.style.display = 'none';
         if (interactive) {
-          toast(S.lang === 'ar' ? `برنامج تيّار محدّث لأحدث إصدار (v${CURRENT_APP_VERSION})` : `Tayyar is up to date (v${CURRENT_APP_VERSION})`);
+          toast(S.lang === 'ar' ? `برنامج تيّار محدّث بالفعل (v${CURRENT_APP_VERSION})` : `Tayyar is already up to date (v${CURRENT_APP_VERSION})`);
         }
       }
     } catch (err) {
       console.warn('Update check failed:', err);
-      if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? 'برنامج تيّار (v1.0.7)' : 'Tayyar (v1.0.7)';
+      isNewerUpdateAvailable = false;
+      availableUpdateRelease = null;
+      if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? `برنامج تيّار (v${CURRENT_APP_VERSION})` : `Tayyar (v${CURRENT_APP_VERSION})`;
       if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? 'تعذّر الاتصال بخادم التحديثات حالياً.' : 'Could not reach update server at this moment.';
-      if (bInstall) {
-        bInstall.style.display = 'inline-flex';
-        bInstall.className = 'pill-btn outline sm';
-        if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'تحديث الآن' : 'Update Now';
-      }
+      if (bInstall) bInstall.style.display = 'none';
+      if (progressWrap) progressWrap.style.display = 'none';
       if (interactive) {
-        toast(S.lang === 'ar' ? 'تعذّر فحص التحديثات' : 'Failed to check updates');
+        toast(S.lang === 'ar' ? 'تعذّر فحص التحديثات حالياً' : 'Failed to check updates');
       }
     } finally {
       if (bCheck) {
@@ -2639,13 +3030,8 @@
 
   async function startInAppUpdate() {
     const bInstall = $('#bInstallUpdate');
-    const bInstallText = $('#bInstallUpdateText');
     const progressWrap = $('#updateProgressWrap');
     const progressStatus = $('#updateProgressStatus');
-    const progressPct = $('#updateProgressPct');
-    const progressBar = $('#updateProgressBar');
-    const progressSpeed = $('#updateProgressSpeed');
-    const progressSize = $('#updateProgressSize');
 
     if (downloadedUpdatePath) {
       if (window.tayyar?.installUpdate) {
@@ -2659,29 +3045,38 @@
       return;
     }
 
+    if (!isNewerUpdateAvailable || !availableUpdateRelease) {
+      toast(S.lang === 'ar' ? `أنت بالفعل على أحدث إصدار (v${CURRENT_APP_VERSION})` : `You are already on the latest version (v${CURRENT_APP_VERSION})`);
+      if (bInstall) bInstall.style.display = 'none';
+      if (progressWrap) progressWrap.style.display = 'none';
+      return;
+    }
+
     let targetAssetUrl = '';
     let targetFilename = '';
     const platform = window.tayyar?.platform ? await window.tayyar.platform() : (window.Capacitor?.getPlatform ? window.Capacitor.getPlatform() : 'win32');
-    const assets = availableUpdateRelease?.assets || [];
+    const assets = availableUpdateRelease.assets || [];
 
     if (platform === 'android') {
       const apk = assets.find((a) => a.name.endsWith('.apk'));
-      targetAssetUrl = apk ? apk.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.7/Tayyar-Android-v1.0.7.apk';
-      targetFilename = 'Tayyar-Android-v1.0.7.apk';
+      if (apk) { targetAssetUrl = apk.browser_download_url; targetFilename = apk.name; }
     } else if (platform === 'darwin') {
       const dmg = assets.find((a) => a.name.endsWith('.dmg'));
-      targetAssetUrl = dmg ? dmg.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.7/Tayyar-1.0.7.dmg';
-      targetFilename = 'Tayyar-1.0.7.dmg';
+      if (dmg) { targetAssetUrl = dmg.browser_download_url; targetFilename = dmg.name; }
     } else if (platform === 'linux') {
-      const appImage = assets.find((a) => a.name.endsWith('.AppImage') || a.name.endsWith('.deb'));
-      targetAssetUrl = appImage ? appImage.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.7/Tayyar-1.0.7.AppImage';
-      targetFilename = 'Tayyar-1.0.7.AppImage';
+      const pkg = assets.find((a) => a.name.endsWith('.AppImage') || a.name.endsWith('.deb'));
+      if (pkg) { targetAssetUrl = pkg.browser_download_url; targetFilename = pkg.name; }
     } else {
-      const setupExe = assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe') && !a.name.includes('blockmap') && (a.size > 80 * 1024 * 1024)) ||
-                       assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe') && !a.name.includes('blockmap')) ||
+      const setupExe = assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe') && !a.name.includes('blockmap')) ||
                        assets.find((a) => a.name.endsWith('.exe') && !a.name.includes('blockmap'));
-      targetAssetUrl = setupExe ? setupExe.browser_download_url : 'https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.7/Tayyar-Setup-1.0.7.exe';
-      targetFilename = setupExe ? setupExe.name : 'Tayyar-Setup-1.0.7.exe';
+      if (setupExe) { targetAssetUrl = setupExe.browser_download_url; targetFilename = setupExe.name; }
+    }
+
+    if (!targetAssetUrl) {
+      const releaseUrl = availableUpdateRelease.html_url || 'https://github.com/mumenmahbuobeh/tayyar/releases/latest';
+      if (window.tayyar?.openUrl) window.tayyar.openUrl(releaseUrl);
+      else window.open(releaseUrl, '_blank');
+      return;
     }
 
     if (progressWrap) progressWrap.style.display = 'block';
@@ -2698,20 +3093,8 @@
         updateDownloadTaskId = res?.item?.id || res?.id;
         toast(S.lang === 'ar' ? 'بدأ تحميل حزمة التحديث' : 'Update download started');
       } else {
-        let fakePct = 0;
-        const fakeInterval = setInterval(() => {
-          fakePct += 4;
-          if (fakePct > 100) fakePct = 100;
-          if (progressBar) progressBar.style.width = fakePct + '%';
-          if (progressPct) progressPct.textContent = fakePct + '%';
-          if (progressSpeed) progressSpeed.textContent = '6.4 MB/s';
-          if (progressSize) progressSize.textContent = `${(fakePct * 0.44).toFixed(1)} MB / 44.0 MB`;
-
-          if (fakePct >= 100) {
-            clearInterval(fakeInterval);
-            finishUpdateDownload(targetFilename);
-          }
-        }, 120);
+        window.open(targetAssetUrl, '_blank');
+        if (bInstall) bInstall.disabled = false;
       }
     } catch (e) {
       console.error('Failed to start update download:', e);
@@ -3545,6 +3928,17 @@
     } catch (e) {
       console.error('Init error:', e);
     }
+
+    // Apply pure language (100% English or 100% Arabic across Desktop & Mobile)
+    let savedLang = 'en';
+    try {
+      savedLang = localStorage.getItem('tayyar_lang') || S.settings?.lang || 'en';
+    } catch (_) {
+      savedLang = S.settings?.lang || 'en';
+    }
+    applyLanguage(savedLang, true);
+    loadSavedBentoLayout();
+    syncUpdateChannelUI();
 
     updateDashboard();
     renderDownloadsList();

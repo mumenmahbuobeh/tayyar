@@ -157,15 +157,11 @@ svg:not([width]) {
 
 /* ================= RTL SUPPORT ================= */
 html[dir="rtl"] .app-layout {
-  grid-template-columns: 1fr 220px;
+  grid-template-columns: 220px 1fr;
 }
 html[dir="rtl"] .sidebar {
   border-right: none;
   border-left: 1px solid var(--border-subtle);
-  order: 2;
-}
-html[dir="rtl"] .main-content {
-  order: 1;
 }
 html[dir="rtl"] .chevron-ic {
   transform: scaleX(-1);
@@ -196,7 +192,7 @@ html[dir="rtl"] .modal-foot {
   grid-template-columns: 68px 1fr !important;
 }
 html[dir="rtl"] .app-layout.sidebar-collapsed {
-  grid-template-columns: 1fr 68px !important;
+  grid-template-columns: 68px 1fr !important;
 }
 
 .sidebar-collapsed .sidebar {
@@ -3677,6 +3673,155 @@ html[dir="rtl"] .glass-island-player {
     transform: scale(0.88);
   }
 }
+
+/* ================= INTERACTIVE DASHBOARD DRAG & DROP CUSTOMIZATION ================= */
+.bento-card {
+  position: relative;
+}
+
+.bento-card.widget-hidden {
+  display: none !important;
+}
+
+.bento-card.widget-wide {
+  grid-column: span 2 !important;
+}
+
+.bento-card.widget-compact {
+  grid-column: span 1 !important;
+}
+
+.bento-grid.customizing .bento-card {
+  cursor: grab !important;
+  border: 1.5px dashed rgba(0, 242, 254, 0.45) !important;
+  box-shadow: 0 0 0 1px rgba(0, 242, 254, 0.15), 0 12px 30px rgba(0, 0, 0, 0.5) !important;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+              border-color 0.2s ease,
+              box-shadow 0.2s ease,
+              opacity 0.2s ease !important;
+  user-select: none;
+}
+
+.bento-grid.customizing .bento-card:hover {
+  border-color: rgba(0, 242, 254, 0.85) !important;
+  transform: translateY(-2px);
+}
+
+.bento-grid.customizing .bento-card:active {
+  cursor: grabbing !important;
+  transform: scale(0.98) !important;
+}
+
+.bento-grid.customizing .bento-card.dragging {
+  opacity: 0.42 !important;
+  transform: scale(0.95) !important;
+  border-color: #00f2fe !important;
+  cursor: grabbing !important;
+}
+
+.bento-grid.customizing .bento-card.drag-over {
+  border: 2px solid #00f2fe !important;
+  box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.35), 0 16px 38px rgba(0, 242, 254, 0.25) !important;
+  transform: scale(1.02) !important;
+}
+
+.widget-edit-controls {
+  display: none;
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 8px;
+  z-index: 25;
+  gap: 5px;
+  align-items: center;
+  background: rgba(14, 16, 24, 0.86);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 3px 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.bento-grid.customizing .widget-edit-controls {
+  display: flex;
+}
+
+.widget-ctrl-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  transition: all 0.16s ease;
+}
+
+.widget-ctrl-btn:hover {
+  background: rgba(0, 242, 254, 0.25);
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.widget-ctrl-btn.btn-hide-widget:hover {
+  background: rgba(239, 68, 68, 0.35);
+  color: #fecaca;
+}
+
+.widget-drag-grip {
+  color: rgba(0, 242, 254, 0.85);
+  font-size: 13px;
+  padding: 0 3px;
+  cursor: grab;
+  letter-spacing: -1px;
+}
+
+.widget-picker-popover {
+  min-width: 230px;
+  padding: 10px !important;
+  inset-inline-end: 0;
+  inset-inline-start: auto;
+}
+
+.widget-picker-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-dim);
+  padding: 4px 8px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 6px;
+}
+
+.widget-picker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 8px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.widget-picker-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.widget-picker-row input[type="checkbox"] {
+  accent-color: #00f2fe;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
 
 
 
