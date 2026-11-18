@@ -84,11 +84,11 @@ jobs:
         with:
           name: tayyar-desktop-${{ matrix.os }}
           path: |
-            dist/Tayyar-Setup-1.0.16.exe
-            dist/Tayyar-1.0.16.exe
-            dist/Tayyar-1.0.16.dmg
-            dist/Tayyar-1.0.16.AppImage
-            dist/tayyar_1.0.16_amd64.deb
+            dist/Tayyar-Setup-1.0.17.exe
+            dist/Tayyar-1.0.17.exe
+            dist/Tayyar-1.0.17.dmg
+            dist/Tayyar-1.0.17.AppImage
+            dist/tayyar_1.0.17_amd64.deb
             dist/latest*.yml
           if-no-files-found: ignore
 
@@ -155,7 +155,7 @@ jobs:
           mkdir -p build-apk
           APK_FILE=$(find android/app/build/outputs/apk -type f -name "*.apk" | head -n 1)
           if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
-            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.16.apk
+            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.17.apk
           else
             echo "Error: APK file not found!" && exit 1
           fi
@@ -164,7 +164,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-android-apk
-          path: build-apk/Tayyar-Android-v1.0.16.apk
+          path: build-apk/Tayyar-Android-v1.0.17.apk
 
   build-ios:
     name: Build iOS Package
@@ -195,7 +195,7 @@ jobs:
           APP_PATH=$(find build/Build/Products -name "*.app" -type d | head -n 1)
           if [ -n "$APP_PATH" ] && [ -d "$APP_PATH" ]; then
             cp -r "$APP_PATH" build/Payload/
-            cd build && zip -r ../../../Tayyar-iOS-v1.0.16.ipa Payload
+            cd build && zip -r ../../../Tayyar-iOS-v1.0.17.ipa Payload
           else
             echo "Error: iOS .app bundle not found!" && exit 1
           fi
@@ -204,13 +204,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-ios-ipa
-          path: Tayyar-iOS-v1.0.16.ipa
+          path: Tayyar-iOS-v1.0.17.ipa
 
       - name: Attach iOS IPA to Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.16
-          files: Tayyar-iOS-v1.0.16.ipa
+          tag_name: v1.0.17
+          files: Tayyar-iOS-v1.0.17.ipa
           fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -238,7 +238,7 @@ jobs:
           cd final-release
           # Strip any blockmap files, old version assets, and duplicate space-separated filenames
           rm -f *.blockmap 2>/dev/null || true
-          rm -f *1.0.0* *1.0.5* *1.0.6* *1.0.7* *1.0.8* *1.0.9* *1.0.10* *1.0.11* *1.0.12* *1.0.13* *1.0.14* *1.0.15* 2>/dev/null || true
+          rm -f *1.0.0* *1.0.5* *1.0.6* *1.0.7* *1.0.8* *1.0.9* *1.0.10* *1.0.11* *1.0.12* *1.0.13* *1.0.14* *1.0.15* *1.0.16* 2>/dev/null || true
           find . -type f -name "* *" -delete 2>/dev/null || true
           echo "Curated Final Release Assets (Strictly 1 Clean Binary per Platform):"
           ls -la
@@ -249,7 +249,7 @@ jobs:
         run: |
           echo "Scanning GitHub releases for obsolete or duplicate assets..."
           curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases" | \
-          jq -r '.[] | .assets[]? | select((.name | test("1\\.0\\.16") | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
+          jq -r '.[] | .assets[]? | select((.name | test("1\\.0\\.17") | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
             if [ -n "$asset_id" ] && [ -n "$asset_name" ]; then
               echo "Withdrawing & deleting unwanted release asset: $asset_name (ID: $asset_id)"
               curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" || true
@@ -259,32 +259,32 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.16
-          name: "Tayyar v1.0.16 — Pro Direct Update Arrival Popup (Stable & Beta)"
+          tag_name: v1.0.17
+          name: "Tayyar v1.0.17 — Critical Video Download Fix (Regional CDN Bypass + Bulletproof MediaStore)"
           body: |
-            ## 🚀 Tayyar Download Manager v1.0.16
+            ## 🚀 Tayyar Download Manager v1.0.17
 
             Universal high-speed multi-connection download manager & Pro Stories Saver designed and developed by **Mu'men Mahbuobeh**.
 
             ### 📦 Download Packages (Official & Clean Binaries)
             * **Windows:**
-              * [Tayyar-Setup-1.0.16.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.16/Tayyar-Setup-1.0.16.exe) (Installer with Bundled Media Engine)
-              * [Tayyar-1.0.16.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.16/Tayyar-1.0.16.exe) (Portable Executable)
+              * [Tayyar-Setup-1.0.17.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.17/Tayyar-Setup-1.0.17.exe) (Installer with Bundled Media Engine)
+              * [Tayyar-1.0.17.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.17/Tayyar-1.0.17.exe) (Portable Executable)
             * **Android:**
-              * [Tayyar-Android-v1.0.16.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.16/Tayyar-Android-v1.0.16.apk) (Direct In-App APK Auto-Installer + Pro Update Popup)
+              * [Tayyar-Android-v1.0.17.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.17/Tayyar-Android-v1.0.17.apk) (Fixed TikTok/YouTube/Facebook Downloads + Bulletproof Gallery Saver)
             * **iOS (Apple iPhone/iPad):**
-              * [Tayyar-iOS-v1.0.16.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.16/Tayyar-iOS-v1.0.16.ipa) (Pro Update Arrival Popup + Stories Saver)
+              * [Tayyar-iOS-v1.0.17.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.17/Tayyar-iOS-v1.0.17.ipa) (Fixed TikTok Cloudflare CDN + YouTube InnerTube + Stories Saver)
             * **macOS:**
-              * [Tayyar-1.0.16.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.16/Tayyar-1.0.16.dmg) (Apple Silicon & Intel)
+              * [Tayyar-1.0.17.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.17/Tayyar-1.0.17.dmg) (Apple Silicon & Intel)
             * **Linux:**
-              * [Tayyar-1.0.16.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.16/Tayyar-1.0.16.AppImage)
-              * [tayyar_1.0.16_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.16/tayyar_1.0.16_amd64.deb)
+              * [Tayyar-1.0.17.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.17/Tayyar-1.0.17.AppImage)
+              * [tayyar_1.0.17_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.17/tayyar_1.0.17_amd64.deb)
 
-            ### ✨ What's New in v1.0.16
-            * **Professional Update Arrival Popup (Desktop & Mobile):** Frosted glass notification card appears automatically when a genuinely newer **Stable** or **Beta** version arrives, displaying the channel badge, version transition (`vOld → vNew`), file size, and parsed What's New highlights.
-            * **Direct 1-Tap In-App Updating:** Live download progress bar right inside the popup; automatically launches the Desktop installer (Windows/macOS/Linux) or Android native APK Package Installer (`FileProvider`) the instant the download finishes.
-            * **Smart Dismiss Controls:** Includes **Update Now**, **Later**, and **Skip Version** controls — never prompts when already on the latest version.
-            * **Pro Story Count & Multi-Select:** Hand-pick exact stories or choose count via stepper, slider, and presets across WhatsApp, Snapchat, Instagram, and Facebook.
+            ### ✨ Critical Fixes in v1.0.17
+            * **Fixed TikTok `Failed` / Timeout Errors (All Platforms):** Prioritized global Cloudflare `tikcdn.io` (via live-token SSSTik) over regionally blocked US `tiktokcdn-us.com` streams on Android, iOS, Windows, macOS, and Linux.
+            * **Bulletproof 3-Tier Android Storage Engine:** Wrapped `MediaStore.Video` / `Images` / `Audio` inserts with automatic fallback to `MediaStore.Downloads` and `FileOutputStream` so OEM ROM restrictions never fail a download.
+            * **Enhanced YouTube Extraction:** Added `adaptiveFormats` MP4 fallback alongside progressive `ANDROID_VR` streams.
+            * **Direct Update Arrival Popup:** Users on `v1.0.16` will automatically receive the new frosted-glass Update Popup to install `v1.0.17` in 1 tap!
           files: final-release/*
           fail_on_unmatched_files: false
           draft: false

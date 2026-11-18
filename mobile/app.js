@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.16';
+  const APP_VERSION = '1.0.17';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -707,6 +707,59 @@
 
     // 2. Universal APIs (Routed natively via CapacitorHttp on iOS & Android — zero CORS)
     if (plat.id === 'tiktok') {
+      // 1st priority: SSSTik (global Cloudflare tikcdn.io CDN — bypasses regional tiktokcdn-us.com blocks!)
+      try {
+        const home = await fetch('https://ssstik.io/');
+        const homeHtml = home.ok ? await home.text() : '';
+        const tt = (homeHtml.match(/tt\s*=\s*'([^']+)'/) || [])[1] || '';
+        const rSss = await fetch('https://ssstik.io/abc?url=dl', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded', Origin: 'https://ssstik.io', Referer: 'https://ssstik.io/en' },
+          body: `id=${encodeURIComponent(cleanUrl)}&locale=en&tt=${encodeURIComponent(tt)}`,
+        });
+        if (rSss.ok) {
+          const sHtml = await rSss.text();
+          const vidM = sHtml.match(/href="(https:\/\/tikcdn\.io\/ssstik\/[^"]+)"/);
+          const audM = sHtml.match(/href="(https:\/\/tikcdn\.io\/ssstik\/mp3\/[^"]+)"/);
+          const thumbM = sHtml.match(/src="(https:\/\/tikcdn\.io\/ssstik\/thumb\/[^"]+)"/);
+          const titleM = sHtml.match(/<p class="maintext">([\s\S]*?)<\/p>/);
+          const formats = [];
+          if (vidM?.[1]) formats.push({ id: 'video', ext: 'mp4', url: vidM[1], directUrl: vidM[1], referer: 'https://ssstik.io/' });
+          if (audM?.[1]) formats.push({ id: 'audio', ext: 'mp3', url: audM[1], directUrl: audM[1], referer: 'https://ssstik.io/' });
+          if (formats.length) {
+            return {
+              ok: true,
+              platform: 'TikTok',
+              platformId: 'tiktok',
+              platformIcon: '⚡',
+              title: titleM ? titleM[1].replace(/<[^>]+>/g, '').trim() || 'TikTok Video' : 'TikTok Video',
+              author: 'TikTok',
+              thumbnail: thumbM?.[1] || '',
+              formats,
+            };
+          }
+        }
+      } catch (_) {}
+      // 2nd priority: NNTech
+      try {
+        const r2 = await fetch(`https://nntech-free-tt-api.vercel.app/api/tiktok/mp4?url=${encodeURIComponent(cleanUrl)}`);
+        if (r2.ok) {
+          const j2 = await r2.json();
+          if (j2?.download && j2.download.startsWith('http')) {
+            return {
+              ok: true,
+              platform: 'TikTok',
+              platformId: 'tiktok',
+              platformIcon: '⚡',
+              title: j2.title || 'TikTok Video',
+              author: 'TikTok',
+              thumbnail: '',
+              formats: [{ id: 'video', ext: 'mp4', url: j2.download, directUrl: j2.download, referer: 'https://www.tiktok.com/' }],
+            };
+          }
+        }
+      } catch (_) {}
+      // 3rd priority: TikWM
       try {
         const r = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`);
         if (r.ok) {
@@ -731,24 +784,6 @@
                 formats,
               };
             }
-          }
-        }
-      } catch (_) {}
-      try {
-        const r2 = await fetch(`https://nntech-free-tt-api.vercel.app/api/tiktok/mp4?url=${encodeURIComponent(cleanUrl)}`);
-        if (r2.ok) {
-          const j2 = await r2.json();
-          if (j2?.download && j2.download.startsWith('http')) {
-            return {
-              ok: true,
-              platform: 'TikTok',
-              platformId: 'tiktok',
-              platformIcon: '⚡',
-              title: j2.title || 'TikTok Video',
-              author: 'TikTok',
-              thumbnail: '',
-              formats: [{ id: 'video', ext: 'mp4', url: j2.download, directUrl: j2.download, referer: 'https://www.tiktok.com/' }],
-            };
           }
         }
       } catch (_) {}
@@ -794,6 +829,12 @@
               }
             }
             const adaptive = ytJson?.streamingData?.adaptiveFormats || [];
+            if (formats.length === 0) {
+              const bestVid = adaptive.find((f) => f?.url && String(f.mimeType || '').toLowerCase().startsWith('video/mp4'));
+              if (bestVid?.url) {
+                formats.push({ id: 'video', ext: 'mp4', url: bestVid.url, directUrl: bestVid.url, userAgent: ytUa });
+              }
+            }
             const bestAud = adaptive
               .filter((f) => f?.url && String(f.mimeType || '').toLowerCase().startsWith('audio/mp4'))
               .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];

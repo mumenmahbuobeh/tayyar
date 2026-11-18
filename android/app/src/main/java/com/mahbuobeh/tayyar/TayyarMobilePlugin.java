@@ -315,8 +315,29 @@ public class TayyarMobilePlugin extends Plugin {
                 }
             }
 
-            // 2. Audio-only stream from adaptiveFormats
+            // 1b. Adaptive MP4 video fallback if progressive array was empty
             org.json.JSONArray adaptive = streaming.optJSONArray("adaptiveFormats");
+            if (formats.length() == 0 && adaptive != null) {
+                for (int i = 0; i < adaptive.length(); i++) {
+                    org.json.JSONObject af = adaptive.optJSONObject(i);
+                    if (af == null) continue;
+                    String mime = af.optString("mimeType", "").toLowerCase();
+                    String vUrl = af.optString("url", "");
+                    if (mime.startsWith("video/mp4") && !vUrl.isEmpty()) {
+                        JSObject fmt = new JSObject();
+                        fmt.put("id", "video_adaptive");
+                        fmt.put("quality", "Video HD (" + af.optString("qualityLabel", "HD") + ")");
+                        fmt.put("ext", "mp4");
+                        fmt.put("url", vUrl);
+                        fmt.put("directUrl", vUrl);
+                        fmt.put("userAgent", UA_YT_ANDROID_VR);
+                        formats.put(fmt);
+                        break;
+                    }
+                }
+            }
+
+            // 2. Audio-only stream from adaptiveFormats
             if (adaptive != null) {
                 String bestAudioUrl = "";
                 int bestBitrate = 0;
@@ -360,7 +381,90 @@ public class TayyarMobilePlugin extends Plugin {
     }
 
     private JSObject resolveTikTok(String url) {
-        // 1. TikWM API
+        // 1. PRIMARY: SSSTik (global Cloudflare tikcdn.io CDN — bypasses regional tiktokcdn-us.com blocks!)
+        try {
+            String home = httpGetText("https://ssstik.io/", UA_CHROME_DESKTOP, "");
+            String tt = "";
+            Matcher mTt = Pattern.compile("tt\\s*=\\s*'([^']+)'").matcher(home);
+            if (mTt.find()) tt = mTt.group(1);
+            String postData = "id=" + URLEncoder.encode(url, "UTF-8") + "&locale=en&tt=" + URLEncoder.encode(tt, "UTF-8");
+            String html = httpPostText("https://ssstik.io/abc?url=dl", postData, "application/x-www-form-urlencoded", UA_CHROME_DESKTOP, "https://ssstik.io", "https://ssstik.io/en");
+            JSArray formats = new JSArray();
+            Matcher m = Pattern.compile("href=\"(https://tikcdn\\.io/ssstik/[^\"]+)\"").matcher(html);
+            if (m.find()) {
+                JSObject f1 = new JSObject();
+                f1.put("id", "nowm");
+                f1.put("quality", "HD No Watermark (MP4)");
+                f1.put("ext", "mp4");
+                f1.put("url", m.group(1));
+                f1.put("directUrl", m.group(1));
+                f1.put("referer", "https://ssstik.io/");
+                f1.put("userAgent", UA_CHROME_DESKTOP);
+                formats.put(f1);
+            }
+            Matcher mAud = Pattern.compile("href=\"(https://tikcdn\\.io/ssstik/mp3/[^\"]+)\"").matcher(html);
+            if (mAud.find()) {
+                JSObject fAud = new JSObject();
+                fAud.put("id", "audio");
+                fAud.put("quality", "Audio Only (MP3)");
+                fAud.put("ext", "mp3");
+                fAud.put("url", mAud.group(1));
+                fAud.put("directUrl", mAud.group(1));
+                fAud.put("referer", "https://ssstik.io/");
+                fAud.put("userAgent", UA_CHROME_DESKTOP);
+                formats.put(fAud);
+            }
+            if (formats.length() > 0) {
+                String title = "TikTok Video";
+                Matcher mTitle = Pattern.compile("<p class=\"maintext\">([\\s\\S]*?)</p>").matcher(html);
+                if (mTitle.find()) title = mTitle.group(1).replaceAll("<[^>]+>", "").trim();
+                String thumb = "";
+                Matcher mThumb = Pattern.compile("src=\"(https://tikcdn\\.io/ssstik/thumb/[^\"]+)\"").matcher(html);
+                if (mThumb.find()) thumb = mThumb.group(1);
+
+                JSObject ret = new JSObject();
+                ret.put("ok", true);
+                ret.put("platform", "TikTok");
+                ret.put("title", title.isEmpty() ? "TikTok Video" : title);
+                ret.put("author", "TikTok");
+                ret.put("thumbnail", thumb);
+                ret.put("formats", formats);
+                return ret;
+            }
+        } catch (Exception ex) {
+            Log.w(TAG, "SSSTik warning: " + ex.getMessage());
+        }
+
+        // 2. NNTech Free TikTok API backup
+        try {
+            String resp = httpGetText("https://nntech-free-tt-api.vercel.app/api/tiktok/mp4?url=" + URLEncoder.encode(url, "UTF-8"), UA_CHROME_DESKTOP, "");
+            if (!resp.isEmpty()) {
+                org.json.JSONObject obj = new org.json.JSONObject(resp);
+                String dl = obj.optString("download", "");
+                if (!dl.isEmpty() && dl.startsWith("http")) {
+                    JSArray formats = new JSArray();
+                    JSObject f1 = new JSObject();
+                    f1.put("id", "nowm");
+                    f1.put("quality", "HD No Watermark (MP4)");
+                    f1.put("ext", "mp4");
+                    f1.put("url", dl);
+                    f1.put("directUrl", dl);
+                    f1.put("referer", "https://www.tiktok.com/");
+                    formats.put(f1);
+
+                    JSObject ret = new JSObject();
+                    ret.put("ok", true);
+                    ret.put("platform", "TikTok");
+                    ret.put("title", obj.optString("title", "TikTok Video"));
+                    ret.put("author", "TikTok");
+                    ret.put("thumbnail", "");
+                    ret.put("formats", formats);
+                    return ret;
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // 3. TikWM API backup (skip US-blocked CDN only if SSSTik & NNTech both failed)
         try {
             String jsonStr = httpGetText("https://www.tikwm.com/api/?url=" + URLEncoder.encode(url, "UTF-8"), UA_CHROME_MOBILE, "https://www.tikwm.com/");
             if (!jsonStr.isEmpty()) {
@@ -368,10 +472,8 @@ public class TayyarMobilePlugin extends Plugin {
                 if (obj.optInt("code", -1) == 0 && obj.has("data")) {
                     org.json.JSONObject data = obj.getJSONObject("data");
                     String play = data.optString("play", "");
-                    String wmplay = data.optString("wmplay", "");
                     String music = data.optString("music", "");
                     if (!play.isEmpty() && !play.startsWith("http")) play = "https://www.tikwm.com" + play;
-                    if (!wmplay.isEmpty() && !wmplay.startsWith("http")) wmplay = "https://www.tikwm.com" + wmplay;
                     if (!music.isEmpty() && !music.startsWith("http")) music = "https://www.tikwm.com" + music;
 
                     JSArray formats = new JSArray();
@@ -416,67 +518,6 @@ public class TayyarMobilePlugin extends Plugin {
         } catch (Exception ex) {
             Log.w(TAG, "TikWM warning: " + ex.getMessage());
         }
-
-        // 2. NNTech Free TikTok API backup
-        try {
-            String resp = httpGetText("https://nntech-free-tt-api.vercel.app/api/tiktok/mp4?url=" + URLEncoder.encode(url, "UTF-8"), UA_CHROME_DESKTOP, "");
-            if (!resp.isEmpty()) {
-                org.json.JSONObject obj = new org.json.JSONObject(resp);
-                String dl = obj.optString("download", "");
-                if (!dl.isEmpty() && dl.startsWith("http")) {
-                    JSArray formats = new JSArray();
-                    JSObject f1 = new JSObject();
-                    f1.put("id", "nowm");
-                    f1.put("quality", "HD No Watermark (MP4)");
-                    f1.put("ext", "mp4");
-                    f1.put("url", dl);
-                    f1.put("directUrl", dl);
-                    f1.put("referer", "https://www.tiktok.com/");
-                    formats.put(f1);
-
-                    JSObject ret = new JSObject();
-                    ret.put("ok", true);
-                    ret.put("platform", "TikTok");
-                    ret.put("title", obj.optString("title", "TikTok Video"));
-                    ret.put("author", "TikTok");
-                    ret.put("thumbnail", "");
-                    ret.put("formats", formats);
-                    return ret;
-                }
-            }
-        } catch (Exception ignored) {}
-
-        // 3. SSSTik backup (with live tt token)
-        try {
-            String home = httpGetText("https://ssstik.io/", UA_CHROME_DESKTOP, "");
-            String tt = "";
-            Matcher mTt = Pattern.compile("tt\\s*=\\s*'([^']+)'").matcher(home);
-            if (mTt.find()) tt = mTt.group(1);
-            String postData = "id=" + URLEncoder.encode(url, "UTF-8") + "&locale=en&tt=" + URLEncoder.encode(tt, "UTF-8");
-            String html = httpPostText("https://ssstik.io/abc?url=dl", postData, "application/x-www-form-urlencoded", UA_CHROME_DESKTOP, "https://ssstik.io", "https://ssstik.io/en");
-            Matcher m = Pattern.compile("href=\"(https://tikcdn\\.io/ssstik/[^\"]+)\"").matcher(html);
-            JSArray formats = new JSArray();
-            if (m.find()) {
-                JSObject f1 = new JSObject();
-                f1.put("id", "nowm");
-                f1.put("quality", "HD No Watermark (MP4)");
-                f1.put("ext", "mp4");
-                f1.put("url", m.group(1));
-                f1.put("directUrl", m.group(1));
-                f1.put("referer", "https://ssstik.io/");
-                formats.put(f1);
-            }
-            if (formats.length() > 0) {
-                JSObject ret = new JSObject();
-                ret.put("ok", true);
-                ret.put("platform", "TikTok");
-                ret.put("title", "TikTok Video");
-                ret.put("author", "TikTok");
-                ret.put("thumbnail", "");
-                ret.put("formats", formats);
-                return ret;
-            }
-        } catch (Exception ignored) {}
 
         return null;
     }
@@ -895,7 +936,7 @@ public class TayyarMobilePlugin extends Plugin {
                         task.total = conn.getContentLengthLong();
                         is = conn.getInputStream();
 
-                        // 3. Save directly to MediaStore (Movies/Pictures/Music/Downloads) OR app-private external dir for direct APK install!
+                        // 3. 3-Tier Bulletproof Storage: MediaStore Gallery -> MediaStore.Downloads -> FileOutputStream!
                         if (forUpdate) {
                             File updDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
                             if (updDir != null && !updDir.exists()) updDir.mkdirs();
@@ -905,14 +946,40 @@ public class TayyarMobilePlugin extends Plugin {
                             task.savedPath = directFile.getAbsolutePath();
                         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             ContentResolver resolver = context.getContentResolver();
-                            mediaStoreUri = insertMediaStoreEntry(resolver, task.filename, task.mimeType, false);
-                            if (mediaStoreUri != null) {
-                                os = resolver.openOutputStream(mediaStoreUri);
-                                String folder = task.mimeType.startsWith("video/") ? "Movies/Tayyar/"
-                                    : task.mimeType.startsWith("image/") ? "Pictures/Tayyar/"
-                                    : task.mimeType.startsWith("audio/") ? "Music/Tayyar/"
-                                    : "Downloads/Tayyar/";
-                                task.savedPath = folder + task.filename;
+                            // Tier 1: Gallery-indexed MediaStore (Movies/Pictures/Music)
+                            try {
+                                mediaStoreUri = insertMediaStoreEntry(resolver, task.filename, task.mimeType, false);
+                                if (mediaStoreUri != null) {
+                                    os = resolver.openOutputStream(mediaStoreUri);
+                                    String folder = task.mimeType.startsWith("video/") ? "Movies/Tayyar/"
+                                        : task.mimeType.startsWith("image/") ? "Pictures/Tayyar/"
+                                        : task.mimeType.startsWith("audio/") ? "Music/Tayyar/"
+                                        : "Downloads/Tayyar/";
+                                    task.savedPath = folder + task.filename;
+                                }
+                            } catch (Exception msEx) {
+                                Log.w(TAG, "Primary MediaStore insert warning, falling back to Downloads: " + msEx.getMessage());
+                                mediaStoreUri = null;
+                                os = null;
+                            }
+                            // Tier 2: Safe fallback to MediaStore.Downloads
+                            if (os == null) {
+                                try {
+                                    ContentValues dlVals = new ContentValues();
+                                    dlVals.put(MediaStore.Downloads.DISPLAY_NAME, "Tayyar_" + System.currentTimeMillis() + "_" + task.filename);
+                                    dlVals.put(MediaStore.Downloads.MIME_TYPE, task.mimeType);
+                                    dlVals.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Tayyar");
+                                    dlVals.put(MediaStore.Downloads.IS_PENDING, 1);
+                                    mediaStoreUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, dlVals);
+                                    if (mediaStoreUri != null) {
+                                        os = resolver.openOutputStream(mediaStoreUri);
+                                        task.savedPath = "Downloads/Tayyar/" + task.filename;
+                                    }
+                                } catch (Exception dlEx) {
+                                    Log.w(TAG, "MediaStore.Downloads fallback warning: " + dlEx.getMessage());
+                                    mediaStoreUri = null;
+                                    os = null;
+                                }
                             }
                         }
 
@@ -1484,10 +1551,15 @@ public class TayyarMobilePlugin extends Plugin {
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         ContentResolver resolver = context.getContentResolver();
-                        mediaStoreUri = insertMediaStoreEntry(resolver, safeName, mimeType, true);
-                        if (mediaStoreUri != null) {
-                            os = resolver.openOutputStream(mediaStoreUri);
-                            savedPath = (mimeType.startsWith("video/") ? "Movies" : "Pictures") + "/Tayyar/Stories/" + safeName;
+                        try {
+                            mediaStoreUri = insertMediaStoreEntry(resolver, safeName, mimeType, true);
+                            if (mediaStoreUri != null) {
+                                os = resolver.openOutputStream(mediaStoreUri);
+                                savedPath = (mimeType.startsWith("video/") ? "Movies" : "Pictures") + "/Tayyar/Stories/" + safeName;
+                            }
+                        } catch (Exception ignored) {
+                            mediaStoreUri = null;
+                            os = null;
                         }
                     }
 

@@ -241,20 +241,27 @@ function resolveTikTokTikwm(url) {
 }
 
 /**
- * Universal fast TikTok scraper via SSSTik (no watermark, bypasses regional ISP blocks).
+ * Universal fast TikTok scraper via SSSTik (global Cloudflare tikcdn.io CDN — bypasses regional ISP blocks).
  */
-function resolveTikTokSsstik(url) {
+async function resolveTikTokSsstik(url) {
+  let tt = '';
+  try {
+    const home = await httpFetchText('https://ssstik.io/');
+    const mTt = (home.body || '').match(/tt\s*=\s*'([^']+)'/);
+    if (mTt && mTt[1]) tt = mTt[1];
+  } catch (_) {}
+
   return new Promise((resolve, reject) => {
-    const postData = qs.stringify({ id: url.trim(), locale: 'en', tt: '' });
+    const postData = qs.stringify({ id: url.trim(), locale: 'en', tt });
     const req = https.request('https://ssstik.io/abc?url=dl', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
         'Origin': 'https://ssstik.io',
         'Referer': 'https://ssstik.io/en'
       },
-      timeout: 10000
+      timeout: 12000
     }, (res) => {
       let html = '';
       res.on('data', (c) => html += c);
@@ -272,7 +279,9 @@ function resolveTikTokSsstik(url) {
             quality: '⚡ فيديو أصلي عالي الدقة بدون علامة مائية (MP4)',
             ext: 'mp4',
             url: dlMatches[0][1],
-            referer: 'https://ssstik.io/'
+            directUrl: dlMatches[0][1],
+            referer: 'https://ssstik.io/',
+            isSocial: true
           });
         }
         if (dlMatches.length > 1) {
@@ -281,7 +290,9 @@ function resolveTikTokSsstik(url) {
             quality: '🎬 جودة فائقة HD بدون علامة مائية (MP4)',
             ext: 'mp4',
             url: dlMatches[1][1],
-            referer: 'https://ssstik.io/'
+            directUrl: dlMatches[1][1],
+            referer: 'https://ssstik.io/',
+            isSocial: true
           });
         }
         const audioMatch = html.match(/href="(https:\/\/tikcdn\.io\/ssstik\/mp3\/[^"]+)"/);
@@ -291,7 +302,9 @@ function resolveTikTokSsstik(url) {
             quality: '🎵 ملف صوتي فقط (MP3)',
             ext: 'mp3',
             url: audioMatch[1],
-            referer: 'https://ssstik.io/'
+            directUrl: audioMatch[1],
+            referer: 'https://ssstik.io/',
+            isSocial: true
           });
         }
 
@@ -397,22 +410,22 @@ async function resolveSocialMedia(url) {
   const plat = detectPlatform(url);
   const platId = plat ? plat.id : 'unknown';
 
-  // 1. TikTok: High-speed resolution (TikWM first, then SSSTik)
+  // 1. TikTok: High-speed resolution (SSSTik Cloudflare tikcdn.io FIRST to avoid regional tiktokcdn-us.com blocks!)
   if (platId === 'tiktok') {
-    try {
-      const res = await resolveTikTokTikwm(url);
-      if (res && res.ok && res.formats?.length) {
-        return res;
-      }
-    } catch (_) {}
     try {
       const res = await resolveTikTokSsstik(url);
       if (res && res.ok && res.formats?.length) {
         return res;
       }
     } catch (e) {
-      console.warn('SSSTik failed, falling back to multi-engine:', e.message);
+      console.warn('SSSTik failed, trying TikWM / yt-dlp:', e.message);
     }
+    try {
+      const res = await resolveTikTokTikwm(url);
+      if (res && res.ok && res.formats?.length) {
+        return res;
+      }
+    } catch (_) {}
   }
 
   // 2. Desktop Resolution using yt-dlp

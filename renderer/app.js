@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.16 is the latest available release.',
+      upToDateDesc: 'Version 1.0.17 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -349,7 +349,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.16 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.17 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -1016,7 +1016,7 @@
       author: 'griciaisl12',
       short: 'MS',
       color: 'avatar-blue',
-      version: 'v1.0.16',
+      version: 'v1.0.17',
       desc: 'Resolves GitHub repository release, file links, Google Drive/Docs into real downloads with mirror acceleration.',
       installed: false,
       enabled: false,
@@ -1560,7 +1560,7 @@
         author: 'User',
         short: name.slice(0, 2).toUpperCase(),
         color: 'avatar-blue',
-        version: 'v1.0.16',
+        version: 'v1.0.17',
         desc: `Installed from ${val}`,
         installed: true,
         enabled: true,
@@ -2946,7 +2946,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases — Stable Default) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.16';
+  const CURRENT_APP_VERSION = '1.0.17';
   let availableUpdateRelease = null;
   let isNewerUpdateAvailable = false;
   let updateDownloadTaskId = null;
