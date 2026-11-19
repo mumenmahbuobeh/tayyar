@@ -1,11 +1,11 @@
 'use strict';
 const { contextBridge, ipcRenderer } = require('electron');
 
-const EVENTS = ['dl:update', 'dl:progress', 'dl:removed', 'settings', 'ui:add-url', 'ui:clip-url', 'ytdlp:progress'];
+const EVENTS = ['dl:update', 'dl:progress', 'dl:removed', 'dl:complete', 'settings', 'ui:add-url', 'ui:clip-url', 'ytdlp:progress'];
 const inv = (name) => (...args) => ipcRenderer.invoke(name, ...args);
 
 const bridge = {
-  version: '1.0.17',
+  version: '1.0.18',
   list: inv('list'),
   platform: inv('platform'),
   settings: {

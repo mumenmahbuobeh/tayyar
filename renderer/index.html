@@ -250,7 +250,7 @@
             </div>
             <div class="card-main-val" id="engineStatusVal" data-i="ready">Ready</div>
             <div class="card-footer">
-              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.17</span>
+              <span class="footer-txt" id="engineVersionVal">Tayyar Engine v1.0.18</span>
               <span class="status-indicator online" id="engineStatusDot"></span>
             </div>
           </div>
@@ -1654,7 +1654,7 @@
             </svg>
           </div>
           <div class="about-hero-details">
-            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.17</span></h2>
+            <h2 class="about-app-name">Tayyar <span class="about-ver">Version 1.0.18</span></h2>
             <p class="about-tagline" data-i="aboutTagline">Before content collapses, preserve what truly matters, let
               beauty enter your orbit of preservation.</p>
             <div class="about-dev-by">
@@ -1689,7 +1689,7 @@
           <div class="updates-status-row">
             <div>
               <h4 class="update-title" id="updateTitleText" data-i="upToDate">Tayyar is up to date</h4>
-              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.17 is the latest available
+              <div class="update-desc" id="updateDescText" data-i="upToDateDesc">Version 1.0.18 is the latest available
                 release.</div>
             </div>
             <div class="update-actions">
@@ -2008,6 +2008,133 @@
     </button>
   </nav>
 
+  <!-- ================= ACTIVE DOWNLOAD PROGRESS & ADVANCED CONTROLS MODAL ================= -->
+  <dialog id="activeDlModal" class="sleek-modal modal-active-dl">
+    <div class="modal-form">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="active-dl-status-dot" id="activeDlStatusDot"></div>
+          <div>
+            <h2 id="activeDlHeadTitle" data-i="activeDlTitle">Active Download</h2>
+            <p class="modal-subhead" id="activeDlHeadSub" data-i="activeDlSubhead">Multi-connection Turbo Transfer</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button type="button" class="icon-btn-ghost" id="bMinActiveDl" title="Minimize / Keep in background">🗕</button>
+          <button type="button" class="icon-btn-ghost modal-close" id="bCloseActiveDl" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="modal-body active-dl-body">
+        <!-- File identity card -->
+        <div class="active-dl-file-card">
+          <div class="active-dl-ext-badge" id="activeDlExtBadge">PDF</div>
+          <div class="active-dl-file-details">
+            <div class="active-dl-filename" id="activeDlFilename">Document.pdf</div>
+            <div class="active-dl-url" id="activeDlUrl">https://...</div>
+          </div>
+        </div>
+
+        <!-- Big Progress Bar & Transfer Rate -->
+        <div class="active-dl-progress-box">
+          <div class="active-dl-bar-header">
+            <span class="active-dl-pct-badge" id="activeDlPct">0%</span>
+            <span class="active-dl-speed-badge" id="activeDlSpeed">0 KB/s</span>
+          </div>
+          <div class="active-dl-bar-track">
+            <div class="active-dl-bar-fill" id="activeDlBarFill" style="width:0%"></div>
+          </div>
+
+          <!-- Multi-Segment Visual Connections Bar (like IDM) -->
+          <div class="active-dl-threads-wrap">
+            <div class="active-dl-threads-lbl">
+              <span data-i="activeThreadsLbl">Active Connections / Segments</span>
+              <span class="active-dl-threads-count" id="activeDlThreadsCount">8 threads</span>
+            </div>
+            <div class="active-dl-threads-bar" id="activeDlThreadsBar">
+              <!-- Dynamically rendered thread segments -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Grid (File Size, Downloaded, Time Left, Resume capability) -->
+        <div class="active-dl-stats-grid">
+          <div class="active-dl-stat-item">
+            <span class="stat-item-lbl" data-i="statSize">File Size</span>
+            <span class="stat-item-val" id="activeDlStatSize">--</span>
+          </div>
+          <div class="active-dl-stat-item">
+            <span class="stat-item-lbl" data-i="statDownloaded">Downloaded</span>
+            <span class="stat-item-val" id="activeDlStatDownloaded">0 B</span>
+          </div>
+          <div class="active-dl-stat-item">
+            <span class="stat-item-lbl" data-i="statEta">Time Left</span>
+            <span class="stat-item-val" id="activeDlStatEta">Calculating...</span>
+          </div>
+          <div class="active-dl-stat-item">
+            <span class="stat-item-lbl" data-i="statResumable">Resume Support</span>
+            <span class="stat-item-val success" id="activeDlStatResumable">Yes</span>
+          </div>
+        </div>
+
+        <!-- Advanced Controls & Speed Limiter Row -->
+        <div class="active-dl-adv-row">
+          <label class="active-dl-speed-limit-lbl">
+            <span data-i="speedLimitLbl">Speed Limit:</span>
+            <select id="activeDlSpeedLimit" class="styled-select sm">
+              <option value="0" selected>⚡ Unlimited (أقصى سرعة)</option>
+              <option value="10485760">10 MB/s</option>
+              <option value="5242880">5 MB/s</option>
+              <option value="2097152">2 MB/s</option>
+              <option value="1048576">1 MB/s</option>
+              <option value="512000">500 KB/s</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="modal-foot active-dl-foot">
+        <button type="button" class="pill-btn light" id="bActiveDlStop" data-i="cancelDownload">Stop & Cancel</button>
+        <button type="button" class="pill-btn outline" id="bActiveDlPause" data-i="pause">Pause</button>
+        <button type="button" class="pill-btn primary" id="bActiveDlResume" data-i="resume" hidden>Resume</button>
+        <button type="button" class="pill-btn primary" id="bActiveDlOpen" data-i="openFile" hidden>Open File</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ================= DOWNLOAD COMPLETE POPUP MODAL (IDM Style with Apple Liquid Glass) ================= -->
+  <dialog id="dlCompleteModal" class="sleek-modal modal-complete">
+    <div class="modal-form">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="dl-complete-icon-ring">✓</div>
+          <div>
+            <h2 data-i="dlCompleteTitle">Download Completed!</h2>
+            <p class="modal-subhead" data-i="dlCompleteSub">The file has been safely downloaded and verified.</p>
+          </div>
+        </div>
+        <button type="button" class="icon-btn-ghost modal-close" id="bCloseCompleteModal">✕</button>
+      </div>
+      <div class="modal-body" style="padding:22px 26px;">
+        <div class="complete-file-card">
+          <div class="complete-ext-badge" id="completeFileExtBadge">PDF</div>
+          <div class="complete-file-info">
+            <div class="complete-filename" id="completeFileName">Document.pdf</div>
+            <div class="complete-meta-row">
+              <span class="chip-badge" id="completeFileSize">12.5 MB</span>
+              <span class="chip-badge success" id="completeFileCategory">Documents</span>
+              <span class="chip-badge outline" id="completeFileTime">Just now</span>
+            </div>
+            <div class="complete-path-box" id="completeFilePath">C:\Users\...\Downloads\Tayyar\Documents\Document.pdf</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="pill-btn light" id="bCloseCompleteBtn" data-i="close">Close</button>
+        <button type="button" class="pill-btn outline" id="bRevealCompleteBtn" data-i="openFolder">Open Folder</button>
+        <button type="button" class="pill-btn primary" id="bOpenCompleteBtn" data-i="openFile">Open File</button>
+      </div>
+    </div>
+  </dialog>
+
   <!-- ================= PRO UPDATE ARRIVAL POPUP (STABLE & BETA) ================= -->
   <div class="desk-upd-overlay" id="deskUpdOverlay" hidden>
     <div class="desk-upd-card" role="dialog" aria-modal="true" aria-labelledby="deskUpdTitle">
@@ -2023,7 +2150,7 @@
         <div class="desk-upd-head-meta">
           <div class="desk-upd-badges">
             <span class="desk-upd-ch-pill stable" id="deskUpdChannelBadge">Stable</span>
-            <span class="desk-upd-ver-pill" id="deskUpdVerPill">v1.0.17 → v1.0.17</span>
+            <span class="desk-upd-ver-pill" id="deskUpdVerPill">v1.0.18 → v1.0.18</span>
             <span class="desk-upd-size-pill" id="deskUpdSizePill"></span>
           </div>
           <h2 class="desk-upd-title" id="deskUpdTitle" data-i="updPopTitle">New Update Available</h2>

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Tayyar Download Manager Integration — تيّار",
   "short_name": "Tayyar",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "Send downloads, media files, and links directly from Firefox to the Tayyar multi-connection desktop download manager.",
   "permissions": [
     "contextMenus",
@@ -22,13 +22,21 @@
     }
   },
   "background": {
-    "scripts": ["background.js"]
+    "scripts": [
+      "background.js"
+    ]
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "css": ["content.css"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
       "run_at": "document_idle"
     }
   ],

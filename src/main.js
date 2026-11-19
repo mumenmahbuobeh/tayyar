@@ -82,7 +82,7 @@ function startBridge() {
 
     if (req.method === 'GET' && (req.url === '/ping' || req.url === '/status')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: '1.0.17', bridge: true, stories: true }));
+      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: '1.0.18', bridge: true, stories: true }));
     }
 
     // Receive Story/Status media blob (WhatsApp Web, Instagram/Facebook/Snapchat Web Stories)
@@ -131,9 +131,12 @@ function startBridge() {
     req.on('data', (c) => { body += c; if (body.length > 65536) req.destroy(); });
     req.on('end', () => {
       try {
-        const { url, referer } = JSON.parse(body);
+        const payload = JSON.parse(body);
+        const url = String(payload.url || '');
+        const referer = String(payload.referer || '');
+        const filename = String(payload.filename || '');
         if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); }
-        send('ui:add-url', { url: String(url || ''), referer: String(referer || '') });
+        send('ui:add-url', { url, referer, filename });
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: true }));
       } catch (_) { res.writeHead(400); res.end(); }
@@ -272,6 +275,7 @@ app.whenReady().then(() => {
   mgr.on('removed', (id) => send('dl:removed', id));
   mgr.on('settings', (s) => send('settings', s));
   mgr.on('complete', (d) => {
+    send('dl:complete', d);
     if (Notification.isSupported()) new Notification({ title: 'اكتمل التحميل', body: d.filename }).show();
   });
   wireIpc();

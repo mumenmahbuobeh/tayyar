@@ -1,7 +1,7 @@
 {
   "name": "tayyar-download-manager",
   "productName": "Tayyar",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "author": {
     "name": "Mu'men Mahbuobeh",
     "email": "mumenmahbuobeh@users.noreply.github.com"
@@ -20,9 +20,9 @@
     "dist:win": "electron-builder --win",
     "dist:linux": "electron-builder --linux",
     "dist:mac": "electron-builder --mac",
-    "build:android": "npx cap copy android && npx cap sync android",
+    "build:android": "node -e \"if (!require('fs').existsSync('mobile/capacitor.js')) require('fs').copyFileSync('node_modules/@capacitor/core/dist/capacitor.js', 'mobile/capacitor.js')\" && npx cap copy android && npx cap sync android",
     "open:android": "npx cap open android",
-    "build:ios": "npx cap copy ios && npx cap sync ios",
+    "build:ios": "node -e \"if (!require('fs').existsSync('mobile/capacitor.js')) require('fs').copyFileSync('node_modules/@capacitor/core/dist/capacitor.js', 'mobile/capacitor.js')\" && npx cap copy ios && npx cap sync ios",
     "open:ios": "npx cap open ios"
   },
   "devDependencies": {

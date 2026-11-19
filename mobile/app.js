@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.17';
+  const APP_VERSION = '1.0.18';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -409,14 +409,18 @@
   }
 
   /* ==================== NATIVE CAPACITOR BRIDGE ==================== */
+  let _cachedNativeEngine = null;
   function getNativeEngine() {
+    if (_cachedNativeEngine) return _cachedNativeEngine;
     try {
-      if (window.Capacitor) {
-        if (window.Capacitor.Plugins?.TayyarMobileEngine) {
-          return window.Capacitor.Plugins.TayyarMobileEngine;
-        }
+      if (typeof window !== 'undefined' && window.Capacitor) {
         if (typeof window.Capacitor.registerPlugin === 'function') {
-          return window.Capacitor.registerPlugin('TayyarMobileEngine');
+          _cachedNativeEngine = window.Capacitor.registerPlugin('TayyarMobileEngine');
+          return _cachedNativeEngine;
+        }
+        if (window.Capacitor.Plugins?.TayyarMobileEngine) {
+          _cachedNativeEngine = window.Capacitor.Plugins.TayyarMobileEngine;
+          return _cachedNativeEngine;
         }
       }
     } catch (_) {}
@@ -695,7 +699,8 @@
         const res = await native.resolveSocialUrl({ url: cleanUrl });
         if (res && res.ok && res.formats && res.formats.length > 0) {
           const first = res.formats[0];
-          const isRealStream = first.directUrl && first.directUrl !== cleanUrl;
+          const streamUrl = first.directUrl || first.url;
+          const isRealStream = streamUrl && streamUrl !== cleanUrl;
           if (isRealStream || plat.id === 'direct') {
             return { ...res, platformId: plat.id, platformIcon: plat.icon };
           }
@@ -1026,6 +1031,7 @@
           item.nativeId = String(res.downloadId);
           saveDownloads();
           pollNativeDownload(item);
+          setTimeout(() => switchTab('downloads'), 500);
           return;
         }
       } catch (e) {
@@ -1457,6 +1463,9 @@
           fallback.style.display = 'flex';
         }
       }
+
+      // Immediately start downloading the video so clicking "Analyze & Download" (فحص وتحميل) starts downloading!
+      await triggerResolvedDownload(false);
     } catch (e) {
       if (analyzeLoader) analyzeLoader.hidden = true;
       showToast(e.message || t('dlFailToast'));

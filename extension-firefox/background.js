@@ -29,7 +29,7 @@ async function pingTayyar() {
   }
 }
 
-async function sendToTayyar(url, referer) {
+async function sendToTayyar(url, referer, filename = '') {
   if (!url || typeof url !== 'string') return false;
   try {
     const res = await fetch(BRIDGE_ADD, {
@@ -41,6 +41,7 @@ async function sendToTayyar(url, referer) {
       body: JSON.stringify({
         url: url.trim(),
         referer: referer || '',
+        filename: filename || '',
       }),
     });
     return res.ok;
@@ -166,8 +167,14 @@ chrome.downloads.onCreated.addListener(async (downloadItem) => {
   const url = downloadItem.finalUrl || downloadItem.url;
   if (!url || !/^https?:\/\//i.test(url)) return;
 
+  // Extract filename if provided by browser (e.g. for PDF / Word / Archives)
+  let suggestedName = '';
+  if (downloadItem.filename) {
+    suggestedName = downloadItem.filename.replace(/^.*[\\\/]/, '');
+  }
+
   // Attempt to delegate to Tayyar
-  const handled = await sendToTayyar(url, downloadItem.referrer);
+  const handled = await sendToTayyar(url, downloadItem.referrer, suggestedName);
   if (handled) {
     // Successfully handed off to desktop manager: cancel the native browser download
     try {

@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.17 is the latest available release.',
+      upToDateDesc: 'Version 1.0.18 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -219,6 +219,21 @@
       updNowDirect: 'Update Now',
       updLaterBtn: 'Later',
       updSkipBtn: 'Skip Version',
+      activeDlTitle: 'Active Download',
+      activeDlSubhead: 'Multi-connection Turbo Transfer',
+      activeThreadsLbl: 'Active Connections / Segments',
+      statSize: 'File Size',
+      statDownloaded: 'Downloaded',
+      statEta: 'Time Left',
+      statResumable: 'Resume Support',
+      cancelDownload: 'Stop & Cancel',
+      speedLimitLbl: 'Speed Limit',
+      dlCompleteTitle: 'Download Completed!',
+      dlCompleteSub: 'The file has been safely downloaded and verified.',
+      openFile: 'Open File',
+      openFolder: 'Open Folder',
+      calcEta: 'Calculating...',
+      speedUnlimited: 'Unlimited',
     },
     ar: {
       dashboard: 'لوحة التحكم',
@@ -349,7 +364,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.17 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.18 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -434,6 +449,21 @@
       updNowDirect: 'تحديث الآن',
       updLaterBtn: 'لاحقاً',
       updSkipBtn: 'تخطي الإصدار',
+      activeDlTitle: 'واجهة التحميل المباشر',
+      activeDlSubhead: 'نقل توربو متعدد المسارات والأجزاء',
+      activeThreadsLbl: 'عدد المسارات والمقاطع النشطة',
+      statSize: 'حجم الملف',
+      statDownloaded: 'تم تنزيله',
+      statEta: 'الوقت المتبقي',
+      statResumable: 'يدعم الاستئناف',
+      cancelDownload: 'إيقاف وإلغاء',
+      speedLimitLbl: 'تحديد السرعة',
+      dlCompleteTitle: 'اكتمل التحميل بنجاح!',
+      dlCompleteSub: 'تم حفظ الملف وفحصه بنجاح في مجلد التحميلات.',
+      openFile: 'فتح الملف',
+      openFolder: 'فتح المجلد',
+      calcEta: 'جاري الحساب...',
+      speedUnlimited: 'أقصى سرعة',
     },
   };
 
@@ -1016,7 +1046,7 @@
       author: 'griciaisl12',
       short: 'MS',
       color: 'avatar-blue',
-      version: 'v1.0.17',
+      version: 'v1.0.18',
       desc: 'Resolves GitHub repository release, file links, Google Drive/Docs into real downloads with mirror acceleration.',
       installed: false,
       enabled: false,
@@ -1560,7 +1590,7 @@
         author: 'User',
         short: name.slice(0, 2).toUpperCase(),
         color: 'avatar-blue',
-        version: 'v1.0.17',
+        version: 'v1.0.18',
         desc: `Installed from ${val}`,
         installed: true,
         enabled: true,
@@ -2261,6 +2291,11 @@
         }
         renderDownloadsList();
       });
+
+      row.addEventListener('dblclick', (e) => {
+        const id = row.dataset.id;
+        if (id) openActiveDownloadModal(id);
+      });
     });
 
     const bResume = $('#bResumeSelected');
@@ -2317,14 +2352,21 @@
   const probeSizeBadge = $('#probeSizeBadge');
   const addErrMsg = $('#addErrMsg');
 
-  function openAddModal(initialUrl = '') {
+  function openAddModal(initialUrl = '', initialFilename = '') {
     if (!addModal) return;
     addModal.showModal();
     if (taskUrlInput) {
       taskUrlInput.value = initialUrl;
       taskUrlInput.focus();
     }
-    if (probeBox) probeBox.hidden = true;
+    if (probeBox) {
+      if (initialFilename) {
+        if (probeFileName) probeFileName.value = initialFilename;
+        probeBox.hidden = false;
+      } else {
+        probeBox.hidden = true;
+      }
+    }
     const socialBox = $('#socialMediaBox');
     if (socialBox) socialBox.hidden = true;
     activeSocialData = null;
@@ -2805,11 +2847,12 @@
           }
         }
 
+        const customProbeName = probeFileName?.value?.trim() || '';
         if (window.tayyar?.add) {
           const res = await window.tayyar.add({
             url: finalDownloadUrl,
-            filename: finalFilename || undefined,
-            userFileName: finalFilename || undefined,
+            filename: finalFilename || customProbeName || undefined,
+            userFileName: finalFilename || customProbeName || undefined,
             referer: referer || undefined,
             dir: dir || undefined,
             connections: conns,
@@ -2819,6 +2862,7 @@
           });
           if (res?.item) {
             S.items.set(res.item.id, res.item);
+            openActiveDownloadModal(res.item.id);
           }
         }
       }
@@ -2946,7 +2990,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases — Stable Default) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.17';
+  const CURRENT_APP_VERSION = '1.0.18';
   let availableUpdateRelease = null;
   let isNewerUpdateAvailable = false;
   let updateDownloadTaskId = null;
@@ -4299,6 +4343,224 @@
     });
   }
 
+  /* ================= ACTIVE DOWNLOAD WINDOW & POPUP (IDM Style) ================= */
+  let currentActiveDlId = null;
+
+  function pathExt(fn) {
+    if (!fn) return 'FILE';
+    const dot = fn.lastIndexOf('.');
+    return dot >= 0 ? fn.slice(dot + 1).toUpperCase() : 'FILE';
+  }
+
+  function openActiveDownloadModal(id) {
+    const d = S.items.get(id);
+    if (!d) return;
+    currentActiveDlId = id;
+    const modal = $('#activeDlModal');
+    if (!modal) return;
+
+    const ext = pathExt(d.filename);
+    const extBadge = $('#activeDlExtBadge');
+    if (extBadge) extBadge.textContent = ext.slice(0, 5);
+
+    const nameEl = $('#activeDlFilename');
+    if (nameEl) {
+      nameEl.textContent = d.filename || d.url || 'Download';
+      nameEl.title = d.filename || d.url;
+    }
+
+    const urlEl = $('#activeDlUrl');
+    if (urlEl) {
+      urlEl.textContent = d.url || '';
+      urlEl.title = d.url || '';
+    }
+
+    updateActiveDlModalUI(d);
+    try {
+      if (!modal.open) modal.showModal();
+    } catch (_) {}
+  }
+
+  function updateActiveDlModalUI(d) {
+    if (!currentActiveDlId || currentActiveDlId !== d.id) return;
+    const modal = $('#activeDlModal');
+    if (!modal || !modal.open) return;
+
+    const isDownloading = d.status === 'downloading';
+    const isPaused = d.status === 'paused';
+    const isCompleted = d.status === 'completed';
+    const isError = d.status === 'error';
+
+    // Status dot & header title
+    const dot = $('#activeDlStatusDot');
+    const title = $('#activeDlHeadTitle');
+    if (dot) {
+      dot.className = isCompleted ? 'active-dl-status-dot completed' : isPaused ? 'active-dl-status-dot paused' : 'active-dl-status-dot';
+    }
+    if (title) {
+      title.textContent = isCompleted
+        ? (S.lang === 'ar' ? 'اكتمل التحميل بنجاح!' : 'Download Completed!')
+        : isPaused
+        ? (S.lang === 'ar' ? 'متوقف مؤقتاً' : 'Paused')
+        : isError
+        ? (S.lang === 'ar' ? 'فشل التحميل' : 'Download Error')
+        : (S.lang === 'ar' ? 'جاري التحميل...' : 'Downloading...');
+    }
+
+    // Percentage & Speed
+    const percent = pct(d);
+    const pctEl = $('#activeDlPct');
+    if (pctEl) pctEl.textContent = isCompleted ? '100%' : `${percent}%`;
+
+    const spdEl = $('#activeDlSpeed');
+    if (spdEl) {
+      spdEl.textContent = isCompleted
+        ? (S.lang === 'ar' ? 'مكتمل' : 'Completed')
+        : isPaused
+        ? (S.lang === 'ar' ? 'متوقف' : 'Paused')
+        : fmtSpeed(d.speed || 0);
+    }
+
+    const fillEl = $('#activeDlBarFill');
+    if (fillEl) fillEl.style.width = isCompleted ? '100%' : `${percent}%`;
+
+    // Multi-segment connections visualizer
+    const segs = d.segments || [];
+    const countEl = $('#activeDlThreadsCount');
+    const barEl = $('#activeDlThreadsBar');
+    if (countEl) {
+      const n = segs.length || d.connections || 8;
+      countEl.textContent = `${n} ${S.lang === 'ar' ? 'مسارات نشطة' : 'active streams'}`;
+    }
+    if (barEl) {
+      if (segs.length > 0) {
+        barEl.innerHTML = segs.map((s) => {
+          const totalChunk = Math.max(1, (s.end >= 0 ? s.end : (d.size || 1)) - s.start + 1);
+          const chunkDone = Math.max(0, s.pos - s.start);
+          const chunkPct = Math.min(100, Math.round((chunkDone / totalChunk) * 100));
+          return `
+            <div class="active-dl-segment-pill" title="Chunk: ${chunkPct}%">
+              <div class="active-dl-segment-fill" style="width: ${chunkPct}%;"></div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        barEl.innerHTML = `
+          <div class="active-dl-segment-pill" style="grid-column: 1 / -1;">
+            <div class="active-dl-segment-fill" style="width: ${percent}%;"></div>
+          </div>
+        `;
+      }
+    }
+
+    // Stats Grid
+    const statSize = $('#activeDlStatSize');
+    if (statSize) statSize.textContent = d.size > 0 ? fmtBytes(d.size) : (d.totalSize > 0 ? fmtBytes(d.totalSize) : '--');
+
+    const statDown = $('#activeDlStatDownloaded');
+    if (statDown) statDown.textContent = fmtBytes(d.downloaded || 0);
+
+    const statEta = $('#activeDlStatEta');
+    if (statEta) {
+      if (isCompleted) statEta.textContent = '0s';
+      else if (d.eta >= 0) statEta.textContent = fmtEta(d.eta);
+      else if (d.speed > 0 && d.size > d.downloaded) {
+        const rem = (d.size - d.downloaded) / d.speed;
+        statEta.textContent = fmtEta(rem);
+      } else {
+        statEta.textContent = S.lang === 'ar' ? 'جاري الحساب...' : 'Calculating...';
+      }
+    }
+
+    const statRes = $('#activeDlStatResumable');
+    if (statRes) {
+      const isRes = d.resumable !== false;
+      statRes.textContent = isRes ? (S.lang === 'ar' ? 'نعم' : 'Yes') : (S.lang === 'ar' ? 'لا' : 'No');
+      statRes.className = isRes ? 'stat-item-val success' : 'stat-item-val';
+    }
+
+    // Action buttons
+    const bPause = $('#bActiveDlPause');
+    const bResume = $('#bActiveDlResume');
+    const bStop = $('#bActiveDlStop');
+    const bOpen = $('#bActiveDlOpen');
+
+    if (bPause) bPause.hidden = !isDownloading;
+    if (bResume) bResume.hidden = !isPaused;
+    if (bStop) bStop.hidden = isCompleted;
+    if (bOpen) bOpen.hidden = !isCompleted;
+  }
+
+  function showDownloadCompleteModal(d) {
+    if (!d) return;
+    const modal = $('#dlCompleteModal');
+    if (!modal) return;
+
+    const ext = pathExt(d.filename);
+    const extBadge = $('#completeFileExtBadge');
+    if (extBadge) extBadge.textContent = ext.slice(0, 5);
+
+    const nameEl = $('#completeFileName');
+    if (nameEl) nameEl.textContent = d.filename || 'Downloaded File';
+
+    const sizeEl = $('#completeFileSize');
+    if (sizeEl) sizeEl.textContent = fmtBytes(d.size || d.downloaded || 0);
+
+    const catEl = $('#completeFileCategory');
+    if (catEl) catEl.textContent = d.category || (ext === 'PDF' ? 'Documents' : 'General');
+
+    const pathEl = $('#completeFilePath');
+    if (pathEl) pathEl.textContent = d.path || '';
+
+    const bOpen = $('#bOpenCompleteBtn');
+    if (bOpen) bOpen.onclick = () => { if (window.tayyar?.open) window.tayyar.open(d.id); };
+
+    const bReveal = $('#bRevealCompleteBtn');
+    if (bReveal) bReveal.onclick = () => { if (window.tayyar?.reveal) window.tayyar.reveal(d.id); };
+
+    const bClose = $('#bCloseCompleteBtn');
+    if (bClose) bClose.onclick = () => modal.close();
+
+    const bTopClose = $('#bCloseCompleteModal');
+    if (bTopClose) bTopClose.onclick = () => modal.close();
+
+    try {
+      if (!modal.open) modal.showModal();
+    } catch (_) {}
+  }
+
+  function setupActiveDownloadControls() {
+    $('#bActiveDlPause')?.addEventListener('click', () => {
+      if (currentActiveDlId && window.tayyar?.pause) window.tayyar.pause([currentActiveDlId]);
+    });
+    $('#bActiveDlResume')?.addEventListener('click', () => {
+      if (currentActiveDlId && window.tayyar?.resume) window.tayyar.resume([currentActiveDlId]);
+    });
+    $('#bActiveDlStop')?.addEventListener('click', () => {
+      if (currentActiveDlId && window.tayyar?.remove) {
+        window.tayyar.remove([currentActiveDlId], false);
+        $('#activeDlModal')?.close();
+        currentActiveDlId = null;
+      }
+    });
+    $('#bActiveDlOpen')?.addEventListener('click', () => {
+      if (currentActiveDlId && window.tayyar?.open) window.tayyar.open(currentActiveDlId);
+    });
+    $('#bMinActiveDl')?.addEventListener('click', () => {
+      $('#activeDlModal')?.close();
+    });
+    $('#bCloseActiveDl')?.addEventListener('click', () => {
+      $('#activeDlModal')?.close();
+    });
+    $('#activeDlSpeedLimit')?.addEventListener('change', (e) => {
+      const val = parseInt(e.target.value, 10);
+      if (window.tayyar?.setSettings) {
+        window.tayyar.setSettings({ speedLimit: val });
+        toast(S.lang === 'ar' ? 'تم ضبط حد السرعة' : 'Speed limit updated');
+      }
+    });
+  }
+
   /* ---------------- IPC & INITIALIZATION ---------------- */
   async function init() {
     const isMobileDevice = window.tayyar?.isMobile || 
@@ -4344,6 +4606,8 @@
     updateDashboard();
     renderDownloadsList();
 
+    setupActiveDownloadControls();
+
     // Listen to real-time events
     window.tayyar.on('dl:update', (d) => {
       if (!d || !d.id) return;
@@ -4357,6 +4621,7 @@
         }
       }
 
+      updateActiveDlModalUI(d);
       updateDashboard();
       renderDownloadsList();
       if (document.body.classList.contains('is-mobile')) updateMobileFloatingStatus(d);
@@ -4375,6 +4640,7 @@
           S.items.set(b.id, b);
           updated = true;
         }
+        updateActiveDlModalUI(it || b);
         if (document.body.classList.contains('is-mobile')) updateMobileFloatingStatus(it || b);
 
         if (updateDownloadTaskId && b.id === updateDownloadTaskId) {
@@ -4406,9 +4672,17 @@
       }
     });
 
+    window.tayyar.on('dl:complete', (d) => {
+      showDownloadCompleteModal(d);
+    });
+
     window.tayyar.on('dl:removed', (id) => {
       S.items.delete(id);
       S.sel.delete(id);
+      if (currentActiveDlId === id) {
+        $('#activeDlModal')?.close();
+        currentActiveDlId = null;
+      }
       updateDashboard();
       renderDownloadsList();
     });
@@ -4424,8 +4698,8 @@
       }, 2500);
     }
 
-    window.tayyar.on('ui:add-url', ({ url }) => {
-      openAddModal(url);
+    window.tayyar.on('ui:add-url', ({ url, filename }) => {
+      openAddModal(url, filename);
     });
 
     window.tayyar.on('ui:clip-url', ({ url }) => {

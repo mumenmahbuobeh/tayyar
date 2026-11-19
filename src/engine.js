@@ -156,42 +156,100 @@ function sanitizeName(name) {
   return n || 'download';
 }
 
+function mimeToExt(mime) {
+  if (!mime) return '';
+  const m = mime.toLowerCase();
+  if (m.includes('application/pdf')) return '.pdf';
+  if (m.includes('application/zip') || m.includes('application/x-zip')) return '.zip';
+  if (m.includes('application/x-rar') || m.includes('application/vnd.rar')) return '.rar';
+  if (m.includes('application/x-7z')) return '.7z';
+  if (m.includes('application/x-tar')) return '.tar';
+  if (m.includes('application/gzip')) return '.gz';
+  if (m.includes('video/mp4')) return '.mp4';
+  if (m.includes('video/x-matroska')) return '.mkv';
+  if (m.includes('audio/mpeg')) return '.mp3';
+  if (m.includes('audio/mp4') || m.includes('audio/m4a')) return '.m4a';
+  if (m.includes('image/jpeg')) return '.jpg';
+  if (m.includes('image/png')) return '.png';
+  if (m.includes('image/webp')) return '.webp';
+  if (m.includes('application/vnd.android.package-archive')) return '.apk';
+  if (m.includes('application/msword')) return '.doc';
+  if (m.includes('wordprocessingml.document')) return '.docx';
+  if (m.includes('application/vnd.ms-excel')) return '.xls';
+  if (m.includes('spreadsheetml.sheet')) return '.xlsx';
+  if (m.includes('presentationml.presentation')) return '.pptx';
+  return '';
+}
+
 function filenameFrom(headers, urlStr) {
   const cd = headers['content-disposition'] || '';
+  let foundName = '';
 
   // 1. RFC 5987 / RFC 6266 filename*=utf-8''... (Standard for international Russian, Chinese, Iranian file servers)
   let m = /filename\*\s*=\s*([^']*)''([^;]+)/i.exec(cd);
   if (m) {
     try {
       const decoded = decodeURIComponent(m[2].trim());
-      if (decoded) return sanitizeName(decoded);
+      if (decoded) foundName = sanitizeName(decoded);
     } catch (_) { /* fall through */ }
   }
 
   // 2. Standard filename="..." (with multi-encoding fallback for legacy servers)
-  m = /filename\s*=\s*"([^"]+)"|filename\s*=\s*([^;]+)/i.exec(cd);
-  if (m) {
-    let raw = (m[1] || m[2] || '').trim();
-    try { raw = decodeURIComponent(raw); } catch (_) {}
-    try {
-      // Fix ISO-8859-1 misinterpretation of UTF-8 sequences (frequent on Russian and Persian servers)
-      const buf = Buffer.from(raw, 'binary');
-      if (buf.length > 0) {
-        const utf8 = buf.toString('utf8');
-        if (!utf8.includes('\ufffd')) raw = utf8;
-      }
-    } catch (_) {}
-    if (raw) return sanitizeName(raw);
+  if (!foundName) {
+    m = /filename\s*=\s*"([^"]+)"|filename\s*=\s*([^;]+)/i.exec(cd);
+    if (m) {
+      let raw = (m[1] || m[2] || '').trim();
+      try { raw = decodeURIComponent(raw); } catch (_) {}
+      try {
+        // Fix ISO-8859-1 misinterpretation of UTF-8 sequences (frequent on Russian and Persian servers)
+        const buf = Buffer.from(raw, 'binary');
+        if (buf.length > 0) {
+          const utf8 = buf.toString('utf8');
+          if (!utf8.includes('\ufffd')) raw = utf8;
+        }
+      } catch (_) {}
+      if (raw) foundName = sanitizeName(raw);
+    }
   }
 
-  // 3. Fallback to URL pathname
-  try {
-    const pathname = new URL(urlStr).pathname;
-    const last = decodeURIComponent(path.basename(pathname));
-    if (last && last !== '/' && last !== '.') return sanitizeName(last);
-  } catch (_) { /* ignore */ }
+  // 3. Fallback to URL pathname or query parameters
+  if (!foundName) {
+    try {
+      const parsed = new URL(urlStr);
+      const pathname = parsed.pathname;
+      const last = decodeURIComponent(path.basename(pathname));
+      if (last && last !== '/' && last !== '.') {
+        foundName = sanitizeName(last);
+      } else {
+        // Check query parameters like ?file=document.pdf or ?filename=paper.pdf or ?name=xyz.pdf
+        for (const [k, v] of parsed.searchParams.entries()) {
+          if (/(file|filename|name|doc|document|title)/i.test(k) && /\.[a-z0-9]{2,5}$/i.test(v)) {
+            foundName = sanitizeName(decodeURIComponent(v));
+            break;
+          }
+        }
+      }
+    } catch (_) { /* ignore */ }
+  }
 
-  return 'download';
+  if (!foundName) foundName = 'download';
+
+  // 4. Ensure proper extension based on Content-Type (guarantees PDF / Docs / Archives are never saved as script or extensionless files!)
+  const scriptExts = ['.php', '.asp', '.aspx', '.jsp', '.cgi', '.do', '.action', '.ashx', '.pl'];
+  const curExt = path.extname(foundName).toLowerCase();
+  const expectedExt = mimeToExt(headers['content-type'] || '');
+  if (expectedExt) {
+    if (!curExt || curExt === '.' || scriptExts.includes(curExt)) {
+      if (scriptExts.includes(curExt)) {
+        foundName = foundName.slice(0, -curExt.length);
+      }
+      foundName += expectedExt;
+    }
+  } else if (!curExt && /pdf/i.test(urlStr)) {
+    foundName += '.pdf';
+  }
+
+  return foundName || 'download';
 }
 
 function uniquePath(dir, name) {
@@ -350,7 +408,17 @@ class DownloadManager extends EventEmitter {
   }
 
   async probe(url, referer = '') {
-    const { req, res } = await request(url, { headers: { Range: 'bytes=0-0', ...(referer ? { Referer: referer } : {}) } });
+    let resObj;
+    try {
+      resObj = await request(url, { headers: { Range: 'bytes=0-0', ...(referer ? { Referer: referer } : {}) } });
+      if (resObj.res.statusCode >= 400 && resObj.res.statusCode !== 416) {
+        throw new Error(`HTTP ${resObj.res.statusCode}`);
+      }
+    } catch (_) {
+      // Fallback: request without Range for servers rejecting byte ranges on probe (common on PDF/docs portals)
+      resObj = await request(url, { headers: { ...(referer ? { Referer: referer } : {}) } });
+    }
+    const { req, res } = resObj;
     const h = res.headers;
     const code = res.statusCode;
     res.resume();
@@ -364,6 +432,9 @@ class DownloadManager extends EventEmitter {
     } else {
       const cl = parseInt(h['content-length'], 10);
       size = Number.isFinite(cl) ? cl : -1;
+      if ((h['accept-ranges'] || '').toLowerCase().includes('bytes')) {
+        resumable = true;
+      }
     }
     return { finalUrl: res.finalUrl, size, resumable, filename: filenameFrom(h, res.finalUrl), mime: h['content-type'] || '' };
   }
@@ -792,7 +863,7 @@ class DownloadManager extends EventEmitter {
           return done(reject, new Error(`HTTP ${res.statusCode}`));
         }
         const ct = (res.headers['content-type'] || '').toLowerCase();
-        if (d.filename && /\.(mp4|mkv|avi|mov|mp3|zip|rar|iso|exe|dmg|apk)$/i.test(d.filename)) {
+        if (d.filename && /\.(mp4|mkv|avi|mov|mp3|zip|rar|iso|exe|dmg|apk|pdf)$/i.test(d.filename)) {
           if (ct.includes('text/html') || ct.includes('text/xml') || ct.includes('application/xml') || ct.includes('application/vnd.apple.mpegurl')) {
             res.resume(); req.destroy();
             return done(reject, new Error(`Server returned error response (${ct || 'text/html'}) instead of media file`));
