@@ -211,7 +211,7 @@ jobs:
   publish-release:
     name: Create GitHub Release
     needs: [build-desktop, build-android]
-    if: !cancelled() && !contains(needs.*.result, 'failure') && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+    if: "${{ !cancelled() && !contains(needs.*.result, 'failure') && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch') }}"
     runs-on: ubuntu-latest
 
     steps:
