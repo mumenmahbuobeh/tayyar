@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.19';
+  const APP_VERSION = '1.0.20';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -167,6 +167,7 @@
       updStableBadge: 'Stable',
       updBetaBadge: 'Beta',
       updSkippedToast: 'Skipped version',
+      streamExtractFailed: 'Could not extract direct media stream (link may be private, restricted, or invalid)',
     },
     ar: {
       appTitle: 'تيّار',
@@ -322,6 +323,7 @@
       updStableBadge: 'مستقر',
       updBetaBadge: 'تجريبي',
       updSkippedToast: 'تم تخطي الإصدار',
+      streamExtractFailed: 'تعذر استخراج رابط الوسائط المباشر (قد يكون الرابط خاصاً أو مقيداً أو غير متاح)',
     },
   };
 
@@ -733,9 +735,10 @@
         const res = await native.resolveSocialUrl({ url: cleanUrl });
         if (res && res.ok && res.formats && res.formats.length > 0) {
           const first = res.formats[0];
-          const streamUrl = first.directUrl || first.url;
-          const isRealStream = streamUrl && streamUrl !== cleanUrl;
-          if (isRealStream || plat.id === 'direct') {
+          const streamUrl = first.directUrl || first.url || '';
+          const isEmbed = streamUrl.includes('/embed/') || streamUrl.includes('youtube.com/embed') || streamUrl.includes('facebook.com/plugins');
+          const isRealStream = streamUrl && streamUrl !== cleanUrl && !isEmbed;
+          if ((isRealStream || plat.id === 'direct') && !isEmbed) {
             return { ...res, platformId: plat.id, platformIcon: plat.icon };
           }
         }
@@ -829,12 +832,13 @@
     }
 
     if (plat.id === 'youtube') {
-      const m = cleanUrl.match(/(?:watch\?v=|shorts\/|live\/|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+      const m = cleanUrl.match(/(?:watch\?v=|v=|v%3D|shorts\/|live\/|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/i);
       if (m) {
         const vidId = m[1];
-        // Primary: YouTube Official InnerTube ANDROID_VR (direct progressive MP4 with FULL AUDIO!)
+        const ytUa = 'com.google.android.apps.youtube.vr.oculus/1.60.19 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip';
+
+        // 1. Primary: YouTube Official InnerTube ANDROID_VR (direct progressive MP4 with FULL AUDIO!)
         try {
-          const ytUa = 'com.google.android.apps.youtube.vr.oculus/1.60.19 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip';
           const rYt = await httpFetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'User-Agent': ytUa },
@@ -891,6 +895,78 @@
                 thumbnail: `https://i.ytimg.com/vi/${vidId}/hqdefault.jpg`,
                 formats,
               };
+            }
+          }
+        } catch (_) {}
+
+        // 2. Secondary: InnerTube VISIONOS + SOCS=CAI Consent + visitorData (Direct unciphered HD MP4 & Audio)
+        try {
+          const rPage = await httpFetch(`https://www.youtube.com/watch?v=${vidId}&bpctr=9999999999&has_verified=1`, {
+            headers: { 'Cookie': 'PREF=hl=en&tz=UTC; SOCS=CAI' }
+          });
+          if (rPage.ok) {
+            const pageHtml = await rPage.text();
+            const mVisitor = pageHtml.match(/"visitorData"\s*:\s*"([^"]+)"/);
+            const visitorData = mVisitor ? mVisitor[1] : '';
+            const mTitle = pageHtml.match(/<title>([^<]+)<\/title>/i);
+            const fallbackTitle = mTitle ? mTitle[1].replace(' - YouTube', '').trim() : 'YouTube Video';
+
+            const rVis = await httpFetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15',
+                'X-Youtube-Client-Name': '101',
+                'X-Youtube-Client-Version': '1.02',
+                'X-Goog-Visitor-Id': visitorData,
+                'Cookie': 'PREF=hl=en&tz=UTC; SOCS=CAI'
+              },
+              body: JSON.stringify({
+                context: {
+                  client: {
+                    clientName: 'VISIONOS',
+                    clientVersion: '1.02',
+                    deviceMake: 'Apple',
+                    deviceModel: 'RealityDevice17,1',
+                    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15',
+                    osName: 'visionOS',
+                    osVersion: '26.5.23O471',
+                    hl: 'en',
+                    gl: 'US',
+                    visitorData: visitorData
+                  }
+                },
+                videoId: vidId,
+                contentCheckOk: true,
+                racyCheckOk: true
+              })
+            });
+            if (rVis.ok) {
+              const jVis = await rVis.json();
+              const formats = [];
+              const adaptive = jVis?.streamingData?.adaptiveFormats || [];
+              const bestVid = adaptive.find((f) => f?.url && String(f.mimeType || '').toLowerCase().startsWith('video/mp4'));
+              if (bestVid?.url) {
+                formats.push({ id: 'video', ext: 'mp4', url: bestVid.url, directUrl: bestVid.url });
+              }
+              const bestAud = adaptive
+                .filter((f) => f?.url && String(f.mimeType || '').toLowerCase().startsWith('audio/mp4'))
+                .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
+              if (bestAud?.url) {
+                formats.push({ id: 'audio', ext: 'm4a', url: bestAud.url, directUrl: bestAud.url });
+              }
+              if (formats.length) {
+                return {
+                  ok: true,
+                  platform: 'YouTube',
+                  platformId: 'youtube',
+                  platformIcon: '▶',
+                  title: jVis?.videoDetails?.title || fallbackTitle,
+                  author: jVis?.videoDetails?.author || 'YouTube',
+                  thumbnail: `https://i.ytimg.com/vi/${vidId}/hqdefault.jpg`,
+                  formats,
+                };
+              }
             }
           }
         } catch (_) {}
@@ -1000,6 +1076,12 @@
           }
         }
       } catch (_) {}
+    }
+
+    // If the URL is from a social media platform and failed to extract a stream,
+    // do NOT treat the web page HTML as an MP4! Throw a descriptive error.
+    if (['youtube', 'tiktok', 'facebook', 'instagram', 'twitter', 'reddit'].includes(plat.id)) {
+      throw new Error(t('streamExtractFailed') || 'Could not extract direct media stream (link may be private, restricted, or invalid)');
     }
 
     // Fallback direct file or OpenGraph stream

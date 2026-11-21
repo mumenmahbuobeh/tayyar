@@ -213,8 +213,13 @@ public class TayyarMobilePlugin extends Plugin {
                     }
                 }
                 if (code >= 200 && code < 400) {
+                    InputStream stream = conn.getInputStream();
+                    String encoding = conn.getContentEncoding();
+                    if (encoding != null && encoding.toLowerCase().contains("gzip")) {
+                        stream = new java.util.zip.GZIPInputStream(stream);
+                    }
                     StringBuilder sb = new StringBuilder();
-                    try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"))) {
                         String line;
                         while ((line = br.readLine()) != null) {
                             sb.append(line);
@@ -248,13 +253,19 @@ public class TayyarMobilePlugin extends Plugin {
             conn.setConnectTimeout(10000);
             conn.setReadTimeout(15000);
 
+            byte[] bodyBytes = body.getBytes("UTF-8");
+            conn.setFixedLengthStreamingMode(bodyBytes.length);
             try (OutputStream os = conn.getOutputStream()) {
-                os.write(body.getBytes("UTF-8"));
+                os.write(bodyBytes);
             }
 
             int code = conn.getResponseCode();
             InputStream stream = (code >= 200 && code < 400) ? conn.getInputStream() : conn.getErrorStream();
             if (stream == null) return "";
+            String encoding = conn.getContentEncoding();
+            if (encoding != null && encoding.toLowerCase().contains("gzip")) {
+                stream = new java.util.zip.GZIPInputStream(stream);
+            }
             StringBuilder sb = new StringBuilder();
             try (BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"))) {
                 String line;
@@ -273,122 +284,307 @@ public class TayyarMobilePlugin extends Plugin {
 
     /* ==================== LIVE-VERIFIED MULTI-PLATFORM RESOLVERS ==================== */
 
-    private JSObject resolveYouTubeInnerTube(String url) {
-        try {
-            Pattern pYt = Pattern.compile("(?:watch\\?v=|shorts/|live/|youtu\\.be/|embed/)([a-zA-Z0-9_-]{11})");
-            Matcher mYt = pYt.matcher(url);
-            if (!mYt.find()) return null;
-            String videoId = mYt.group(1);
+    private String extractYouTubeVideoId(String input) {
+        if (input == null || input.trim().isEmpty()) return null;
+        String s = input.trim();
+        Matcher m = Pattern.compile("(?:v=|v%3D|shorts/|live/|youtu\\.be/|embed/)([a-zA-Z0-9_-]{11})", Pattern.CASE_INSENSITIVE).matcher(s);
+        if (m.find()) return m.group(1);
+        if (s.matches("^[a-zA-Z0-9_-]{11}$")) return s;
+        return null;
+    }
 
-            String payload = "{\"videoId\":\"" + videoId + "\",\"context\":{\"client\":{\"clientName\":\"ANDROID_VR\",\"clientVersion\":\"1.60.19\",\"deviceMake\":\"Oculus\",\"deviceModel\":\"Quest 3\",\"osName\":\"Android\",\"osVersion\":\"12L\",\"androidSdkVersion\":32,\"hl\":\"en\",\"gl\":\"US\"}},\"contentCheckOk\":true,\"racyCheckOk\":true}";
-            String resp = httpPostText(
+    private JSObject resolveYouTube(String videoId) {
+        if (videoId == null || videoId.isEmpty()) return null;
+
+        // --- ATTEMPT 1: InnerTube ANDROID_VR (Gives progressive single-file MP4 with full audio muxed) ---
+        try {
+            String payloadVr = "{\"videoId\":\"" + videoId + "\",\"context\":{\"client\":{\"clientName\":\"ANDROID_VR\",\"clientVersion\":\"1.60.19\",\"deviceMake\":\"Oculus\",\"deviceModel\":\"Quest 3\",\"osName\":\"Android\",\"osVersion\":\"12L\",\"androidSdkVersion\":32,\"hl\":\"en\",\"gl\":\"US\"}},\"contentCheckOk\":true,\"racyCheckOk\":true}";
+            String respVr = httpPostText(
                 "https://www.youtube.com/youtubei/v1/player?prettyPrint=false",
-                payload,
+                payloadVr,
                 "application/json",
                 UA_YT_ANDROID_VR,
                 "https://www.youtube.com",
                 "https://www.youtube.com/"
             );
-            if (resp.isEmpty()) return null;
-
-            org.json.JSONObject root = new org.json.JSONObject(resp);
-            org.json.JSONObject playability = root.optJSONObject("playabilityStatus");
-            if (playability != null && !"OK".equalsIgnoreCase(playability.optString("status", ""))) {
-                return null;
-            }
-
-            org.json.JSONObject details = root.optJSONObject("videoDetails");
-            String title = details != null ? details.optString("title", "YouTube Video") : "YouTube Video";
-            String author = details != null ? details.optString("author", "YouTube") : "YouTube";
-            String thumb = "https://i.ytimg.com/vi/" + videoId + "/hqdefault.jpg";
-
-            org.json.JSONObject streaming = root.optJSONObject("streamingData");
-            if (streaming == null) return null;
-
-            JSArray formats = new JSArray();
-
-            // 1. Progressive formats (Video + Full Audio muxed in single MP4!)
-            org.json.JSONArray prog = streaming.optJSONArray("formats");
-            if (prog != null) {
-                for (int i = prog.length() - 1; i >= 0; i--) {
-                    org.json.JSONObject f = prog.optJSONObject(i);
-                    if (f == null) continue;
-                    String fUrl = f.optString("url", "");
-                    if (fUrl.isEmpty()) continue;
-                    String qLabel = f.optString("qualityLabel", "HD");
-                    JSObject fmt = new JSObject();
-                    fmt.put("id", "video_" + qLabel);
-                    fmt.put("quality", "Video MP4 + Audio (" + qLabel + ")");
-                    fmt.put("ext", "mp4");
-                    fmt.put("url", fUrl);
-                    fmt.put("directUrl", fUrl);
-                    fmt.put("userAgent", UA_YT_ANDROID_VR);
-                    formats.put(fmt);
-                }
-            }
-
-            // 1b. Adaptive MP4 video fallback if progressive array was empty
-            org.json.JSONArray adaptive = streaming.optJSONArray("adaptiveFormats");
-            if (formats.length() == 0 && adaptive != null) {
-                for (int i = 0; i < adaptive.length(); i++) {
-                    org.json.JSONObject af = adaptive.optJSONObject(i);
-                    if (af == null) continue;
-                    String mime = af.optString("mimeType", "").toLowerCase();
-                    String vUrl = af.optString("url", "");
-                    if (mime.startsWith("video/mp4") && !vUrl.isEmpty()) {
-                        JSObject fmt = new JSObject();
-                        fmt.put("id", "video_adaptive");
-                        fmt.put("quality", "Video HD (" + af.optString("qualityLabel", "HD") + ")");
-                        fmt.put("ext", "mp4");
-                        fmt.put("url", vUrl);
-                        fmt.put("directUrl", vUrl);
-                        fmt.put("userAgent", UA_YT_ANDROID_VR);
-                        formats.put(fmt);
-                        break;
+            if (!respVr.isEmpty()) {
+                org.json.JSONObject rootVr = new org.json.JSONObject(respVr);
+                org.json.JSONObject playVr = rootVr.optJSONObject("playabilityStatus");
+                if (playVr != null && "OK".equalsIgnoreCase(playVr.optString("status", ""))) {
+                    org.json.JSONObject details = rootVr.optJSONObject("videoDetails");
+                    String title = details != null ? details.optString("title", "YouTube Video") : "YouTube Video";
+                    String author = details != null ? details.optString("author", "YouTube") : "YouTube";
+                    String thumb = "https://i.ytimg.com/vi/" + videoId + "/hqdefault.jpg";
+                    org.json.JSONObject streaming = rootVr.optJSONObject("streamingData");
+                    if (streaming != null) {
+                        JSArray formats = new JSArray();
+                        org.json.JSONArray prog = streaming.optJSONArray("formats");
+                        if (prog != null) {
+                            for (int i = prog.length() - 1; i >= 0; i--) {
+                                org.json.JSONObject f = prog.optJSONObject(i);
+                                if (f == null) continue;
+                                String fUrl = f.optString("url", "");
+                                if (fUrl.isEmpty()) continue;
+                                String qLabel = f.optString("qualityLabel", "HD");
+                                JSObject fmt = new JSObject();
+                                fmt.put("id", "video_" + qLabel);
+                                fmt.put("quality", "Video MP4 (" + qLabel + ")");
+                                fmt.put("ext", "mp4");
+                                fmt.put("url", fUrl);
+                                fmt.put("directUrl", fUrl);
+                                fmt.put("userAgent", UA_YT_ANDROID_VR);
+                                formats.put(fmt);
+                            }
+                        }
+                        org.json.JSONArray adaptive = streaming.optJSONArray("adaptiveFormats");
+                        if (formats.length() == 0 && adaptive != null) {
+                            for (int i = 0; i < adaptive.length(); i++) {
+                                org.json.JSONObject af = adaptive.optJSONObject(i);
+                                if (af == null) continue;
+                                String mime = af.optString("mimeType", "").toLowerCase();
+                                String vUrl = af.optString("url", "");
+                                if (mime.startsWith("video/mp4") && !vUrl.isEmpty()) {
+                                    JSObject fmt = new JSObject();
+                                    fmt.put("id", "video_hd");
+                                    fmt.put("quality", "Video MP4 (" + af.optString("qualityLabel", "HD") + ")");
+                                    fmt.put("ext", "mp4");
+                                    fmt.put("url", vUrl);
+                                    fmt.put("directUrl", vUrl);
+                                    fmt.put("userAgent", UA_YT_ANDROID_VR);
+                                    formats.put(fmt);
+                                    break;
+                                }
+                            }
+                        }
+                        if (adaptive != null) {
+                            String bestAudioUrl = "";
+                            int bestBitrate = 0;
+                            for (int i = 0; i < adaptive.length(); i++) {
+                                org.json.JSONObject af = adaptive.optJSONObject(i);
+                                if (af == null) continue;
+                                String mime = af.optString("mimeType", "").toLowerCase();
+                                String aUrl = af.optString("url", "");
+                                int br = af.optInt("bitrate", 0);
+                                if (mime.startsWith("audio/mp4") && !aUrl.isEmpty() && br >= bestBitrate) {
+                                    bestBitrate = br;
+                                    bestAudioUrl = aUrl;
+                                }
+                            }
+                            if (!bestAudioUrl.isEmpty()) {
+                                JSObject fAudio = new JSObject();
+                                fAudio.put("id", "audio");
+                                fAudio.put("quality", "Audio Only (M4A)");
+                                fAudio.put("ext", "m4a");
+                                fAudio.put("url", bestAudioUrl);
+                                fAudio.put("directUrl", bestAudioUrl);
+                                fAudio.put("userAgent", UA_YT_ANDROID_VR);
+                                formats.put(fAudio);
+                            }
+                        }
+                        if (formats.length() > 0) {
+                            JSObject ret = new JSObject();
+                            ret.put("ok", true);
+                            ret.put("platform", "YouTube");
+                            ret.put("title", title);
+                            ret.put("author", author);
+                            ret.put("thumbnail", thumb);
+                            ret.put("formats", formats);
+                            return ret;
+                        }
                     }
                 }
-            }
-
-            // 2. Audio-only stream from adaptiveFormats
-            if (adaptive != null) {
-                String bestAudioUrl = "";
-                int bestBitrate = 0;
-                for (int i = 0; i < adaptive.length(); i++) {
-                    org.json.JSONObject af = adaptive.optJSONObject(i);
-                    if (af == null) continue;
-                    String mime = af.optString("mimeType", "").toLowerCase();
-                    String aUrl = af.optString("url", "");
-                    int br = af.optInt("bitrate", 0);
-                    if (mime.startsWith("audio/mp4") && !aUrl.isEmpty() && br >= bestBitrate) {
-                        bestBitrate = br;
-                        bestAudioUrl = aUrl;
-                    }
-                }
-                if (!bestAudioUrl.isEmpty()) {
-                    JSObject fAudio = new JSObject();
-                    fAudio.put("id", "audio");
-                    fAudio.put("quality", "Audio Only (M4A)");
-                    fAudio.put("ext", "m4a");
-                    fAudio.put("url", bestAudioUrl);
-                    fAudio.put("directUrl", bestAudioUrl);
-                    fAudio.put("userAgent", UA_YT_ANDROID_VR);
-                    formats.put(fAudio);
-                }
-            }
-
-            if (formats.length() > 0) {
-                JSObject ret = new JSObject();
-                ret.put("ok", true);
-                ret.put("platform", "YouTube");
-                ret.put("title", title);
-                ret.put("author", author);
-                ret.put("thumbnail", thumb);
-                ret.put("formats", formats);
-                return ret;
             }
         } catch (Exception ex) {
-            Log.w(TAG, "YouTube InnerTube error: " + ex.getMessage());
+            Log.w(TAG, "YouTube ANDROID_VR attempt warning: " + ex.getMessage());
         }
+
+        // --- ATTEMPT 2: InnerTube VISIONOS + SOCS=CAI Consent + visitorData (Direct unciphered MP4 HD & Audio) ---
+        try {
+            // 1. Fetch watch page with SOCS=CAI cookie to collect visitorData and cookies
+            String watchUrl = "https://www.youtube.com/watch?v=" + videoId + "&bpctr=9999999999&has_verified=1";
+            HttpURLConnection watchConn = (HttpURLConnection) new URL(watchUrl).openConnection();
+            watchConn.setRequestProperty("User-Agent", UA_CHROME_DESKTOP);
+            watchConn.setRequestProperty("Cookie", "PREF=hl=en&tz=UTC; SOCS=CAI");
+            watchConn.setRequestProperty("Accept-Language", "en-US,en;q=0.9");
+            watchConn.setConnectTimeout(8000);
+            watchConn.setReadTimeout(12000);
+
+            StringBuilder watchHtml = new StringBuilder();
+            String visitorData = "";
+            StringBuilder cookiesBuilder = new StringBuilder("PREF=hl=en&tz=UTC; SOCS=CAI");
+
+            List<String> cookies = watchConn.getHeaderFields().get("Set-Cookie");
+            if (cookies != null) {
+                for (String c : cookies) {
+                    String part = c.split(";")[0].trim();
+                    if (!part.isEmpty()) {
+                        cookiesBuilder.append("; ").append(part);
+                    }
+                }
+            }
+
+            InputStream wStream = (watchConn.getResponseCode() >= 200 && watchConn.getResponseCode() < 400)
+                ? watchConn.getInputStream() : watchConn.getErrorStream();
+            if (wStream != null) {
+                String enc = watchConn.getContentEncoding();
+                if (enc != null && enc.toLowerCase().contains("gzip")) {
+                    wStream = new java.util.zip.GZIPInputStream(wStream);
+                }
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(wStream, "UTF-8"))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        watchHtml.append(line);
+                        if (watchHtml.length() > 2000000) break;
+                    }
+                }
+            }
+            watchConn.disconnect();
+
+            String htmlStr = watchHtml.toString();
+            Matcher mvData = Pattern.compile("\"visitorData\"\\s*:\\s*\"([^\"]+)\"").matcher(htmlStr);
+            if (mvData.find()) {
+                visitorData = mvData.group(1);
+            }
+
+            String pageTitle = "YouTube Video";
+            Matcher mt = Pattern.compile("<title>([^<]+)</title>", Pattern.CASE_INSENSITIVE).matcher(htmlStr);
+            if (mt.find()) {
+                pageTitle = mt.group(1).replace(" - YouTube", "").trim();
+            }
+
+            // 2. POST player API with VISIONOS context & visitorData
+            org.json.JSONObject clientObj = new org.json.JSONObject();
+            clientObj.put("clientName", "VISIONOS");
+            clientObj.put("clientVersion", "1.02");
+            clientObj.put("deviceMake", "Apple");
+            clientObj.put("deviceModel", "RealityDevice17,1");
+            clientObj.put("userAgent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15");
+            clientObj.put("osName", "visionOS");
+            clientObj.put("osVersion", "26.5.23O471");
+            clientObj.put("hl", "en");
+            clientObj.put("gl", "US");
+            if (!visitorData.isEmpty()) {
+                clientObj.put("visitorData", visitorData);
+            }
+
+            org.json.JSONObject contextObj = new org.json.JSONObject();
+            contextObj.put("client", clientObj);
+
+            org.json.JSONObject postBody = new org.json.JSONObject();
+            postBody.put("context", contextObj);
+            postBody.put("videoId", videoId);
+            postBody.put("contentCheckOk", true);
+            postBody.put("racyCheckOk", true);
+
+            HttpURLConnection pConn = (HttpURLConnection) new URL("https://www.youtube.com/youtubei/v1/player?prettyPrint=false").openConnection();
+            pConn.setRequestMethod("POST");
+            pConn.setDoOutput(true);
+            pConn.setRequestProperty("Content-Type", "application/json");
+            pConn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15");
+            pConn.setRequestProperty("X-Youtube-Client-Name", "101");
+            pConn.setRequestProperty("X-Youtube-Client-Version", "1.02");
+            if (!visitorData.isEmpty()) {
+                pConn.setRequestProperty("X-Goog-Visitor-Id", visitorData);
+            }
+            pConn.setRequestProperty("Origin", "https://www.youtube.com");
+            pConn.setRequestProperty("Cookie", cookiesBuilder.toString());
+            pConn.setConnectTimeout(9000);
+            pConn.setReadTimeout(15000);
+
+            byte[] bBytes = postBody.toString().getBytes("UTF-8");
+            pConn.setFixedLengthStreamingMode(bBytes.length);
+            try (OutputStream os = pConn.getOutputStream()) {
+                os.write(bBytes);
+            }
+
+            int pCode = pConn.getResponseCode();
+            InputStream pStream = (pCode >= 200 && pCode < 400) ? pConn.getInputStream() : pConn.getErrorStream();
+            if (pStream != null) {
+                String enc = pConn.getContentEncoding();
+                if (enc != null && enc.toLowerCase().contains("gzip")) {
+                    pStream = new java.util.zip.GZIPInputStream(pStream);
+                }
+                StringBuilder pSb = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(pStream, "UTF-8"))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        pSb.append(line);
+                        if (pSb.length() > 2000000) break;
+                    }
+                }
+                pConn.disconnect();
+
+                org.json.JSONObject pRoot = new org.json.JSONObject(pSb.toString());
+                org.json.JSONObject pPlay = pRoot.optJSONObject("playabilityStatus");
+                if (pPlay != null && "OK".equalsIgnoreCase(pPlay.optString("status", ""))) {
+                    org.json.JSONObject pDetails = pRoot.optJSONObject("videoDetails");
+                    String title = pDetails != null ? pDetails.optString("title", pageTitle) : pageTitle;
+                    String author = pDetails != null ? pDetails.optString("author", "YouTube") : "YouTube";
+                    String thumb = "https://i.ytimg.com/vi/" + videoId + "/hqdefault.jpg";
+
+                    org.json.JSONObject pStreaming = pRoot.optJSONObject("streamingData");
+                    if (pStreaming != null) {
+                        JSArray formats = new JSArray();
+                        org.json.JSONArray adaptive = pStreaming.optJSONArray("adaptiveFormats");
+                        if (adaptive != null) {
+                            for (int i = 0; i < adaptive.length(); i++) {
+                                org.json.JSONObject af = adaptive.optJSONObject(i);
+                                if (af == null) continue;
+                                String mime = af.optString("mimeType", "").toLowerCase();
+                                String vUrl = af.optString("url", "");
+                                if (mime.startsWith("video/mp4") && !vUrl.isEmpty()) {
+                                    String qLabel = af.optString("qualityLabel", "HD");
+                                    JSObject fmt = new JSObject();
+                                    fmt.put("id", "video_" + qLabel);
+                                    fmt.put("quality", "Video MP4 (" + qLabel + ")");
+                                    fmt.put("ext", "mp4");
+                                    fmt.put("url", vUrl);
+                                    fmt.put("directUrl", vUrl);
+                                    fmt.put("userAgent", UA_CHROME_DESKTOP);
+                                    formats.put(fmt);
+                                }
+                            }
+                            String bestAudioUrl = "";
+                            int bestBitrate = 0;
+                            for (int i = 0; i < adaptive.length(); i++) {
+                                org.json.JSONObject af = adaptive.optJSONObject(i);
+                                if (af == null) continue;
+                                String mime = af.optString("mimeType", "").toLowerCase();
+                                String aUrl = af.optString("url", "");
+                                int br = af.optInt("bitrate", 0);
+                                if (mime.startsWith("audio/mp4") && !aUrl.isEmpty() && br >= bestBitrate) {
+                                    bestBitrate = br;
+                                    bestAudioUrl = aUrl;
+                                }
+                            }
+                            if (!bestAudioUrl.isEmpty()) {
+                                JSObject fAudio = new JSObject();
+                                fAudio.put("id", "audio");
+                                fAudio.put("quality", "Audio Only (M4A)");
+                                fAudio.put("ext", "m4a");
+                                fAudio.put("url", bestAudioUrl);
+                                fAudio.put("directUrl", bestAudioUrl);
+                                fAudio.put("userAgent", UA_CHROME_DESKTOP);
+                                formats.put(fAudio);
+                            }
+                        }
+                        if (formats.length() > 0) {
+                            JSObject ret = new JSObject();
+                            ret.put("ok", true);
+                            ret.put("platform", "YouTube");
+                            ret.put("title", title);
+                            ret.put("author", author);
+                            ret.put("thumbnail", thumb);
+                            ret.put("formats", formats);
+                            return ret;
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            Log.w(TAG, "YouTube VISIONOS attempt warning: " + ex.getMessage());
+        }
+
         return null;
     }
 
@@ -1201,11 +1397,22 @@ public class TayyarMobilePlugin extends Plugin {
             @Override
             public void run() {
                 try {
+                    // 1. YouTube video ID check directly before redirects
+                    final String ytId = extractYouTubeVideoId(rawUrl);
+                    if (ytId != null) {
+                        JSObject ytRes = resolveYouTube(ytId);
+                        if (ytRes != null && ytRes.optBoolean("ok", false)) {
+                            call.resolve(ytRes);
+                            return;
+                        }
+                    }
+
                     final String url = resolveRedirects(rawUrl.trim());
                     JSObject res = null;
 
-                    if (url.contains("youtube.com") || url.contains("youtu.be")) {
-                        res = resolveYouTubeInnerTube(url);
+                    final String ytIdAfterRedirect = extractYouTubeVideoId(url);
+                    if (ytIdAfterRedirect != null) {
+                        res = resolveYouTube(ytIdAfterRedirect);
                     } else if (url.contains("tiktok.com")) {
                         res = resolveTikTok(url);
                     } else if (url.contains("facebook.com") || url.contains("fb.watch") || url.contains("fb.com")) {
@@ -1221,7 +1428,7 @@ public class TayyarMobilePlugin extends Plugin {
                         return;
                     }
 
-                    // OpenGraph video/image fallback for Snapchat spotlight or other sites
+                    // OpenGraph video/image fallback for Snapchat spotlight or other sites (STRICT MEDIA VALIDATION)
                     String html = httpGetText(url, UA_CHROME_DESKTOP, "");
                     if (!html.isEmpty()) {
                         Matcher mv = Pattern.compile("<meta[^>]+property=[\"']og:video(?::secure_url|:url)?[\"'][^>]+content=[\"']([^\"']+)[\"']", Pattern.CASE_INSENSITIVE).matcher(html);
@@ -1229,23 +1436,33 @@ public class TayyarMobilePlugin extends Plugin {
                             mv = Pattern.compile("<meta[^>]+content=[\"']([^\"']+)[\"'][^>]+property=[\"']og:video(?::secure_url|:url)?[\"']", Pattern.CASE_INSENSITIVE).matcher(html);
                         }
                         if (mv.find()) {
-                            String vUrl = mv.group(1).replace("&amp;", "&");
-                            JSArray formats = new JSArray();
-                            JSObject f1 = new JSObject();
-                            f1.put("id", "direct");
-                            f1.put("quality", "Direct HD (MP4)");
-                            f1.put("ext", "mp4");
-                            f1.put("url", vUrl);
-                            f1.put("directUrl", vUrl);
-                            formats.put(f1);
+                            String vUrl = mv.group(1).replace("&amp;", "&").trim();
+                            String lowUrl = vUrl.toLowerCase();
+                            boolean isEmbed = lowUrl.contains("/embed/") || lowUrl.contains("youtube.com") || lowUrl.contains("youtu.be") ||
+                                              lowUrl.contains("facebook.com/plugins") || lowUrl.contains("instagram.com/p/") ||
+                                              lowUrl.endsWith(".html") || lowUrl.endsWith(".htm");
+                            boolean isMediaFile = lowUrl.endsWith(".mp4") || lowUrl.endsWith(".webm") || lowUrl.endsWith(".mov") ||
+                                                  lowUrl.endsWith(".mkv") || lowUrl.contains("googlevideo.com") || lowUrl.contains("tikcdn.io") ||
+                                                  lowUrl.contains("sc-cdn.net") || lowUrl.contains("fbcdn.net") || lowUrl.contains("cdninstagram.com") ||
+                                                  lowUrl.contains("twimg.com") || lowUrl.contains("video.twimg.com");
+                            if (!isEmbed && isMediaFile) {
+                                JSArray formats = new JSArray();
+                                JSObject f1 = new JSObject();
+                                f1.put("id", "direct");
+                                f1.put("quality", "Direct HD (MP4)");
+                                f1.put("ext", "mp4");
+                                f1.put("url", vUrl);
+                                f1.put("directUrl", vUrl);
+                                formats.put(f1);
 
-                            JSObject ret = new JSObject();
-                            ret.put("ok", true);
-                            ret.put("platform", url.contains("snapchat.com") ? "Snapchat" : "Media");
-                            ret.put("title", "Video");
-                            ret.put("formats", formats);
-                            call.resolve(ret);
-                            return;
+                                JSObject ret = new JSObject();
+                                ret.put("ok", true);
+                                ret.put("platform", url.contains("snapchat.com") ? "Snapchat" : "Media");
+                                ret.put("title", "Video");
+                                ret.put("formats", formats);
+                                call.resolve(ret);
+                                return;
+                            }
                         }
                     }
 
