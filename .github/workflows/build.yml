@@ -211,7 +211,7 @@ jobs:
   publish-release:
     name: Create GitHub Release
     needs: [build-desktop, build-android]
-    if: always() && !cancelled() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+    if: !cancelled() && !contains(needs.*.result, 'failure') && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
 
     steps:
@@ -241,24 +241,11 @@ jobs:
           mkdir -p final-release
           find release-assets -type f -exec cp -v {} final-release/ \;
           cd final-release
-          # Strip any blockmap files, old version assets, and duplicate space-separated filenames
+          # Strip any blockmap files and duplicate space-separated filenames
           rm -f *.blockmap 2>/dev/null || true
           find . -type f -name "* *" -delete 2>/dev/null || true
           echo "Curated Final Release Assets (Strictly 1 Clean Binary per Platform):"
           ls -la
-
-      - name: Clean up Obsolete & Duplicate Release Assets from GitHub
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Scanning GitHub releases for obsolete or duplicate assets..."
-          curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases" | \
-          jq -r --arg ver "$VERSION" '.[] | .assets[]? | select((.name | test($ver) | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
-            if [ -n "$asset_id" ] && [ -n "$asset_name" ]; then
-              echo "Withdrawing & deleting unwanted release asset: $asset_name (ID: $asset_id)"
-              curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" || true
-            fi
-          done || true
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
