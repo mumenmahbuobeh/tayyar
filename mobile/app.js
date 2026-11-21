@@ -1025,7 +1025,6 @@
       formats: [{ id: 'direct', ext: detectedExt, url: cleanUrl, directUrl: cleanUrl }],
     };
   }
-  }
 
   /* ==================== NATIVE DOWNLOAD RUNNER (ANDROID + iOS) ==================== */
   function sanitizeName(str, fallbackExt) {
