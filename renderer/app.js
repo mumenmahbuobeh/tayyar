@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.19 is the latest available release.',
+      upToDateDesc: 'Version 1.0.20 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -364,7 +364,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.19 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.20 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -2995,7 +2995,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases — Stable Default) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.19';
+  const CURRENT_APP_VERSION = '1.0.20';
   let availableUpdateRelease = null;
   let isNewerUpdateAvailable = false;
   let updateDownloadTaskId = null;
@@ -3078,9 +3078,9 @@
       const latestTag = (rel.tag_name || '').replace(/^v/, '');
       const isNewer = semverCompare(latestTag, CURRENT_APP_VERSION) > 0;
       isNewerUpdateAvailable = isNewer;
+      availableUpdateRelease = rel;
 
       if (isNewer) {
-        availableUpdateRelease = rel;
         if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? `تحديث جديد متوفر: v${latestTag}` : `New Update Available: v${latestTag}`;
         if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? 'انقر على "تحديث الآن" للتحميل والتثبيت المباشر من داخل البرنامج.' : 'Click "Update Now" to download and install directly inside Tayyar.';
         if (bInstall) {
@@ -3092,22 +3092,38 @@
         let skippedVer = '';
         try { skippedVer = localStorage.getItem('tayyar_skipped_update_ver') || ''; } catch (_) {}
         if (interactive || skippedVer !== latestTag) {
-          showDeskUpdatePopup(rel, channel);
+          showDeskUpdatePopup(rel, channel, false);
         }
       } else {
-        availableUpdateRelease = null;
         downloadedUpdatePath = null;
         updateDownloadTaskId = null;
         if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? 'برنامج تيّار محدّث لأحدث إصدار' : 'Tayyar is up to date';
         if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? `الإصدار ${CURRENT_APP_VERSION} هو أحدث إصدار مستقر متوفر.` : `Version ${CURRENT_APP_VERSION} is the latest available release.`;
-        if (bInstall) bInstall.style.display = 'none';
+        if (bInstall) {
+          bInstall.style.display = 'inline-flex';
+          bInstall.disabled = false;
+          bInstall.className = 'pill-btn secondary sm';
+          if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'معاينة نافذة التحديث' : 'View Update Modal';
+        }
         if (progressWrap) progressWrap.style.display = 'none';
         if (interactive) {
-          toast(S.lang === 'ar' ? `برنامج تيّار محدّث بالفعل (v${CURRENT_APP_VERSION})` : `Tayyar is already up to date (v${CURRENT_APP_VERSION})`);
+          showDeskUpdatePopup(rel, channel, true);
         }
       }
     } catch (err) {
       console.warn('Update check failed:', err);
+      isNewerUpdateAvailable = false;
+      if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? `برنامج تيّار (v${CURRENT_APP_VERSION})` : `Tayyar (v${CURRENT_APP_VERSION})`;
+      if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? 'الإصدار الحالي يعمل بأحدث التقنيات.' : 'Current version is running with latest engine.';
+      if (bInstall) {
+        bInstall.style.display = 'inline-flex';
+        bInstall.disabled = false;
+        bInstall.className = 'pill-btn secondary sm';
+        if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'معاينة نافذة التحديث' : 'View Update Modal';
+      }
+      if (interactive) {
+        showDeskUpdatePopup(availableUpdateRelease || { tag_name: 'v' + CURRENT_APP_VERSION, published_at: new Date() }, channel, true);
+      }
       isNewerUpdateAvailable = false;
       availableUpdateRelease = null;
       if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? `برنامج تيّار (v${CURRENT_APP_VERSION})` : `Tayyar (v${CURRENT_APP_VERSION})`;
@@ -3308,47 +3324,60 @@
     }
   }
 
-  async function showDeskUpdatePopup(rel, channel) {
+  async function showDeskUpdatePopup(rel, channel, isLatest = false) {
     const overlay = $('#deskUpdOverlay');
-    if (!overlay || !rel) return;
+    if (!overlay) return;
 
-    const latestTag = (rel.tag_name || '').replace(/^v/, '');
-    const isBeta = !!rel.prerelease || (channel === 'beta' && /beta|alpha|rc/i.test(rel.tag_name || ''));
+    const latestTag = (rel?.tag_name || CURRENT_APP_VERSION).replace(/^v/, '');
+    const isBeta = !!rel?.prerelease || (channel === 'beta' && /beta|alpha|rc/i.test(rel?.tag_name || ''));
 
     const tag = $('#deskUpdTag');
     if (tag) {
-      tag.textContent = isBeta
-        ? (S.lang === 'ar' ? 'يتوفر إصدار تجريبي جديد' : 'New beta version available')
-        : (S.lang === 'ar' ? 'يتوفر إصدار جديد' : 'New version available');
+      if (isLatest) {
+        tag.textContent = S.lang === 'ar' ? 'البرنامج محدّث بالكامل' : 'Tayyar is up to date';
+      } else {
+        tag.textContent = isBeta
+          ? (S.lang === 'ar' ? 'يتوفر إصدار تجريبي جديد' : 'New beta version available')
+          : (S.lang === 'ar' ? 'يتوفر إصدار جديد' : 'New version available');
+      }
     }
 
     const title = $('#deskUpdTitle');
     if (title) {
-      title.textContent = S.lang === 'ar' ? `إصدار طيار ${latestTag} متوفر الآن` : `Tayyar ${latestTag} is here`;
+      if (isLatest) {
+        title.textContent = S.lang === 'ar' ? `أنت تستخدم أحدث إصدار (${CURRENT_APP_VERSION})` : `Tayyar ${CURRENT_APP_VERSION} is Up to Date`;
+      } else {
+        title.textContent = S.lang === 'ar' ? `إصدار طيار ${latestTag} متوفر الآن` : `Tayyar ${latestTag} is here`;
+      }
     }
 
     const oldVer = $('#deskUpdOldVer');
     if (oldVer) oldVer.textContent = CURRENT_APP_VERSION;
 
     const newVer = $('#deskUpdNewVer');
-    if (newVer) newVer.textContent = latestTag;
+    if (newVer) newVer.textContent = isLatest ? CURRENT_APP_VERSION : latestTag;
 
     const dateEl = $('#deskUpdDate');
-    if (dateEl && rel.published_at) {
+    if (dateEl) {
       try {
-        const d = new Date(rel.published_at);
+        const d = (rel && rel.published_at) ? new Date(rel.published_at) : new Date();
         dateEl.textContent = d.toLocaleDateString(S.lang === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
       } catch (_) {}
     }
 
     const btnNow = $('#btnDeskUpdNow');
     const nowTxt = $('#deskUpdNowText');
-    if (!downloadedUpdatePath) {
-      setDeskStepperStage('download', 0, S.lang === 'ar' ? 'جاهز لبدء التحديث الفوري' : 'Ready to start update');
+    if (isLatest) {
+      setDeskStepperStage('reopen', 100, S.lang === 'ar' ? `برنامج تيّار محدّث لأحدث إصدار (${CURRENT_APP_VERSION}). النظام جاهز للعمل بكامل الميزات.` : `Tayyar is up to date (v${CURRENT_APP_VERSION}). System ready.`);
+      if (btnNow) btnNow.disabled = false;
+      if (nowTxt) nowTxt.textContent = S.lang === 'ar' ? 'إعادة الفحص والتحميل' : 'Recheck / Reinstall';
+    } else if (!downloadedUpdatePath) {
+      setDeskStepperStage('download', 0, S.lang === 'ar' ? 'جاهز لبدء التحديث الفوري المباشر' : 'Ready to start update');
       if (btnNow) btnNow.disabled = false;
       if (nowTxt) nowTxt.textContent = S.lang === 'ar' ? 'تحديث الآن' : 'Update Now';
     } else {
       setDeskStepperStage('install', 100, S.lang === 'ar' ? 'اكتمل التحميل! جاهز للتثبيت' : 'Download complete! Ready to install');
+      if (btnNow) btnNow.disabled = false;
       if (nowTxt) nowTxt.textContent = S.lang === 'ar' ? 'تثبيت وإعادة التشغيل' : 'Install & Restart';
     }
 
@@ -3362,7 +3391,13 @@
 
   $('#btnDeskUpdClose')?.addEventListener('click', hideDeskUpdatePopup);
   $('#btnDeskUpdLater')?.addEventListener('click', hideDeskUpdatePopup);
-  $('#btnDeskUpdNow')?.addEventListener('click', () => startInAppUpdate());
+  $('#btnDeskUpdNow')?.addEventListener('click', () => {
+    if (isNewerUpdateAvailable && availableUpdateRelease) {
+      startInAppUpdate();
+    } else {
+      checkAppUpdates(true);
+    }
+  });
   $('#btnDeskUpdSkip')?.addEventListener('click', () => {
     const latestTag = (availableUpdateRelease?.tag_name || '').replace(/^v/, '');
     if (latestTag) {
@@ -3373,6 +3408,15 @@
   });
   $('#deskUpdOverlay')?.addEventListener('click', (e) => {
     if (e.target === $('#deskUpdOverlay')) hideDeskUpdatePopup();
+  });
+
+  $('#bInstallUpdate')?.addEventListener('click', () => {
+    const ch = (cfgChannel && cfgChannel.value === 'beta') ? 'beta' : 'stable';
+    showDeskUpdatePopup(availableUpdateRelease || { tag_name: 'v' + CURRENT_APP_VERSION }, ch, !isNewerUpdateAvailable);
+  });
+  $('#bPreviewUpdateModal')?.addEventListener('click', () => {
+    const ch = (cfgChannel && cfgChannel.value === 'beta') ? 'beta' : 'stable';
+    showDeskUpdatePopup(availableUpdateRelease || { tag_name: 'v' + CURRENT_APP_VERSION }, ch, !isNewerUpdateAvailable);
   });
 
   const bCheckUpdate = $('#bCheckUpdate');
@@ -4115,10 +4159,14 @@
             formatId: isAudioOnly ? 'audio' : 'best'
           });
 
-          if (res && res.id) {
+          const dlItem = res?.item || res;
+          const dlId = dlItem?.id;
+          if (dlId) {
+            S.items.set(dlId, dlItem);
+            openActiveDownloadModal(dlId);
             window.tayyar.on('dl:progress', (items) => {
               const list = Array.isArray(items) ? items : [items];
-              const match = list.find(it => it.id === res.id);
+              const match = list.find(it => it.id === dlId);
               if (match) {
                 const pct = match.size > 0 ? Math.min(100, Math.round((match.downloaded / match.size) * 100)) : 0;
                 if (spBar) spBar.style.width = `${pct}%`;

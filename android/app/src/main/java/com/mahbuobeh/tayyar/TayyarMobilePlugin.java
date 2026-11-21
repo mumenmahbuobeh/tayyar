@@ -585,7 +585,89 @@ public class TayyarMobilePlugin extends Plugin {
             Log.w(TAG, "YouTube VISIONOS attempt warning: " + ex.getMessage());
         }
 
+        // --- ATTEMPT 3: Invidious Public Video Stream Fallback ---
+        try {
+            String[] invInstances = new String[]{
+                "https://inv.tux.pizza/api/v1/videos/",
+                "https://vid.puffyan.us/api/v1/videos/",
+                "https://invidious.nerdvpn.de/api/v1/videos/"
+            };
+            for (String base : invInstances) {
+                try {
+                    String invResp = httpGetText(base + videoId, UA_CHROME_DESKTOP, "");
+                    if (!invResp.isEmpty() && invResp.startsWith("{")) {
+                        org.json.JSONObject invJson = new org.json.JSONObject(invResp);
+                        String title = invJson.optString("title", "YouTube Video");
+                        String author = invJson.optString("author", "YouTube");
+                        String thumb = "https://i.ytimg.com/vi/" + videoId + "/hqdefault.jpg";
+                        JSArray formats = new JSArray();
+
+                        org.json.JSONArray fStreams = invJson.optJSONArray("formatStreams");
+                        if (fStreams != null) {
+                            for (int i = 0; i < fStreams.length(); i++) {
+                                org.json.JSONObject fs = fStreams.optJSONObject(i);
+                                if (fs == null) continue;
+                                String u = fs.optString("url", "");
+                                String q = fs.optString("qualityLabel", "HD");
+                                String ext = fs.optString("container", "mp4");
+                                if (!u.isEmpty() && "mp4".equalsIgnoreCase(ext)) {
+                                    JSObject fmt = new JSObject();
+                                    fmt.put("id", "video_" + q);
+                                    fmt.put("quality", "Video MP4 (" + q + ")");
+                                    fmt.put("ext", "mp4");
+                                    fmt.put("url", u);
+                                    fmt.put("directUrl", u);
+                                    fmt.put("userAgent", UA_CHROME_DESKTOP);
+                                    formats.put(fmt);
+                                    break;
+                                }
+                            }
+                        }
+
+                        org.json.JSONArray aStreams = invJson.optJSONArray("adaptiveFormats");
+                        if (aStreams != null) {
+                            for (int i = 0; i < aStreams.length(); i++) {
+                                org.json.JSONObject as = aStreams.optJSONObject(i);
+                                if (as == null) continue;
+                                String type = as.optString("type", "").toLowerCase();
+                                String u = as.optString("url", "");
+                                if (type.startsWith("audio/") && !u.isEmpty()) {
+                                    JSObject fmt = new JSObject();
+                                    fmt.put("id", "audio");
+                                    fmt.put("quality", "Audio Only (M4A)");
+                                    fmt.put("ext", "m4a");
+                                    fmt.put("url", u);
+                                    fmt.put("directUrl", u);
+                                    fmt.put("userAgent", UA_CHROME_DESKTOP);
+                                    formats.put(fmt);
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (formats.length() > 0) {
+                            JSObject ret = new JSObject();
+                            ret.put("ok", true);
+                            ret.put("platform", "YouTube");
+                            ret.put("title", title);
+                            ret.put("author", author);
+                            ret.put("thumbnail", thumb);
+                            ret.put("formats", formats);
+                            return ret;
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+        } catch (Exception ex) {
+            Log.w(TAG, "YouTube Invidious attempt warning: " + ex.getMessage());
+        }
+
         return null;
+    }
+
+    private JSObject resolveYouTubeInnerTube(String url) {
+        String ytId = extractYouTubeVideoId(url);
+        return resolveYouTube(ytId);
     }
 
     private JSObject resolveTikTok(String url) {
@@ -974,18 +1056,24 @@ public class TayyarMobilePlugin extends Plugin {
                 return new ResolvedStream(url, providedReferer, ua);
             }
 
-            url = resolveRedirects(url);
+            String ytId = extractYouTubeVideoId(url);
             JSObject resolved = null;
-            if (url.contains("youtube.com") || url.contains("youtu.be")) {
-                resolved = resolveYouTubeInnerTube(url);
-            } else if (url.contains("tiktok.com")) {
-                resolved = resolveTikTok(url);
-            } else if (url.contains("facebook.com") || url.contains("fb.watch") || url.contains("fb.com")) {
-                resolved = resolveFacebook(url);
-            } else if (url.contains("instagram.com")) {
-                resolved = resolveInstagram(url);
-            } else if (url.contains("twitter.com") || url.contains("x.com")) {
-                resolved = resolveTwitter(url);
+            if (ytId != null) {
+                resolved = resolveYouTube(ytId);
+            } else {
+                url = resolveRedirects(url);
+                String ytId2 = extractYouTubeVideoId(url);
+                if (ytId2 != null) {
+                    resolved = resolveYouTube(ytId2);
+                } else if (url.contains("tiktok.com")) {
+                    resolved = resolveTikTok(url);
+                } else if (url.contains("facebook.com") || url.contains("fb.watch") || url.contains("fb.com")) {
+                    resolved = resolveFacebook(url);
+                } else if (url.contains("instagram.com")) {
+                    resolved = resolveInstagram(url);
+                } else if (url.contains("twitter.com") || url.contains("x.com")) {
+                    resolved = resolveTwitter(url);
+                }
             }
 
             if (resolved != null && resolved.has("formats")) {
@@ -1004,8 +1092,20 @@ public class TayyarMobilePlugin extends Plugin {
                     }
                 }
             }
+
+            boolean isSocial = ytId != null || url.contains("youtube.com") || url.contains("youtu.be") ||
+                url.contains("tiktok.com") || url.contains("facebook.com") || url.contains("fb.watch") || url.contains("fb.com") ||
+                url.contains("instagram.com") || url.contains("twitter.com") || url.contains("x.com");
+            if (isSocial) {
+                throw new Exception("تعذر استخراج رابط الوسائط المباشر من هذا المصدر (قد يكون المحتوى مقيداً أو خاصاً)");
+            }
+
             return new ResolvedStream(url, providedReferer, providedUa);
         } catch (Exception e) {
+            String msg = e.getMessage() != null ? e.getMessage() : "";
+            if (msg.contains("تعذر استخراج رابط الوسائط")) {
+                throw new RuntimeException(msg);
+            }
             return new ResolvedStream(initialUrl, providedReferer, providedUa);
         }
     }

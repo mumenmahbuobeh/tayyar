@@ -6,6 +6,7 @@ const http = require('http');
 const https = require('https');
 const { DownloadManager, isDownloadableUrl } = require('./engine');
 const social = require('./social');
+const pkg = require('../package.json');
 
 const BRIDGE_PORT = 6824;
 const THEMES = {
@@ -82,7 +83,7 @@ function startBridge() {
 
     if (req.method === 'GET' && (req.url === '/ping' || req.url === '/status')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: '1.0.18', bridge: true, stories: true }));
+      return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: pkg.version, bridge: true, stories: true }));
     }
 
     // Receive Story/Status media blob (WhatsApp Web, Instagram/Facebook/Snapchat Web Stories)

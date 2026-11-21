@@ -84,11 +84,11 @@ jobs:
         with:
           name: tayyar-desktop-${{ matrix.os }}
           path: |
-            dist/Tayyar-Setup-1.0.19.exe
-            dist/Tayyar-1.0.19.exe
-            dist/Tayyar-1.0.19.dmg
-            dist/Tayyar-1.0.19.AppImage
-            dist/tayyar_1.0.19_amd64.deb
+            dist/Tayyar-Setup-*.exe
+            dist/Tayyar-*.exe
+            dist/Tayyar-*.dmg
+            dist/Tayyar-*.AppImage
+            dist/*.deb
             dist/latest*.yml
           if-no-files-found: ignore
 
@@ -100,11 +100,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Java JDK 21
+      - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '17'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -155,7 +155,8 @@ jobs:
           mkdir -p build-apk
           APK_FILE=$(find android/app/build/outputs/apk -type f -name "*.apk" | head -n 1)
           if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
-            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.19.apk
+            VERSION=$(node -p "require('./package.json').version")
+            cp -fv "$APK_FILE" "build-apk/Tayyar-Android-v${VERSION}.apk"
           else
             echo "Error: APK file not found!" && exit 1
           fi
@@ -164,7 +165,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-android-apk
-          path: build-apk/Tayyar-Android-v1.0.19.apk
+          path: build-apk/*.apk
 
   build-ios:
     name: Build iOS Package
@@ -194,8 +195,9 @@ jobs:
           mkdir -p build/Payload
           APP_PATH=$(find build/Build/Products -name "*.app" -type d | head -n 1)
           if [ -n "$APP_PATH" ] && [ -d "$APP_PATH" ]; then
+            VERSION=$(node -p "require('./package.json').version")
             cp -r "$APP_PATH" build/Payload/
-            cd build && zip -r ../../../Tayyar-iOS-v1.0.19.ipa Payload
+            cd build && zip -r "../../../Tayyar-iOS-v${VERSION}.ipa" Payload
           else
             echo "Error: iOS .app bundle not found!" && exit 1
           fi
@@ -204,16 +206,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-ios-ipa
-          path: Tayyar-iOS-v1.0.19.ipa
-
-      - name: Attach iOS IPA to Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v1.0.19
-          files: Tayyar-iOS-v1.0.19.ipa
-          fail_on_unmatched_files: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: Tayyar-iOS-*.ipa
 
   publish-release:
     name: Create GitHub Release
@@ -224,6 +217,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Determine Target Release Version
+        id: get_ver
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "tag_name=v$VERSION" >> $GITHUB_ENV
 
       - name: Download All Artifacts
         uses: actions/download-artifact@v4
@@ -238,7 +243,6 @@ jobs:
           cd final-release
           # Strip any blockmap files, old version assets, and duplicate space-separated filenames
           rm -f *.blockmap 2>/dev/null || true
-          rm -f *1.0.0* *1.0.5* *1.0.6* *1.0.7* *1.0.8* *1.0.9* *1.0.10* *1.0.11* *1.0.12* *1.0.13* *1.0.14* *1.0.15* *1.0.16* *1.0.17* *1.0.18* 2>/dev/null || true
           find . -type f -name "* *" -delete 2>/dev/null || true
           echo "Curated Final Release Assets (Strictly 1 Clean Binary per Platform):"
           ls -la
@@ -249,7 +253,7 @@ jobs:
         run: |
           echo "Scanning GitHub releases for obsolete or duplicate assets..."
           curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases" | \
-          jq -r '.[] | .assets[]? | select((.name | test("1\\.0\\.19") | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
+          jq -r --arg ver "$VERSION" '.[] | .assets[]? | select((.name | test($ver) | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
             if [ -n "$asset_id" ] && [ -n "$asset_name" ]; then
               echo "Withdrawing & deleting unwanted release asset: $asset_name (ID: $asset_id)"
               curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" || true
@@ -259,34 +263,34 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.19
-          name: "Tayyar v1.0.19 — StellarHub-Inspired Update Pipeline & Universal Social/Direct Downloader Engine"
+          tag_name: ${{ env.tag_name }}
+          name: "Tayyar ${{ env.tag_name }} — StellarHub-Inspired Update Pipeline & Universal Social/Direct Downloader Engine"
           body: |
-            ## 🚀 Tayyar Download Manager v1.0.19
+            ## 🚀 Tayyar Download Manager ${{ env.tag_name }}
 
             Universal high-speed multi-connection download manager & Pro Stories Saver designed and developed by **Mu'men Mahbuobeh**.
 
-            ### 📦 Download Packages (Official & Clean Binaries)
+            ### 📦 Official Clean Release Packages
             * **Windows:**
-              * [Tayyar-Setup-1.0.19.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-Setup-1.0.19.exe) (Installer with Bundled Media Engine)
-              * [Tayyar-1.0.19.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-1.0.19.exe) (Portable Executable)
+              * [Tayyar-Setup-${{ env.VERSION }}.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/Tayyar-Setup-${{ env.VERSION }}.exe) (Installer with Bundled Media Engine)
+              * [Tayyar-${{ env.VERSION }}.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/Tayyar-${{ env.VERSION }}.exe) (Portable Executable)
             * **Android:**
-              * [Tayyar-Android-v1.0.19.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-Android-v1.0.19.apk) (Native Zero-CORS Stream Resolver & 1-Tap Downloader)
+              * [Tayyar-Android-${{ env.tag_name }}.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/Tayyar-Android-${{ env.tag_name }}.apk) (Native Zero-CORS Stream Resolver & 1-Tap Downloader)
             * **iOS (Apple iPhone/iPad):**
-              * [Tayyar-iOS-v1.0.19.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-iOS-v1.0.19.ipa) (Native Capacitor Bridge Restored + Direct Media Saving)
+              * [Tayyar-iOS-${{ env.tag_name }}.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/Tayyar-iOS-${{ env.tag_name }}.ipa) (Native Capacitor Bridge Restored + Direct Media Saving)
             * **macOS:**
-              * [Tayyar-1.0.19.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-1.0.19.dmg) (Apple Silicon & Intel)
+              * [Tayyar-${{ env.VERSION }}.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/Tayyar-${{ env.VERSION }}.dmg) (Apple Silicon & Intel)
             * **Linux:**
-              * [Tayyar-1.0.19.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-1.0.19.AppImage)
-              * [tayyar_1.0.19_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/tayyar_1.0.19_amd64.deb)
+              * [Tayyar-${{ env.VERSION }}.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/Tayyar-${{ env.VERSION }}.AppImage)
+              * [tayyar_${{ env.VERSION }}_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/tayyar_${{ env.VERSION }}_amd64.deb)
 
-            ### ✨ Key Improvements & Fixes in v1.0.19
-            * **StellarHub-Inspired Pro Update Modal (Desktop & Mobile):** Brand new dark OLED update card featuring an orange-accented 4-stage pipeline stepper (Download ➜ Check ➜ Install ➜ Reopen), slim progress bar, real-time downloaded byte readouts, and automatic restart notification.
+            ### ✨ Key Improvements & Fixes in ${{ env.tag_name }}
+            * **StellarHub-Inspired Pro Update Modal (Desktop & Mobile):** Dark OLED update card featuring an orange-accented 4-stage pipeline stepper (Download ➜ Check ➜ Install ➜ Reopen), slim progress bar, real-time downloaded byte readouts, and automatic restart notification. Can be previewed and tested anytime directly from Settings.
             * **Universal Zero-CORS Mobile Stream Resolving:** Integrated native `CapacitorHttp` routing on Android and iOS to completely eliminate webview CORS blocks when querying social APIs (YouTube, TikTok, Facebook, Instagram, Snapchat).
             * **Built-in Pure Node.js InnerTube Resolver on Desktop:** Added standalone progressive MP4 extraction in `src/social.js` with full audio muxing, allowing desktop downloads without relying on external system binaries.
             * **Direct Stream Fallback Engine:** When yt-dlp is unavailable or encounters unmerged video streams, the desktop engine seamlessly falls back to direct HTTP multi-segment streaming.
             * **Instant Auto-Analyze on Paste:** Automatically extracts video data immediately upon pasting any URL, streamlining the 1-tap download experience.
-            * **Document & Direct File Integrity:** Accurate filename and MIME handling for PDF, ZIP, APK, and document downloads without incorrect file extension appending.
+            * **Document & Direct File Integrity:** Accurate filename and MIME handling for PDF, ZIP, APK, and document downloads with active progress modal and completion popup.
           files: final-release/*
           fail_on_unmatched_files: false
           draft: false

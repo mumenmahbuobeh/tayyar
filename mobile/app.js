@@ -1873,32 +1873,45 @@
     }
   }
 
-  function showUpdatePopup(rel) {
-    if (!rel || !updPopupOverlay) return;
-    const latest = (rel.tag_name || '').replace(/^v/, '');
-    const isBeta = !!rel.prerelease || (cfgUpdateChannel?.value === 'beta' && /beta|alpha|rc/i.test(rel.tag_name || ''));
+  function showUpdatePopup(rel, isLatest = false) {
+    if (!updPopupOverlay) return;
+    const r = rel || { tag_name: 'v' + APP_VERSION, published_at: new Date() };
+    const latest = (r.tag_name || APP_VERSION).replace(/^v/, '');
+    const isBeta = !!r.prerelease || (cfgUpdateChannel?.value === 'beta' && /beta|alpha|rc/i.test(r.tag_name || ''));
     const isAr = state.lang === 'ar';
 
     const badge = $('#updPopChannelBadge');
     if (badge) {
-      badge.textContent = isBeta
-        ? (isAr ? 'إصدار تجريبي جديد متوفر' : 'New Beta available')
-        : (isAr ? 'إصدار جديد متوفر' : 'New version available');
+      if (isLatest) {
+        badge.textContent = isAr ? 'أنت على أحدث إصدار' : 'You are on the latest version';
+      } else {
+        badge.textContent = isBeta
+          ? (isAr ? 'إصدار تجريبي جديد متوفر' : 'New Beta available')
+          : (isAr ? 'إصدار جديد متوفر' : 'New version available');
+      }
     }
     if ($('#updPopTitle')) {
-      $('#updPopTitle').textContent = isAr ? `طيار ${latest} متوفر الآن` : `Tayyar ${latest} is here`;
+      if (isLatest) {
+        $('#updPopTitle').textContent = isAr ? `تطبيق طيار محدث بالكامل (${APP_VERSION})` : `Tayyar ${APP_VERSION} is Up to Date`;
+      } else {
+        $('#updPopTitle').textContent = isAr ? `طيار ${latest} متوفر الآن` : `Tayyar ${latest} is here`;
+      }
     }
     if ($('#updPopOldVer')) $('#updPopOldVer').textContent = APP_VERSION;
-    if ($('#updPopNewVer')) $('#updPopNewVer').textContent = latest;
+    if ($('#updPopNewVer')) $('#updPopNewVer').textContent = isLatest ? APP_VERSION : latest;
     if ($('#updPopDate')) {
-      const d = rel.published_at ? new Date(rel.published_at) : new Date();
+      const d = r.published_at ? new Date(r.published_at) : new Date();
       $('#updPopDate').textContent = d.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     }
 
     const btnNow = $('#btnUpdPopNow');
     const txtNow = $('#updPopNowText');
-    if (!downloadedUpdateApkPath) {
-      setMobStepperStage('download', 0, isAr ? 'جاهز للتحميل والتثبيت' : 'Ready to download and install');
+    if (isLatest) {
+      setMobStepperStage('reopen', 100, isAr ? `تطبيق تيّار محدث لأحدث إصدار (v${APP_VERSION}). النظام جاهز للعمل بكامل الميزات.` : `Tayyar is up to date (v${APP_VERSION}). System ready.`);
+      if (btnNow) btnNow.disabled = false;
+      if (txtNow) txtNow.textContent = isAr ? 'إعادة الفحص والتحميل' : 'Re-check & Download';
+    } else if (!downloadedUpdateApkPath) {
+      setMobStepperStage('download', 0, isAr ? 'جاهز للتحميل والتثبيت المباشر' : 'Ready to download and install');
       if (btnNow) btnNow.disabled = false;
       if (txtNow) txtNow.textContent = isAr ? 'تحديث الآن' : 'Update Now';
     } else {
@@ -1915,9 +1928,8 @@
   }
 
   async function runDirectMobileUpdate() {
-    if (!state.hasNewerUpdate || !state.updateRelease) {
-      showToast(t('alreadyLatestToast'));
-      hideUpdatePopup();
+    if (!state.updateRelease) {
+      checkUpdates(true);
       return;
     }
 
@@ -2049,21 +2061,24 @@
         let skipped = '';
         try { skipped = localStorage.getItem(STORAGE_KEY_SKIPPED_VER) || ''; } catch (_) {}
         if (interactive || skipped !== latest) {
-          showUpdatePopup(rel);
+          showUpdatePopup(rel, false);
         }
       } else {
-        state.updateRelease = null;
+        state.updateRelease = rel;
         downloadedUpdateApkPath = '';
         $('#updStatusTitle').textContent = t('upToDate');
         $('#updStatusDesc').textContent = t('upToDateDesc');
         if (updActionRow) updActionRow.hidden = true;
-        if (interactive) showToast(t('alreadyLatestToast'));
+        if (interactive) {
+          showUpdatePopup(rel, true);
+        }
       }
     } catch (_) {
       state.hasNewerUpdate = false;
-      state.updateRelease = null;
       if (updActionRow) updActionRow.hidden = true;
-      if (interactive) showToast(t('dlFailToast'));
+      if (interactive) {
+        showUpdatePopup(state.updateRelease || { tag_name: 'v' + APP_VERSION, published_at: new Date() }, true);
+      }
     } finally {
       if (btnCheckUpdate) {
         btnCheckUpdate.disabled = false;
@@ -2080,12 +2095,11 @@
   });
 
   btnCheckUpdate?.addEventListener('click', () => checkUpdates(true));
+  $('#btnPreviewUpdModal')?.addEventListener('click', () => {
+    showUpdatePopup(state.updateRelease || { tag_name: 'v' + APP_VERSION, published_at: new Date() }, !state.hasNewerUpdate);
+  });
   btnDownloadUpdate?.addEventListener('click', () => {
-    if (state.hasNewerUpdate && state.updateRelease) {
-      showUpdatePopup(state.updateRelease);
-    } else {
-      showToast(t('alreadyLatestToast'));
-    }
+    showUpdatePopup(state.updateRelease || { tag_name: 'v' + APP_VERSION, published_at: new Date() }, !state.hasNewerUpdate);
   });
 
   $('#btnUpdPopNow')?.addEventListener('click', runDirectMobileUpdate);
