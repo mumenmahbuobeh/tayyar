@@ -4672,3 +4672,333 @@ html[dir="rtl"] .glass-island-player {
 
 
 
+
+
+/* ==================== STELLARHUB-STYLE UPDATE POPUP ==================== */
+.stellar-upd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: stellarFadeIn 0.22s ease-out;
+}
+
+@keyframes stellarFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.stellar-upd-card {
+  position: relative;
+  width: 100%;
+  max-width: 530px;
+  border-radius: 24px;
+  padding: 28px 28px 22px;
+  background: #111217;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font-family: inherit;
+}
+
+.stellar-upd-close {
+  position: absolute;
+  top: 18px;
+  inset-inline-end: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.stellar-upd-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.stellar-upd-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.stellar-upd-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: #181920;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FF5A36;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(255, 90, 54, 0.15);
+}
+
+.stellar-upd-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.stellar-upd-header-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.stellar-upd-accent-tag {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #FF5A36;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.stellar-upd-title {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+}
+
+.stellar-upd-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.stellar-ver-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stellar-ver-badge.old {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stellar-ver-arrow {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+}
+
+.stellar-ver-badge.new {
+  background: rgba(255, 90, 54, 0.16);
+  color: #FF7A59;
+  border: 1px solid rgba(255, 90, 54, 0.35);
+}
+
+.stellar-upd-date {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
+  margin-inline-start: 4px;
+}
+
+/* Stepper Pipeline */
+.stellar-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 18px 0 20px;
+  position: relative;
+}
+
+.stellar-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+}
+
+.stellar-step-bubble {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #181920;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.25s ease;
+}
+
+.stellar-step-bubble svg {
+  width: 20px;
+  height: 20px;
+}
+
+.stellar-step-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  transition: all 0.25s ease;
+}
+
+/* Stepper States */
+.stellar-step.active .stellar-step-bubble {
+  background: rgba(255, 90, 54, 0.16);
+  border-color: #FF5A36;
+  color: #FF7A59;
+  box-shadow: 0 0 16px rgba(255, 90, 54, 0.28);
+}
+
+.stellar-step.active .stellar-step-name {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.stellar-step.completed .stellar-step-bubble {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: #22c55e;
+  color: #4ade80;
+}
+
+.stellar-step.completed .stellar-step-name {
+  color: #cbd5e1;
+}
+
+.stellar-step-connector {
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 22px;
+  transition: background 0.25s ease;
+}
+
+.stellar-step-connector.active {
+  background: linear-gradient(90deg, #FF5A36, rgba(255, 90, 54, 0.4));
+}
+
+/* Thin Progress Bar */
+.stellar-prog-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.stellar-prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF5A36, #FF8C6B);
+  border-radius: 999px;
+  transition: width 0.2s ease-out;
+  box-shadow: 0 0 8px rgba(255, 90, 54, 0.5);
+}
+
+/* Status Row */
+.stellar-status-row {
+  margin: 10px 0 16px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.7);
+  min-height: 18px;
+}
+
+/* Notice Footnote */
+.stellar-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 18px;
+}
+
+.stellar-notice svg {
+  width: 15px;
+  height: 15px;
+  color: rgba(255, 255, 255, 0.45);
+  flex-shrink: 0;
+}
+
+/* Bottom Actions */
+.stellar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.stellar-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stellar-btn-subtle {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 10px;
+  transition: all 0.18s ease;
+}
+
+.stellar-btn-subtle:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.stellar-btn-primary {
+  background: #FF5A36;
+  border: none;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 9px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 90, 54, 0.35);
+  transition: all 0.2s ease;
+}
+
+.stellar-btn-primary:hover {
+  background: #ff6e4d;
+  box-shadow: 0 6px 20px rgba(255, 90, 54, 0.5);
+  transform: translateY(-1px);
+}
+
+.stellar-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}

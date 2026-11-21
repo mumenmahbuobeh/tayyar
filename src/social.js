@@ -403,6 +403,122 @@ function resolveYouTubePiped(url) {
   });
 }
 
+function resolveYouTubeInnerTube(url) {
+  return new Promise((resolve) => {
+    const m = url.match(/(?:watch\?v=|shorts\/|live\/|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+    if (!m) return resolve(null);
+    const videoId = m[1];
+    const postData = JSON.stringify({
+      videoId,
+      context: {
+        client: {
+          clientName: 'ANDROID_VR',
+          clientVersion: '1.60.19',
+          deviceMake: 'Oculus',
+          deviceModel: 'Quest 3',
+          osName: 'Android',
+          osVersion: '12L',
+          androidSdkVersion: 32,
+          hl: 'en',
+          gl: 'US'
+        }
+      },
+      contentCheckOk: true,
+      racyCheckOk: true
+    });
+    const ytUa = 'com.google.android.apps.youtube.vr.oculus/1.60.19 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip';
+    const req = https.request('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': ytUa
+      },
+      timeout: 10000
+    }, (res) => {
+      let buf = '';
+      res.on('data', c => buf += c);
+      res.on('end', () => {
+        try {
+          const j = JSON.parse(buf);
+          const title = j.videoDetails?.title || 'YouTube Video';
+          const author = j.videoDetails?.author || 'YouTube';
+          const thumb = j.videoDetails?.thumbnail?.thumbnails?.pop()?.url || '';
+          const formats = [];
+          const prog = j.streamingData?.formats || [];
+          for (let i = prog.length - 1; i >= 0; i--) {
+            if (prog[i]?.url) {
+              const qLabel = prog[i].qualityLabel || 'HD';
+              formats.push({
+                id: `video_${qLabel}`,
+                formatId: `video_${qLabel}`,
+                quality: `🌟 فيديو مباشر MP4 مع صوت (${qLabel})`,
+                ext: 'mp4',
+                url: prog[i].url,
+                directUrl: prog[i].url,
+                userAgent: ytUa,
+                isSocial: false,
+                filesize: parseInt(prog[i].contentLength || '0', 10) || -1
+              });
+              break;
+            }
+          }
+          const adaptive = j.streamingData?.adaptiveFormats || [];
+          if (formats.length === 0) {
+            const bestVid = adaptive.find((f) => f?.url && String(f.mimeType || '').toLowerCase().startsWith('video/mp4'));
+            if (bestVid?.url) {
+              formats.push({
+                id: 'video_adaptive',
+                formatId: 'video_adaptive',
+                quality: `🌟 فيديو MP4 عالي الجودة (${bestVid.qualityLabel || 'HD'})`,
+                ext: 'mp4',
+                url: bestVid.url,
+                directUrl: bestVid.url,
+                userAgent: ytUa,
+                isSocial: false,
+                filesize: parseInt(bestVid.contentLength || '0', 10) || -1
+              });
+            }
+          }
+          const bestAud = adaptive
+            .filter((f) => f?.url && String(f.mimeType || '').toLowerCase().startsWith('audio/mp4'))
+            .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
+          if (bestAud?.url) {
+            formats.push({
+              id: 'audio_m4a',
+              formatId: 'audio_m4a',
+              quality: '🎵 ملف صوتي نقي بدون فيديو (M4A / MP3)',
+              ext: 'm4a',
+              url: bestAud.url,
+              directUrl: bestAud.url,
+              userAgent: ytUa,
+              isSocial: false,
+              filesize: parseInt(bestAud.contentLength || '0', 10) || -1
+            });
+          }
+          if (formats.length) {
+            return resolve({
+              ok: true,
+              platform: 'YouTube',
+              platformId: 'youtube',
+              title,
+              author,
+              thumbnail: thumb,
+              formats
+            });
+          }
+          resolve(null);
+        } catch (_) {
+          resolve(null);
+        }
+      });
+    });
+    req.on('error', () => resolve(null));
+    req.on('timeout', () => { req.destroy(); resolve(null); });
+    req.write(postData);
+    req.end();
+  });
+}
+
 /**
  * Primary multi-platform social media resolver.
  */
@@ -426,6 +542,18 @@ async function resolveSocialMedia(url) {
         return res;
       }
     } catch (_) {}
+  }
+
+  // 2. YouTube: High-speed InnerTube ANDROID_VR Progressive Direct Stream (zero wait, full audio)
+  if (platId === 'youtube') {
+    try {
+      const ytRes = await resolveYouTubeInnerTube(url);
+      if (ytRes && ytRes.ok && ytRes.formats?.length) {
+        return ytRes;
+      }
+    } catch (e) {
+      console.warn('InnerTube resolution warning, falling back to yt-dlp:', e.message);
+    }
   }
 
   // 2. Desktop Resolution using yt-dlp

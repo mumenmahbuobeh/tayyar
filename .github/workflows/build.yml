@@ -84,11 +84,11 @@ jobs:
         with:
           name: tayyar-desktop-${{ matrix.os }}
           path: |
-            dist/Tayyar-Setup-1.0.18.exe
-            dist/Tayyar-1.0.18.exe
-            dist/Tayyar-1.0.18.dmg
-            dist/Tayyar-1.0.18.AppImage
-            dist/tayyar_1.0.18_amd64.deb
+            dist/Tayyar-Setup-1.0.19.exe
+            dist/Tayyar-1.0.19.exe
+            dist/Tayyar-1.0.19.dmg
+            dist/Tayyar-1.0.19.AppImage
+            dist/tayyar_1.0.19_amd64.deb
             dist/latest*.yml
           if-no-files-found: ignore
 
@@ -155,7 +155,7 @@ jobs:
           mkdir -p build-apk
           APK_FILE=$(find android/app/build/outputs/apk -type f -name "*.apk" | head -n 1)
           if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
-            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.18.apk
+            cp -fv "$APK_FILE" build-apk/Tayyar-Android-v1.0.19.apk
           else
             echo "Error: APK file not found!" && exit 1
           fi
@@ -164,7 +164,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-android-apk
-          path: build-apk/Tayyar-Android-v1.0.18.apk
+          path: build-apk/Tayyar-Android-v1.0.19.apk
 
   build-ios:
     name: Build iOS Package
@@ -195,7 +195,7 @@ jobs:
           APP_PATH=$(find build/Build/Products -name "*.app" -type d | head -n 1)
           if [ -n "$APP_PATH" ] && [ -d "$APP_PATH" ]; then
             cp -r "$APP_PATH" build/Payload/
-            cd build && zip -r ../../../Tayyar-iOS-v1.0.18.ipa Payload
+            cd build && zip -r ../../../Tayyar-iOS-v1.0.19.ipa Payload
           else
             echo "Error: iOS .app bundle not found!" && exit 1
           fi
@@ -204,13 +204,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tayyar-ios-ipa
-          path: Tayyar-iOS-v1.0.18.ipa
+          path: Tayyar-iOS-v1.0.19.ipa
 
       - name: Attach iOS IPA to Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.18
-          files: Tayyar-iOS-v1.0.18.ipa
+          tag_name: v1.0.19
+          files: Tayyar-iOS-v1.0.19.ipa
           fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -238,7 +238,7 @@ jobs:
           cd final-release
           # Strip any blockmap files, old version assets, and duplicate space-separated filenames
           rm -f *.blockmap 2>/dev/null || true
-          rm -f *1.0.0* *1.0.5* *1.0.6* *1.0.7* *1.0.8* *1.0.9* *1.0.10* *1.0.11* *1.0.12* *1.0.13* *1.0.14* *1.0.15* *1.0.16* *1.0.17* 2>/dev/null || true
+          rm -f *1.0.0* *1.0.5* *1.0.6* *1.0.7* *1.0.8* *1.0.9* *1.0.10* *1.0.11* *1.0.12* *1.0.13* *1.0.14* *1.0.15* *1.0.16* *1.0.17* *1.0.18* 2>/dev/null || true
           find . -type f -name "* *" -delete 2>/dev/null || true
           echo "Curated Final Release Assets (Strictly 1 Clean Binary per Platform):"
           ls -la
@@ -249,7 +249,7 @@ jobs:
         run: |
           echo "Scanning GitHub releases for obsolete or duplicate assets..."
           curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases" | \
-          jq -r '.[] | .assets[]? | select((.name | test("1\\.0\\.18") | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
+          jq -r '.[] | .assets[]? | select((.name | test("1\\.0\\.19") | not) or (.name | test(" ")) or (.name | endswith(".blockmap"))) | "\(.id) \(.name)"' | while read -r asset_id asset_name; do
             if [ -n "$asset_id" ] && [ -n "$asset_name" ]; then
               echo "Withdrawing & deleting unwanted release asset: $asset_name (ID: $asset_id)"
               curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" || true
@@ -259,33 +259,34 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.18
-          name: "Tayyar v1.0.18 — Native Mobile Capacitor Bridge Fix, Robust PDF Engine, Active Multi-Segment Visualizer & Complete POPUP"
+          tag_name: v1.0.19
+          name: "Tayyar v1.0.19 — StellarHub-Inspired Update Pipeline & Universal Social/Direct Downloader Engine"
           body: |
-            ## 🚀 Tayyar Download Manager v1.0.18
+            ## 🚀 Tayyar Download Manager v1.0.19
 
             Universal high-speed multi-connection download manager & Pro Stories Saver designed and developed by **Mu'men Mahbuobeh**.
 
             ### 📦 Download Packages (Official & Clean Binaries)
             * **Windows:**
-              * [Tayyar-Setup-1.0.18.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.18/Tayyar-Setup-1.0.18.exe) (Installer with Bundled Media Engine)
-              * [Tayyar-1.0.18.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.18/Tayyar-1.0.18.exe) (Portable Executable)
+              * [Tayyar-Setup-1.0.19.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-Setup-1.0.19.exe) (Installer with Bundled Media Engine)
+              * [Tayyar-1.0.19.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-1.0.19.exe) (Portable Executable)
             * **Android:**
-              * [Tayyar-Android-v1.0.18.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.18/Tayyar-Android-v1.0.18.apk) (Native Capacitor Bridge Restored + Direct 1-Tap Video Downloader)
+              * [Tayyar-Android-v1.0.19.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-Android-v1.0.19.apk) (Native Zero-CORS Stream Resolver & 1-Tap Downloader)
             * **iOS (Apple iPhone/iPad):**
-              * [Tayyar-iOS-v1.0.18.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.18/Tayyar-iOS-v1.0.18.ipa) (Native Capacitor Bridge Restored + Direct Video Saving)
+              * [Tayyar-iOS-v1.0.19.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-iOS-v1.0.19.ipa) (Native Capacitor Bridge Restored + Direct Media Saving)
             * **macOS:**
-              * [Tayyar-1.0.18.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.18/Tayyar-1.0.18.dmg) (Apple Silicon & Intel)
+              * [Tayyar-1.0.19.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-1.0.19.dmg) (Apple Silicon & Intel)
             * **Linux:**
-              * [Tayyar-1.0.18.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.18/Tayyar-1.0.18.AppImage)
-              * [tayyar_1.0.18_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.18/tayyar_1.0.18_amd64.deb)
+              * [Tayyar-1.0.19.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-1.0.19.AppImage)
+              * [tayyar_1.0.19_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/tayyar_1.0.19_amd64.deb)
 
-            ### ✨ Key Improvements & Fixes in v1.0.18
-            * **Fixed Mobile Video Downloads (Android & iOS):** Restored and bundled the missing `capacitor.js` bridge file directly in the app package, enabling the native Java/Swift download engine (`TayyarMobilePlugin`) to intercept and handle all video downloads seamlessly.
-            * **Instant 1-Tap Video Download on Mobile:** Clicking "Analyze & Download" (فحص وتحميل) now automatically triggers the native download immediately and redirects smoothly to the downloads tab.
-            * **Robust PDF & Document Downloader (Desktop & Extensions):** Automatic detection of `application/pdf` MIME types, fallback query parameter extraction, and stripping of dynamic script extensions (`.php`, `.aspx`, `.jsp`) so documents are always saved with genuine `.pdf` extensions. Supported non-range dynamic servers.
-            * **Active Download Interface (Advanced Window):** Interactive window during active downloads displaying real-time transfer speed, multi-segment connection visualizer (threads/chunks bar), ETA, Pause, Resume, Stop & Cancel, and dynamic speed limiter.
-            * **Download Complete POPUP (Apple Liquid Glass):** Beautiful completion modal presenting the saved filename, size, path, with quick actions to "Open File", "Open Folder", or dismiss.
+            ### ✨ Key Improvements & Fixes in v1.0.19
+            * **StellarHub-Inspired Pro Update Modal (Desktop & Mobile):** Brand new dark OLED update card featuring an orange-accented 4-stage pipeline stepper (Download ➜ Check ➜ Install ➜ Reopen), slim progress bar, real-time downloaded byte readouts, and automatic restart notification.
+            * **Universal Zero-CORS Mobile Stream Resolving:** Integrated native `CapacitorHttp` routing on Android and iOS to completely eliminate webview CORS blocks when querying social APIs (YouTube, TikTok, Facebook, Instagram, Snapchat).
+            * **Built-in Pure Node.js InnerTube Resolver on Desktop:** Added standalone progressive MP4 extraction in `src/social.js` with full audio muxing, allowing desktop downloads without relying on external system binaries.
+            * **Direct Stream Fallback Engine:** When yt-dlp is unavailable or encounters unmerged video streams, the desktop engine seamlessly falls back to direct HTTP multi-segment streaming.
+            * **Instant Auto-Analyze on Paste:** Automatically extracts video data immediately upon pasting any URL, streamlining the 1-tap download experience.
+            * **Document & Direct File Integrity:** Accurate filename and MIME handling for PDF, ZIP, APK, and document downloads without incorrect file extension appending.
           files: final-release/*
           fail_on_unmatched_files: false
           draft: false

@@ -24,7 +24,7 @@ app.on('second-instance', () => {
   if (win) {
     if (win.isMinimized()) win.restore();
     win.focus();
-    try { win.webContents.reloadIgnoringCache(); } catch (_) {}
+    try { win.webContents.reloadIgnoringCache(); } catch (_) { }
   }
 });
 
@@ -33,7 +33,7 @@ const send = (ch, payload) => { if (win && !win.isDestroyed()) win.webContents.s
 function applyTheme() {
   if (!win || process.platform === 'darwin') return;
   const t = THEMES[mgr.settings.theme] || THEMES.dark;
-  try { win.setBackgroundColor(t.color); } catch (_) {}
+  try { win.setBackgroundColor(t.color); } catch (_) { }
 }
 
 function createWindow() {
@@ -104,7 +104,7 @@ function startBridge() {
           const buf = Buffer.from(m[2], 'base64');
           const ext = mime.includes('mp4') || mime.includes('video') ? 'mp4'
             : mime.includes('png') ? 'png'
-            : mime.includes('webp') ? 'webp' : 'jpg';
+              : mime.includes('webp') ? 'webp' : 'jpg';
           const rawName = String(payload.filename || `Story_${Date.now()}.${ext}`)
             .replace(/[\\/:*?"<>|\r\n]/g, '_');
           const finalName = rawName.includes('.') ? rawName : `${rawName}.${ext}`;

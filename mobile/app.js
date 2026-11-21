@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.18';
+  const APP_VERSION = '1.0.19';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -688,6 +688,40 @@
     return { id: 'direct', name: t('directFiles'), icon: '🚀' };
   }
 
+  async function httpFetch(url, options = {}) {
+    const cap = window.Capacitor?.Plugins?.CapacitorHttp || window.CapacitorHttp;
+    if (cap && typeof cap.request === 'function') {
+      try {
+        const method = (options.method || 'GET').toUpperCase();
+        let headers = options.headers || {};
+        if (headers instanceof Headers) {
+          const hObj = {};
+          headers.forEach((v, k) => { hObj[k] = v; });
+          headers = hObj;
+        }
+        const res = await cap.request({
+          url,
+          method,
+          headers,
+          data: options.body,
+        });
+        const status = typeof res.status === 'number' ? res.status : 200;
+        const resData = res.data;
+        return {
+          ok: status >= 200 && status < 300,
+          status,
+          statusText: String(status),
+          headers: new Headers(res.headers || {}),
+          text: async () => typeof resData === 'string' ? resData : JSON.stringify(resData),
+          json: async () => typeof resData === 'object' ? resData : JSON.parse(resData),
+        };
+      } catch (err) {
+        console.warn('CapacitorHttp request warning, falling back to window.fetch:', err);
+      }
+    }
+    return window.fetch(url, options);
+  }
+
   async function resolveMediaUrl(rawUrl) {
     const cleanUrl = rawUrl.trim();
     const plat = detectPlatform(cleanUrl);
@@ -714,10 +748,10 @@
     if (plat.id === 'tiktok') {
       // 1st priority: SSSTik (global Cloudflare tikcdn.io CDN — bypasses regional tiktokcdn-us.com blocks!)
       try {
-        const home = await fetch('https://ssstik.io/');
+        const home = await httpFetch('https://ssstik.io/');
         const homeHtml = home.ok ? await home.text() : '';
         const tt = (homeHtml.match(/tt\s*=\s*'([^']+)'/) || [])[1] || '';
-        const rSss = await fetch('https://ssstik.io/abc?url=dl', {
+        const rSss = await httpFetch('https://ssstik.io/abc?url=dl', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded', Origin: 'https://ssstik.io', Referer: 'https://ssstik.io/en' },
           body: `id=${encodeURIComponent(cleanUrl)}&locale=en&tt=${encodeURIComponent(tt)}`,
@@ -747,7 +781,7 @@
       } catch (_) {}
       // 2nd priority: NNTech
       try {
-        const r2 = await fetch(`https://nntech-free-tt-api.vercel.app/api/tiktok/mp4?url=${encodeURIComponent(cleanUrl)}`);
+        const r2 = await httpFetch(`https://nntech-free-tt-api.vercel.app/api/tiktok/mp4?url=${encodeURIComponent(cleanUrl)}`);
         if (r2.ok) {
           const j2 = await r2.json();
           if (j2?.download && j2.download.startsWith('http')) {
@@ -766,7 +800,7 @@
       } catch (_) {}
       // 3rd priority: TikWM
       try {
-        const r = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`);
+        const r = await httpFetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`);
         if (r.ok) {
           const j = await r.json();
           if (j && j.code === 0 && j.data) {
@@ -801,7 +835,7 @@
         // Primary: YouTube Official InnerTube ANDROID_VR (direct progressive MP4 with FULL AUDIO!)
         try {
           const ytUa = 'com.google.android.apps.youtube.vr.oculus/1.60.19 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip';
-          const rYt = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
+          const rYt = await httpFetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'User-Agent': ytUa },
             body: JSON.stringify({
@@ -865,7 +899,7 @@
 
     if (plat.id === 'facebook') {
       try {
-        const rFb = await fetch('https://fdown.co.in/ajax', {
+        const rFb = await httpFetch('https://fdown.co.in/ajax', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Origin: 'https://fdown.co.in', Referer: 'https://fdown.co.in/' },
           body: JSON.stringify({ url: cleanUrl }),
@@ -896,7 +930,7 @@
       try {
         const sc = cleanUrl.match(/\/(?:p|reel|tv)\/([A-Za-z0-9_-]+)/);
         if (sc) {
-          const rIg = await fetch(`https://www.instagram.com/p/${sc[1]}/embed/captioned/`);
+          const rIg = await httpFetch(`https://www.instagram.com/p/${sc[1]}/embed/captioned/`);
           if (rIg.ok) {
             const html = await rIg.text();
             const mv = html.match(/"video_url"\s*:\s*"(https:[^"\\]+)"/);
@@ -924,7 +958,7 @@
       const m = cleanUrl.match(/(?:twitter\.com|x\.com)\/([^/]+)\/status\/(\d+)/i);
       if (m) {
         try {
-          const r = await fetch(`https://api.fxtwitter.com/${m[1]}/status/${m[2]}`);
+          const r = await httpFetch(`https://api.fxtwitter.com/${m[1]}/status/${m[2]}`);
           if (r.ok) {
             const j = await r.json();
             const vid = j.tweet?.media?.videos?.[0];
@@ -947,7 +981,7 @@
 
     if (plat.id === 'reddit') {
       try {
-        const r = await fetch(cleanUrl.split('?')[0].replace(/\/$/, '') + '.json');
+        const r = await httpFetch(cleanUrl.split('?')[0].replace(/\/$/, '') + '.json');
         if (r.ok) {
           const j = await r.json();
           const post = j[0]?.data?.children?.[0]?.data;
@@ -970,10 +1004,14 @@
 
     // Fallback direct file or OpenGraph stream
     let guessName = `${plat.name}_Media`;
+    let detectedExt = 'mp4';
     try {
       const uObj = new URL(cleanUrl);
       const seg = decodeURIComponent(uObj.pathname.split('/').filter(Boolean).pop() || '');
-      if (seg && seg.includes('.')) guessName = seg;
+      if (seg && seg.includes('.')) {
+        guessName = seg;
+        detectedExt = seg.split('.').pop().toLowerCase();
+      }
     } catch (_) {}
 
     return {
@@ -984,8 +1022,9 @@
       title: guessName,
       author: plat.name,
       thumbnail: '',
-      formats: [{ id: 'video', ext: 'mp4', url: cleanUrl, directUrl: cleanUrl }],
+      formats: [{ id: 'direct', ext: detectedExt, url: cleanUrl, directUrl: cleanUrl }],
     };
+  }
   }
 
   /* ==================== NATIVE DOWNLOAD RUNNER (ANDROID + iOS) ==================== */
@@ -1438,7 +1477,7 @@
       if (analyzeLoader) analyzeLoader.hidden = true;
 
       // If it's a direct downloadable file URL, start downloading IMMEDIATELY!
-      if (data.platformId === 'direct' && /\.(mp4|mp3|m4a|mkv|webm|apk|zip|rar|7z|pdf|jpg|jpeg|png|webp|exe|dmg|iso)(\?.*)?$/i.test(raw)) {
+      if (data.platformId === 'direct' && /\.(mp4|mp3|m4a|mkv|webm|avi|mov|apk|zip|rar|7z|tar|gz|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|exe|dmg|iso)(\?.*)?$/i.test(raw)) {
         await triggerResolvedDownload(false);
         return;
       }
@@ -1464,7 +1503,7 @@
         }
       }
 
-      // Immediately start downloading the video so clicking "Analyze & Download" (فحص وتحميل) starts downloading!
+      // Start downloading the resolved media immediately
       await triggerResolvedDownload(false);
     } catch (e) {
       if (analyzeLoader) analyzeLoader.hidden = true;
@@ -1476,9 +1515,10 @@
     const raw = (urlInput?.value || '').trim();
     if (!raw) return;
     if (!state.currentResolved) {
-      await triggerAnalyze();
+      state.currentResolved = await resolveMediaUrl(raw);
     }
     const res = state.currentResolved;
+    if (!res) return;
     const formats = res?.formats || [];
     let chosen = null;
 
@@ -1489,15 +1529,30 @@
     }
 
     const dlUrl = chosen?.directUrl || chosen?.url || raw;
-    const ext = isAudio ? (chosen?.ext === 'm4a' ? 'm4a' : 'mp3') : (chosen?.ext || 'mp4');
-    const filename = sanitizeName(`${res?.platform || 'Tayyar'}_${res?.title || Date.now()}`, ext);
+    let ext = chosen?.ext;
+    if (!ext) {
+      ext = isAudio ? 'mp3' : 'mp4';
+      try {
+        const uObj = new URL(dlUrl);
+        const match = uObj.pathname.match(/\.([a-zA-Z0-9]{2,5})$/);
+        if (match) ext = match[1].toLowerCase();
+      } catch (_) {}
+    }
+
+    let title = res?.title || 'Tayyar_File';
+    let filename = '';
+    if (title.includes('.')) {
+      filename = sanitizeName(title, ext);
+    } else {
+      filename = sanitizeName(`${res?.platform || 'Tayyar'}_${title}`, ext);
+    }
 
     await startDownload({
       url: dlUrl,
       filename,
       referer: chosen?.referer || '',
       userAgent: chosen?.userAgent || '',
-      platformIcon: res?.platformIcon || '🎬',
+      platformIcon: isAudio ? '🎵' : (res?.platformIcon || '🎬'),
       isAudio,
     });
   }
@@ -1693,31 +1748,82 @@
       : assets.find((a) => a.name.endsWith('.apk'));
   }
 
+  function setMobStepperStage(stage, pct = 0, statusText = '') {
+    const sDl = $('#stepMobDl');
+    const sCheck = $('#stepMobCheck');
+    const sInstall = $('#stepMobInstall');
+    const sReopen = $('#stepMobReopen');
+    const c1 = $('#connMob1');
+    const c2 = $('#connMob2');
+    const c3 = $('#connMob3');
+    const fill = $('#updPopProgFill');
+    const stat = $('#updPopProgStatus');
+
+    if (pct >= 0 && fill) fill.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+    if (statusText && stat) stat.textContent = statusText;
+
+    [sDl, sCheck, sInstall, sReopen].forEach((el) => {
+      if (el) el.classList.remove('active', 'completed');
+    });
+    [c1, c2, c3].forEach((el) => {
+      if (el) el.classList.remove('active');
+    });
+
+    if (stage === 'download') {
+      if (sDl) sDl.classList.add('active');
+    } else if (stage === 'check') {
+      if (sDl) sDl.classList.add('completed');
+      if (c1) c1.classList.add('active');
+      if (sCheck) sCheck.classList.add('active');
+    } else if (stage === 'install') {
+      if (sDl) sDl.classList.add('completed');
+      if (sCheck) sCheck.classList.add('completed');
+      if (c1) c1.classList.add('active');
+      if (c2) c2.classList.add('active');
+      if (sInstall) sInstall.classList.add('active');
+    } else if (stage === 'reopen') {
+      if (sDl) sDl.classList.add('completed');
+      if (sCheck) sCheck.classList.add('completed');
+      if (sInstall) sInstall.classList.add('completed');
+      if (c1) c1.classList.add('active');
+      if (c2) c2.classList.add('active');
+      if (c3) c3.classList.add('active');
+      if (sReopen) sReopen.classList.add('active');
+    }
+  }
+
   function showUpdatePopup(rel) {
     if (!rel || !updPopupOverlay) return;
     const latest = (rel.tag_name || '').replace(/^v/, '');
     const isBeta = !!rel.prerelease || (cfgUpdateChannel?.value === 'beta' && /beta|alpha|rc/i.test(rel.tag_name || ''));
-    const asset = getMobileReleaseAsset(rel);
+    const isAr = state.lang === 'ar';
 
     const badge = $('#updPopChannelBadge');
     if (badge) {
-      badge.className = `upd-channel-pill ${isBeta ? 'beta' : 'stable'}`;
-      badge.textContent = isBeta ? t('updBetaBadge') : t('updStableBadge');
+      badge.textContent = isBeta
+        ? (isAr ? 'إصدار تجريبي جديد متوفر' : 'New Beta available')
+        : (isAr ? 'إصدار جديد متوفر' : 'New version available');
     }
-    if ($('#updPopOldVer')) $('#updPopOldVer').textContent = `v${APP_VERSION}`;
-    if ($('#updPopNewVer')) $('#updPopNewVer').textContent = `v${latest}`;
-    if ($('#updPopSize')) $('#updPopSize').textContent = asset?.size ? `• ${fmtBytes(asset.size)}` : '';
-    if ($('#updPopNotes')) $('#updPopNotes').textContent = extractReleaseHighlights(rel.body);
+    if ($('#updPopTitle')) {
+      $('#updPopTitle').textContent = isAr ? `طيار ${latest} متوفر الآن` : `Tayyar ${latest} is here`;
+    }
+    if ($('#updPopOldVer')) $('#updPopOldVer').textContent = APP_VERSION;
+    if ($('#updPopNewVer')) $('#updPopNewVer').textContent = latest;
+    if ($('#updPopDate')) {
+      const d = rel.published_at ? new Date(rel.published_at) : new Date();
+      $('#updPopDate').textContent = d.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
 
-    const progBox = $('#updPopProgress');
     const btnNow = $('#btnUpdPopNow');
     const txtNow = $('#updPopNowText');
     if (!downloadedUpdateApkPath) {
-      if (progBox) progBox.hidden = true;
+      setMobStepperStage('download', 0, isAr ? 'جاهز للتحميل والتثبيت' : 'Ready to download and install');
       if (btnNow) btnNow.disabled = false;
-      if (txtNow) txtNow.textContent = t('updNowDirect');
+      if (txtNow) txtNow.textContent = isAr ? 'تحديث الآن' : 'Update Now';
     } else {
-      if (txtNow) txtNow.textContent = t('updInstallNow');
+      setMobStepperStage('install', 100, isAr ? 'الحزمة جاهزة للتثبيت' : 'Package ready to install');
+      if (btnNow) btnNow.disabled = false;
+      if (txtNow) txtNow.textContent = isAr ? 'تثبيت الآن' : 'Install Now';
     }
 
     updPopupOverlay.hidden = false;
@@ -1735,10 +1841,12 @@
     }
 
     const native = getNativeEngine();
+    const isAr = state.lang === 'ar';
 
     // If APK already downloaded on Android, launch installer immediately!
     if (downloadedUpdateApkPath && native && typeof native.installApk === 'function') {
       try {
+        setMobStepperStage('install', 100, isAr ? 'جاري فتح مثبت الحزم...' : 'Opening Package Installer...');
         await native.installApk({ path: downloadedUpdateApkPath });
         return;
       } catch (e) {
@@ -1752,17 +1860,10 @@
       return;
     }
 
-    const progBox = $('#updPopProgress');
-    const progFill = $('#updPopProgFill');
-    const progPct = $('#updPopProgPct');
-    const progSpd = $('#updPopProgSpeed');
-    const progBytes = $('#updPopProgBytes');
-    const progStatus = $('#updPopProgStatus');
     const btnNow = $('#btnUpdPopNow');
     const txtNow = $('#updPopNowText');
 
-    if (progBox) progBox.hidden = false;
-    if (progStatus) progStatus.textContent = t('updDownloading');
+    setMobStepperStage('download', 0, isAr ? 'بدء تحميل التحديث...' : 'Starting update download...');
     if (btnNow) btnNow.disabled = true;
 
     // Android Native Direct APK Download + Auto-Launch Package Installer!
@@ -1781,27 +1882,33 @@
               const q = await native.queryDownload({ downloadId: dlId });
               if (!q) return;
               const pctVal = q.percent || (q.total > 0 ? Math.min(99, Math.round((q.downloaded / q.total) * 100)) : 0);
-              if (progFill) progFill.style.width = `${pctVal}%`;
-              if (progPct) progPct.textContent = `${pctVal}%`;
-              if (progSpd) progSpd.textContent = fmtSpeed(q.speed || 0);
-              if (progBytes) progBytes.textContent = `${fmtBytes(q.downloaded || 0)}${q.total > 0 ? ' / ' + fmtBytes(q.total) : ''}`;
+              const statStr = isAr
+                ? `جاري التحميل، ${fmtBytes(q.downloaded || 0)} من ${fmtBytes(q.total || 0)}`
+                : `Downloading, ${fmtBytes(q.downloaded || 0)} of ${fmtBytes(q.total || 0)}`;
+              setMobStepperStage('download', pctVal, statStr);
 
               if (q.status === 'completed') {
                 clearInterval(updPollTimer);
                 updPollTimer = null;
                 downloadedUpdateApkPath = q.path || '';
-                if (progFill) progFill.style.width = '100%';
-                if (progPct) progPct.textContent = '100%';
-                if (progStatus) progStatus.textContent = t('updReadyInstall');
-                if (btnNow) btnNow.disabled = false;
-                if (txtNow) txtNow.textContent = t('updInstallNow');
-                if (downloadedUpdateApkPath && typeof native.installApk === 'function') {
-                  native.installApk({ path: downloadedUpdateApkPath }).catch(() => {});
-                }
+
+                // Transition through Check -> Install -> Reopen
+                setMobStepperStage('check', 100, isAr ? 'جاري التحقق من سلامة الحزمة...' : 'Verifying package integrity...');
+                setTimeout(() => {
+                  setMobStepperStage('install', 100, isAr ? 'جاري التثبيت...' : 'Installing update...');
+                  if (btnNow) btnNow.disabled = false;
+                  if (txtNow) txtNow.textContent = isAr ? 'إعادة التشغيل' : 'Restart Now';
+                  if (downloadedUpdateApkPath && typeof native.installApk === 'function') {
+                    native.installApk({ path: downloadedUpdateApkPath }).catch(() => {});
+                  }
+                  setTimeout(() => {
+                    setMobStepperStage('reopen', 100, isAr ? 'إعادة تشغيل طيار...' : 'Reopening Tayyar...');
+                  }, 1200);
+                }, 700);
               } else if (q.status === 'error') {
                 clearInterval(updPollTimer);
                 updPollTimer = null;
-                if (progStatus) progStatus.textContent = `${t('dlFailToast')}: ${q.error || ''}`;
+                setMobStepperStage('download', 0, `${t('dlFailToast')}: ${q.error || ''}`);
                 if (btnNow) btnNow.disabled = false;
               }
             } catch (_) {}
@@ -1840,7 +1947,7 @@
       const url = ch === 'beta'
         ? 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases'
         : 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases/latest';
-      const r = await fetch(url, { headers: { Accept: 'application/vnd.github.v3+json' } });
+      const r = await httpFetch(url, { headers: { Accept: 'application/vnd.github.v3+json' } });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const payload = await r.json();
       const rel = Array.isArray(payload)
@@ -2162,7 +2269,7 @@
           ];
       for (const u of urls) {
         try {
-          const r = await fetch(u);
+          const r = await httpFetch(u);
           if (!r.ok) continue;
           const html = await r.text();
           const m = html.match(/<script[^>]+id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
@@ -2207,7 +2314,7 @@
         : (plat === 'instagram'
             ? `https://www.instagram.com/stories/${encodeURIComponent(clean.replace(/^@/, ''))}/`
             : `https://www.facebook.com/stories/${encodeURIComponent(clean.replace(/^@/, ''))}/`);
-      const r = await fetch(targetUrl);
+      const r = await httpFetch(targetUrl);
       if (r.ok) {
         const html = await r.text();
         const matches = [...html.matchAll(/"(?:browser_native_hd_url|playable_url_quality_hd|playable_url|video_url)":"(https:[^"\\]+)"/g)];

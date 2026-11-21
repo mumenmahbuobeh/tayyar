@@ -882,61 +882,111 @@
     </button>
   </nav>
 
-  <!-- ==================== PRO UPDATE ARRIVAL POPUP (STABLE & BETA) ==================== -->
-  <div class="upd-popup-overlay" id="updPopupOverlay" hidden>
-    <div class="upd-popup-card" role="dialog" aria-modal="true" aria-labelledby="updPopTitle">
-      <button type="button" class="upd-pop-close" id="btnUpdPopClose" aria-label="Close">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
+  <!-- ==================== STELLAR-INSPIRED PRO UPDATE ARRIVAL POPUP (MOBILE) ==================== -->
+  <div class="stellar-upd-overlay" id="updPopupOverlay" hidden>
+    <div class="stellar-upd-card" role="dialog" aria-modal="true" aria-labelledby="updPopTitle">
+      <button type="button" class="stellar-upd-close" id="btnUpdPopClose" aria-label="Close">✕</button>
 
-      <div class="upd-pop-hero">
-        <div class="upd-pop-icon">
+      <!-- Top Header Row -->
+      <div class="stellar-upd-top">
+        <div class="stellar-upd-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5"/>
             <path d="M5 19.5h14"/>
           </svg>
         </div>
-        <span class="upd-channel-pill stable" id="updPopChannelBadge">Stable</span>
-      </div>
-
-      <h2 class="upd-pop-title" id="updPopTitle" data-i="updPopTitle">New Update Available</h2>
-      <div class="upd-pop-ver-row">
-        <span class="upd-ver-old" id="updPopOldVer">v1.0.18</span>
-        <span class="upd-ver-arrow">→</span>
-        <span class="upd-ver-new" id="updPopNewVer">v1.0.18</span>
-        <span class="upd-ver-size" id="updPopSize"></span>
-      </div>
-
-      <div class="upd-pop-notes-wrap" id="updPopNotesWrap">
-        <div class="upd-pop-notes-hdr" data-i="updWhatsNew">What's New</div>
-        <div class="upd-pop-notes" id="updPopNotes"></div>
-      </div>
-
-      <!-- Inline Direct Download Progress -->
-      <div class="upd-pop-progress" id="updPopProgress" hidden>
-        <div class="upd-prog-top">
-          <span id="updPopProgStatus" data-i="updDownloading">Downloading update...</span>
-          <span id="updPopProgPct">0%</span>
-        </div>
-        <div class="upd-prog-track"><div class="upd-prog-fill" id="updPopProgFill" style="width:0%"></div></div>
-        <div class="upd-prog-foot">
-          <span id="updPopProgSpeed">0 KB/s</span>
-          <span id="updPopProgBytes">0 MB</span>
+        <div class="stellar-upd-header-meta">
+          <span class="stellar-upd-accent-tag" id="updPopChannelBadge" data-i="updPopAvailable">New version available</span>
+          <h2 class="stellar-upd-title" id="updPopTitle">Tayyar 1.0.19 is here</h2>
+          <div class="stellar-upd-meta-row">
+            <span class="stellar-ver-badge old" id="updPopOldVer">1.0.18</span>
+            <span class="stellar-ver-arrow">›</span>
+            <span class="stellar-ver-badge new" id="updPopNewVer">1.0.19</span>
+            <span class="stellar-upd-date" id="updPopDate">November 21, 2026</span>
+          </div>
         </div>
       </div>
 
-      <div class="upd-pop-actions">
-        <button type="button" class="cta-primary-btn upd-pop-primary" id="btnUpdPopNow">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          <span id="updPopNowText" data-i="updNowDirect">Update Now</span>
-        </button>
-        <div class="upd-pop-sec-row">
-          <button type="button" class="upd-pop-sec-btn" id="btnUpdPopLater" data-i="updLaterBtn">Later</button>
-          <button type="button" class="upd-pop-sec-btn" id="btnUpdPopSkip" data-i="updSkipBtn">Skip Version</button>
+      <!-- 4-Step Pipeline Stepper (Download -> Check -> Install -> Reopen) -->
+      <div class="stellar-stepper">
+        <!-- Step 1: Download -->
+        <div class="stellar-step active" id="stepMobDl">
+          <div class="stellar-step-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </div>
+          <span class="stellar-step-name" data-i="stepDownload">Download</span>
+        </div>
+        <div class="stellar-step-connector" id="connMob1"></div>
+
+        <!-- Step 2: Check -->
+        <div class="stellar-step" id="stepMobCheck">
+          <div class="stellar-step-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+          </div>
+          <span class="stellar-step-name" data-i="stepCheck">Check</span>
+        </div>
+        <div class="stellar-step-connector" id="connMob2"></div>
+
+        <!-- Step 3: Install -->
+        <div class="stellar-step" id="stepMobInstall">
+          <div class="stellar-step-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+              <polyline points="2 17 12 22 22 17"/>
+              <polyline points="2 12 12 17 22 12"/>
+            </svg>
+          </div>
+          <span class="stellar-step-name" data-i="stepInstall">Install</span>
+        </div>
+        <div class="stellar-step-connector" id="connMob3"></div>
+
+        <!-- Step 4: Reopen -->
+        <div class="stellar-step" id="stepMobReopen">
+          <div class="stellar-step-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+          </div>
+          <span class="stellar-step-name" data-i="stepReopen">Reopen</span>
+        </div>
+      </div>
+
+      <!-- Slim Modern Progress Bar -->
+      <div class="stellar-prog-track" id="updPopProgTrack">
+        <div class="stellar-prog-fill" id="updPopProgFill" style="width: 0%;"></div>
+      </div>
+
+      <!-- Live Dynamic Status Text -->
+      <div class="stellar-status-row">
+        <span class="stellar-status-txt" id="updPopProgStatus" data-i="updReady">Ready to update</span>
+      </div>
+
+      <!-- Helper Notice -->
+      <div class="stellar-notice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <span id="updPopNoticeText" data-i="updNotice">When it is installed, Tayyar closes and opens again by itself.</span>
+      </div>
+
+      <!-- Bottom Action Row -->
+      <div class="stellar-actions">
+        <button type="button" class="stellar-btn-subtle" id="btnUpdPopSkip" data-i="updSkipBtn">Skip</button>
+        <div class="stellar-actions-right">
+          <button type="button" class="stellar-btn-subtle" id="btnUpdPopLater" data-i="updCancelBtn">Cancel</button>
+          <button type="button" class="stellar-btn-primary" id="btnUpdPopNow">
+            <span id="updPopNowText" data-i="updNowDirect">Update Now</span>
+          </button>
         </div>
       </div>
     </div>

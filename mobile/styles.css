@@ -2277,237 +2277,332 @@ html[dir="rtl"] .ios-chev { transform: scaleX(-1); }
   height: 13px;
 }
 
-/* ==================== PRO UPDATE ARRIVAL POPUP (MOBILE OLED GLASS) ==================== */
-.upd-popup-overlay {
+/* ==================== STELLARHUB-STYLE UPDATE POPUP (MOBILE) ==================== */
+.stellar-upd-overlay {
   position: fixed;
   inset: 0;
-  z-index: 2500;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  animation: updFadeIn 0.22s ease forwards;
+  padding: 16px;
+  animation: stellarFadeIn 0.22s ease-out;
 }
 
-@keyframes updFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+@keyframes stellarFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-.upd-popup-card {
+.stellar-upd-card {
   position: relative;
   width: 100%;
-  max-width: 390px;
-  max-height: 86vh;
-  overflow-y: auto;
-  border-radius: 26px;
-  padding: 22px 20px 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(16, 16, 22, 0.96) 28%), #0c0c10;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 24px 64px rgba(0, 0, 0, 0.85);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  animation: updPopSpring 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@keyframes updPopSpring {
-  from { opacity: 0; transform: translateY(16px) scale(0.94); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.upd-pop-close {
-  position: absolute;
-  top: 14px;
-  inset-inline-end: 14px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-2);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.upd-pop-close svg {
-  width: 14px;
-  height: 14px;
-}
-
-.upd-pop-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.upd-pop-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  background: linear-gradient(145deg, #2563eb 0%, #0ea5e9 100%);
+  max-width: 440px;
+  border-radius: 24px;
+  padding: 24px 20px 20px;
+  background: #111217;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.04);
   color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.48), inset 0 1px 1.5px rgba(255, 255, 255, 0.45);
+  font-family: inherit;
 }
 
-.upd-pop-icon svg {
+.stellar-upd-close {
+  position: absolute;
+  top: 16px;
+  inset-inline-end: 16px;
   width: 28px;
   height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.18s ease;
 }
 
-.upd-channel-pill {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  padding: 3px 11px;
-  border-radius: 999px;
-}
-
-.upd-channel-pill.stable {
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.14);
-  border: 1px solid rgba(52, 211, 153, 0.34);
-}
-
-.upd-channel-pill.beta {
-  color: #fbbf24;
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(251, 191, 36, 0.36);
-}
-
-.upd-pop-title {
-  font-size: 19px;
-  font-weight: 800;
-  letter-spacing: -0.4px;
+.stellar-upd-close:active {
+  background: rgba(255, 255, 255, 0.14);
   color: #ffffff;
 }
 
-.upd-pop-ver-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: 8px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  font-size: 12.5px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.upd-ver-old { color: var(--text-3); }
-.upd-ver-arrow { color: #38bdf8; }
-.upd-ver-new { color: #ffffff; }
-.upd-ver-size { color: var(--text-2); font-weight: 600; font-size: 11.5px; }
-
-.upd-pop-notes-wrap {
-  width: 100%;
-  margin-top: 14px;
-  padding: 12px;
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  text-align: start;
-}
-
-.upd-pop-notes-hdr {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #38bdf8;
-  margin-bottom: 6px;
-}
-
-.upd-pop-notes {
-  font-size: 12.5px;
-  color: var(--text-2);
-  line-height: 1.55;
-  max-height: 120px;
-  overflow-y: auto;
-  white-space: pre-line;
-}
-
-.upd-pop-progress {
-  width: 100%;
-  margin-top: 14px;
-  padding: 11px 12px;
-  border-radius: 14px;
-  background: rgba(14, 165, 233, 0.07);
-  border: 1px solid rgba(14, 165, 233, 0.25);
-}
-
-.upd-prog-top,
-.upd-prog-foot {
+.stellar-upd-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.stellar-upd-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: #181920;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FF5A36;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(255, 90, 54, 0.15);
+}
+
+.stellar-upd-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.stellar-upd-header-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.stellar-upd-accent-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #FF5A36;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.stellar-upd-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.4px;
+  line-height: 1.25;
+}
+
+.stellar-upd-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+
+.stellar-ver-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 10px;
   font-size: 11.5px;
   font-weight: 700;
 }
 
-.upd-prog-top { color: #ffffff; margin-bottom: 7px; }
-.upd-prog-foot { color: var(--text-2); margin-top: 6px; font-weight: 600; font-variant-numeric: tabular-nums; }
-
-.upd-prog-track {
-  width: 100%;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  overflow: hidden;
+.stellar-ver-badge.old {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.upd-prog-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #2563eb 0%, #38bdf8 100%);
-  transition: width 0.25s ease;
+.stellar-ver-arrow {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 13px;
 }
 
-.upd-pop-actions {
-  width: 100%;
-  margin-top: 16px;
+.stellar-ver-badge.new {
+  background: rgba(255, 90, 54, 0.16);
+  color: #FF7A59;
+  border: 1px solid rgba(255, 90, 54, 0.35);
+}
+
+.stellar-upd-date {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
+  margin-inline-start: 4px;
+}
+
+/* Stepper Pipeline */
+.stellar-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 18px;
+  position: relative;
+}
+
+.stellar-step {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  z-index: 2;
+  flex: 1;
 }
 
-.upd-pop-primary {
-  margin-top: 0;
-  height: 46px;
-}
-
-.upd-pop-sec-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.upd-pop-sec-btn {
+.stellar-step-bubble {
+  width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  color: var(--text-2);
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
+  background: #181920;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.25s ease;
 }
 
-.upd-pop-sec-btn:active {
-  background: rgba(255, 255, 255, 0.14);
+.stellar-step-bubble svg {
+  width: 17px;
+  height: 17px;
+}
+
+.stellar-step-name {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  transition: all 0.25s ease;
+}
+
+/* Stepper States */
+.stellar-step.active .stellar-step-bubble {
+  background: rgba(255, 90, 54, 0.16);
+  border-color: #FF5A36;
+  color: #FF7A59;
+  box-shadow: 0 0 14px rgba(255, 90, 54, 0.28);
+}
+
+.stellar-step.active .stellar-step-name {
   color: #ffffff;
+  font-weight: 700;
+}
+
+.stellar-step.completed .stellar-step-bubble {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: #22c55e;
+  color: #4ade80;
+}
+
+.stellar-step.completed .stellar-step-name {
+  color: #cbd5e1;
+}
+
+.stellar-step-connector {
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 20px;
+  transition: background 0.25s ease;
+}
+
+.stellar-step-connector.active {
+  background: linear-gradient(90deg, #FF5A36, rgba(255, 90, 54, 0.4));
+}
+
+/* Thin Progress Bar */
+.stellar-prog-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.stellar-prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF5A36, #FF8C6B);
+  border-radius: 999px;
+  transition: width 0.2s ease-out;
+  box-shadow: 0 0 8px rgba(255, 90, 54, 0.5);
+}
+
+/* Status Row */
+.stellar-status-row {
+  margin: 10px 0 14px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  min-height: 18px;
+}
+
+/* Notice Footnote */
+.stellar-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.stellar-notice svg {
+  width: 14px;
+  height: 14px;
+  color: rgba(255, 255, 255, 0.45);
+  flex-shrink: 0;
+}
+
+/* Bottom Actions */
+.stellar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.stellar-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stellar-btn-subtle {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: all 0.18s ease;
+}
+
+.stellar-btn-subtle:active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.stellar-btn-primary {
+  background: #FF5A36;
+  border: none;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 90, 54, 0.35);
+  transition: all 0.2s ease;
+}
+
+.stellar-btn-primary:active {
+  background: #ff6e4d;
+  box-shadow: 0 6px 20px rgba(255, 90, 54, 0.5);
+  transform: translateY(-1px);
+}
+
+.stellar-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }

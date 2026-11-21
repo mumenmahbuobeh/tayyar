@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.18 is the latest available release.',
+      upToDateDesc: 'Version 1.0.19 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -364,7 +364,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.18 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.19 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -1046,7 +1046,7 @@
       author: 'griciaisl12',
       short: 'MS',
       color: 'avatar-blue',
-      version: 'v1.0.18',
+      version: 'v1.0.19',
       desc: 'Resolves GitHub repository release, file links, Google Drive/Docs into real downloads with mirror acceleration.',
       installed: false,
       enabled: false,
@@ -1590,7 +1590,7 @@
         author: 'User',
         short: name.slice(0, 2).toUpperCase(),
         color: 'avatar-blue',
-        version: 'v1.0.18',
+        version: 'v1.0.19',
         desc: `Installed from ${val}`,
         installed: true,
         enabled: true,
@@ -2358,6 +2358,9 @@
     if (taskUrlInput) {
       taskUrlInput.value = initialUrl;
       taskUrlInput.focus();
+      if (initialUrl) {
+        taskUrlInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
     }
     if (probeBox) {
       if (initialFilename) {
@@ -2447,6 +2450,7 @@
   let activeSocialData = null;
 
   async function resolveSocialMedia(url, platform) {
+    const plat = platform || detectSocialPlatform(url) || { id: 'direct', name: 'Media' };
     // 1. Desktop local yt-dlp / Node.js resolver (highest fidelity)
     if (window.tayyar?.socialResolve) {
       try {
@@ -2834,11 +2838,12 @@
               .trim();
             finalFilename = `${activeSocialData.platform || 'Tayyar'}_${cleanTitle}.${ext}`;
 
-            if (window.tayyar?.isMobile || !window.tayyar?.socialResolve) {
-              finalDownloadUrl = fmt.directUrl || (fmt.url && !fmt.url.includes('.m3u8') ? fmt.url : u);
+            if (fmt.directUrl && !fmt.directUrl.includes('.m3u8')) {
+              finalDownloadUrl = fmt.directUrl;
               referer = fmt.referer || '';
+              isSocialDownload = false; // Direct stream ready for multi-segment acceleration!
             } else {
-              finalDownloadUrl = fmt.directUrl || u;
+              finalDownloadUrl = (fmt.url && !fmt.url.includes('.m3u8')) ? fmt.url : u;
               referer = fmt.referer || '';
             }
           } else {
@@ -2990,7 +2995,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases — Stable Default) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.18';
+  const CURRENT_APP_VERSION = '1.0.19';
   let availableUpdateRelease = null;
   let isNewerUpdateAvailable = false;
   let updateDownloadTaskId = null;
@@ -3222,24 +3227,27 @@
       if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'تثبيت التحديث وإعادة التشغيل' : 'Install & Restart';
     }
 
-    const deskFill = $('#deskUpdProgFill');
-    const deskPct = $('#deskUpdProgPct');
-    const deskStat = $('#deskUpdProgStatus');
-    const deskBtnNow = $('#btnDeskUpdNow');
-    const deskNowTxt = $('#deskUpdNowText');
-    if (deskFill) deskFill.style.width = '100%';
-    if (deskPct) deskPct.textContent = '100%';
-    if (deskStat) {
-      deskStat.innerHTML = `<span style="color:#34d399;">✓ ${S.lang === 'ar' ? 'اكتمل التحميل! جاري تشغيل التثبيت...' : 'Download complete! Launching installer...'}</span>`;
-    }
-    if (deskBtnNow) deskBtnNow.disabled = false;
-    if (deskNowTxt) deskNowTxt.textContent = S.lang === 'ar' ? 'تثبيت وإعادة التشغيل' : 'Install & Restart';
+    // Advance Stage 1 (Download) -> Stage 2 (Check)
+    setDeskStepperStage('check', 100, S.lang === 'ar' ? 'جاري التحقق من سلامة الحزمة والتوقيع الرقمي...' : 'Checking package integrity...');
 
-    toast(S.lang === 'ar' ? 'اكتمل تحميل التحديث! جاري تشغيل المثبّت...' : 'Update ready! Launching installer...');
-    // Auto-launch the installer immediately for true direct updating!
-    if (window.tayyar?.installUpdate && filePath) {
-      setTimeout(() => window.tayyar.installUpdate(filePath), 600);
-    }
+    setTimeout(() => {
+      // Advance Stage 2 (Check) -> Stage 3 (Install)
+      setDeskStepperStage('install', 100, S.lang === 'ar' ? 'جاري تجهيز وتثبيت التحديث...' : 'Installing update...');
+
+      setTimeout(() => {
+        // Advance Stage 3 (Install) -> Stage 4 (Reopen)
+        setDeskStepperStage('reopen', 100, S.lang === 'ar' ? 'جاري إعادة فتح طيار تلقائياً...' : 'Reopening Tayyar...');
+        const deskBtnNow = $('#btnDeskUpdNow');
+        const deskNowTxt = $('#deskUpdNowText');
+        if (deskBtnNow) deskBtnNow.disabled = false;
+        if (deskNowTxt) deskNowTxt.textContent = S.lang === 'ar' ? 'إعادة التشغيل' : 'Reopen';
+
+        toast(S.lang === 'ar' ? 'اكتمل التثبيت! جاري إعادة فتح البرنامج...' : 'Update installed! Reopening Tayyar...');
+        if (window.tayyar?.installUpdate && filePath) {
+          setTimeout(() => window.tayyar.installUpdate(filePath), 800);
+        }
+      }, 700);
+    }, 600);
   }
 
   function extractDeskReleaseHighlights(bodyText) {
@@ -3258,6 +3266,48 @@
       : '• Performance, stability & download engine enhancements.\n• Direct 1-click installation.';
   }
 
+  function setDeskStepperStage(stage, pct = 0, statusText = '') {
+    const sDl = $('#stepDeskDl');
+    const sCheck = $('#stepDeskCheck');
+    const sInst = $('#stepDeskInstall');
+    const sReopen = $('#stepDeskReopen');
+    const c1 = $('#connDesk1');
+    const c2 = $('#connDesk2');
+    const c3 = $('#connDesk3');
+    const progFill = $('#deskUpdProgFill');
+    const progStatus = $('#deskUpdProgStatus');
+
+    if (progFill) progFill.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+    if (progStatus && statusText) progStatus.textContent = statusText;
+
+    const reset = () => {
+      [sDl, sCheck, sInst, sReopen].forEach(el => el && el.classList.remove('active', 'completed'));
+      [c1, c2, c3].forEach(el => el && el.classList.remove('active'));
+    };
+
+    reset();
+
+    if (stage === 'download') {
+      if (sDl) sDl.classList.add('active');
+    } else if (stage === 'check') {
+      if (sDl) sDl.classList.add('completed');
+      if (c1) c1.classList.add('active');
+      if (sCheck) sCheck.classList.add('active');
+    } else if (stage === 'install') {
+      if (sDl) sDl.classList.add('completed');
+      if (sCheck) sCheck.classList.add('completed');
+      if (c1) c1.classList.add('active');
+      if (c2) c2.classList.add('active');
+      if (sInst) sInst.classList.add('active');
+    } else if (stage === 'reopen') {
+      if (sDl) sDl.classList.add('completed');
+      if (sCheck) sCheck.classList.add('completed');
+      if (sInst) sInst.classList.add('completed');
+      [c1, c2, c3].forEach(el => el && el.classList.add('active'));
+      if (sReopen) sReopen.classList.add('active');
+    }
+  }
+
   async function showDeskUpdatePopup(rel, channel) {
     const overlay = $('#deskUpdOverlay');
     if (!overlay || !rel) return;
@@ -3265,44 +3315,40 @@
     const latestTag = (rel.tag_name || '').replace(/^v/, '');
     const isBeta = !!rel.prerelease || (channel === 'beta' && /beta|alpha|rc/i.test(rel.tag_name || ''));
 
-    const chBadge = $('#deskUpdChannelBadge');
-    if (chBadge) {
-      chBadge.className = `desk-upd-ch-pill ${isBeta ? 'beta' : 'stable'}`;
-      chBadge.textContent = isBeta
-        ? (S.lang === 'ar' ? 'نسخة تجريبية (Beta)' : 'Beta Release')
-        : (S.lang === 'ar' ? 'نسخة مستقرة (Stable)' : 'Stable Release');
+    const tag = $('#deskUpdTag');
+    if (tag) {
+      tag.textContent = isBeta
+        ? (S.lang === 'ar' ? 'يتوفر إصدار تجريبي جديد' : 'New beta version available')
+        : (S.lang === 'ar' ? 'يتوفر إصدار جديد' : 'New version available');
     }
 
-    const verPill = $('#deskUpdVerPill');
-    if (verPill) verPill.textContent = `v${CURRENT_APP_VERSION} → v${latestTag}`;
+    const title = $('#deskUpdTitle');
+    if (title) {
+      title.textContent = S.lang === 'ar' ? `إصدار طيار ${latestTag} متوفر الآن` : `Tayyar ${latestTag} is here`;
+    }
 
-    // Show size of the matching platform installer
-    const sizePill = $('#deskUpdSizePill');
-    if (sizePill) {
+    const oldVer = $('#deskUpdOldVer');
+    if (oldVer) oldVer.textContent = CURRENT_APP_VERSION;
+
+    const newVer = $('#deskUpdNewVer');
+    if (newVer) newVer.textContent = latestTag;
+
+    const dateEl = $('#deskUpdDate');
+    if (dateEl && rel.published_at) {
       try {
-        const plat = window.tayyar?.platform ? await window.tayyar.platform() : 'win32';
-        const assets = rel.assets || [];
-        let matched = null;
-        if (plat === 'darwin') matched = assets.find((a) => a.name.endsWith('.dmg'));
-        else if (plat === 'linux') matched = assets.find((a) => a.name.endsWith('.AppImage') || a.name.endsWith('.deb'));
-        else matched = assets.find((a) => /Setup/i.test(a.name) && a.name.endsWith('.exe')) || assets.find((a) => a.name.endsWith('.exe'));
-        sizePill.textContent = matched?.size ? `• ${fmtBytes(matched.size)}` : '';
-      } catch (_) {
-        sizePill.textContent = '';
-      }
+        const d = new Date(rel.published_at);
+        dateEl.textContent = d.toLocaleDateString(S.lang === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (_) {}
     }
 
-    const notesEl = $('#deskUpdNotes');
-    if (notesEl) notesEl.textContent = extractDeskReleaseHighlights(rel.body);
-
-    const progEl = $('#deskUpdProgress');
     const btnNow = $('#btnDeskUpdNow');
     const nowTxt = $('#deskUpdNowText');
     if (!downloadedUpdatePath) {
-      if (progEl) progEl.hidden = true;
+      setDeskStepperStage('download', 0, S.lang === 'ar' ? 'جاهز لبدء التحديث الفوري' : 'Ready to start update');
       if (btnNow) btnNow.disabled = false;
       if (nowTxt) nowTxt.textContent = S.lang === 'ar' ? 'تحديث الآن' : 'Update Now';
     } else {
+      setDeskStepperStage('install', 100, S.lang === 'ar' ? 'اكتمل التحميل! جاهز للتثبيت' : 'Download complete! Ready to install');
       if (nowTxt) nowTxt.textContent = S.lang === 'ar' ? 'تثبيت وإعادة التشغيل' : 'Install & Restart';
     }
 

@@ -2136,51 +2136,109 @@
   </dialog>
 
   <!-- ================= PRO UPDATE ARRIVAL POPUP (STABLE & BETA) ================= -->
-  <div class="desk-upd-overlay" id="deskUpdOverlay" hidden>
-    <div class="desk-upd-card" role="dialog" aria-modal="true" aria-labelledby="deskUpdTitle">
-      <button type="button" class="desk-upd-close" id="btnDeskUpdClose" aria-label="Close">✕</button>
+  <!-- StellarHub-Inspired Next-Gen Update Popup (Desktop) -->
+  <div class="stellar-upd-overlay" id="deskUpdOverlay" hidden>
+    <div class="stellar-upd-card" role="dialog" aria-modal="true" aria-labelledby="deskUpdTitle">
+      <button type="button" class="stellar-upd-close" id="btnDeskUpdClose" aria-label="Close">✕</button>
 
-      <div class="desk-upd-head">
-        <div class="desk-upd-icon">
+      <!-- Top Header Row -->
+      <div class="stellar-upd-top">
+        <div class="stellar-upd-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5"/>
             <path d="M5 19.5h14"/>
           </svg>
         </div>
-        <div class="desk-upd-head-meta">
-          <div class="desk-upd-badges">
-            <span class="desk-upd-ch-pill stable" id="deskUpdChannelBadge">Stable</span>
-            <span class="desk-upd-ver-pill" id="deskUpdVerPill">v1.0.18 → v1.0.18</span>
-            <span class="desk-upd-size-pill" id="deskUpdSizePill"></span>
+        <div class="stellar-upd-header-meta">
+          <span class="stellar-upd-accent-tag" id="deskUpdTag" data-i="updPopAvailable">New version available</span>
+          <h2 class="stellar-upd-title" id="deskUpdTitle">Tayyar 1.0.19 is here</h2>
+          <div class="stellar-upd-meta-row">
+            <span class="stellar-ver-badge old" id="deskUpdOldVer">1.0.18</span>
+            <span class="stellar-ver-arrow">›</span>
+            <span class="stellar-ver-badge new" id="deskUpdNewVer">1.0.19</span>
+            <span class="stellar-upd-date" id="deskUpdDate">November 21, 2026</span>
           </div>
-          <h2 class="desk-upd-title" id="deskUpdTitle" data-i="updPopTitle">New Update Available</h2>
-          <p class="desk-upd-sub" id="deskUpdSub" data-i="updPopSub">A newer version of Tayyar is ready for direct installation.</p>
         </div>
       </div>
 
-      <div class="desk-upd-notes-box">
-        <div class="desk-upd-notes-lbl" data-i="updWhatsNew">What's New</div>
-        <div class="desk-upd-notes-body" id="deskUpdNotes"></div>
+      <!-- 4-Step Pipeline Stepper (Download -> Check -> Install -> Reopen) -->
+      <div class="stellar-stepper">
+        <!-- Step 1: Download -->
+        <div class="stellar-step active" id="stepDeskDl">
+          <div class="stellar-step-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </div>
+          <span class="stellar-step-name" data-i="stepDownload">Download</span>
+        </div>
+        <div class="stellar-step-connector" id="connDesk1"></div>
+
+        <!-- Step 2: Check -->
+        <div class="stellar-step" id="stepDeskCheck">
+          <div class="stellar-step-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+          </div>
+          <span class="stellar-step-name" data-i="stepCheck">Check</span>
+        </div>
+        <div class="stellar-step-connector" id="connDesk2"></div>
+
+        <!-- Step 3: Install -->
+        <div class="stellar-step" id="stepDeskInstall">
+          <div class="stellar-step-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+              <polyline points="2 17 12 22 22 17"/>
+              <polyline points="2 12 12 17 22 12"/>
+            </svg>
+          </div>
+          <span class="stellar-step-name" data-i="stepInstall">Install</span>
+        </div>
+        <div class="stellar-step-connector" id="connDesk3"></div>
+
+        <!-- Step 4: Reopen -->
+        <div class="stellar-step" id="stepDeskReopen">
+          <div class="stellar-step-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+          </div>
+          <span class="stellar-step-name" data-i="stepReopen">Reopen</span>
+        </div>
       </div>
 
-      <!-- Inline Live Direct Download Progress -->
-      <div class="desk-upd-progress" id="deskUpdProgress" hidden>
-        <div class="dup-top">
-          <span id="deskUpdProgStatus" data-i="updDownloading">Downloading update...</span>
-          <span id="deskUpdProgPct">0%</span>
-        </div>
-        <div class="dup-track"><div class="dup-fill" id="deskUpdProgFill" style="width:0%"></div></div>
-        <div class="dup-foot">
-          <span id="deskUpdProgSpeed">0 KB/s</span>
-          <span id="deskUpdProgSize">0 MB / 0 MB</span>
-        </div>
+      <!-- Slim Modern Progress Bar -->
+      <div class="stellar-prog-track" id="deskUpdProgTrack">
+        <div class="stellar-prog-fill" id="deskUpdProgFill" style="width: 0%;"></div>
       </div>
 
-      <div class="desk-upd-actions">
-        <button type="button" class="pill-btn outline" id="btnDeskUpdSkip" data-i="updSkipBtn">Skip Version</button>
-        <div class="desk-upd-actions-right">
-          <button type="button" class="pill-btn glass-btn" id="btnDeskUpdLater" data-i="updLaterBtn">Later</button>
-          <button type="button" class="pill-btn primary" id="btnDeskUpdNow">
+      <!-- Live Dynamic Status Text -->
+      <div class="stellar-status-row">
+        <span class="stellar-status-txt" id="deskUpdProgStatus" data-i="updReady">Ready to update</span>
+      </div>
+
+      <!-- Helper Notice -->
+      <div class="stellar-notice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <span id="deskUpdNoticeText" data-i="updNotice">When it is installed, Tayyar closes and opens again by itself.</span>
+      </div>
+
+      <!-- Bottom Action Row -->
+      <div class="stellar-actions">
+        <button type="button" class="stellar-btn-subtle" id="btnDeskUpdSkip" data-i="updSkipBtn">Skip</button>
+        <div class="stellar-actions-right">
+          <button type="button" class="stellar-btn-subtle" id="btnDeskUpdLater" data-i="updCancelBtn">Cancel</button>
+          <button type="button" class="stellar-btn-primary" id="btnDeskUpdNow">
             <span id="deskUpdNowText" data-i="updNowDirect">Update Now</span>
           </button>
         </div>

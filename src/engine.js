@@ -334,11 +334,13 @@ function request(urlStr, { headers = {}, redirects = 10, timeout = 30000, cookie
 }
 
 class DownloadManager extends EventEmitter {
-  constructor({ stateFile, defaultDir }) {
+  constructor({ stateFile, defaultDir, downloadDir } = {}) {
     super();
     this.stateFile = stateFile;
+    const os = require('os');
+    const safeDefault = defaultDir || downloadDir || path.join(os.homedir(), 'Downloads', 'Tayyar');
     this.settings = {
-      downloadDir: defaultDir,
+      downloadDir: safeDefault,
       connections: 8,
       maxConcurrent: 3,
       speedLimitKB: 0,
@@ -701,12 +703,23 @@ class DownloadManager extends EventEmitter {
       });
     } catch (e) {
       if (job.stopped) return;
-      if (d.url && /^https?:\/\//i.test(d.url) && !d.url.includes('.m3u8') && !d.url.includes('.mpd')) {
-        try {
-          console.warn('yt-dlp exited with error, falling back to direct HTTP stream engine:', e.message);
-          d.isSocial = false;
-          return await this._start(d);
-        } catch (_) {}
+      console.warn('yt-dlp exited with error, attempting built-in direct stream resolver:', e.message);
+      try {
+        const social = require('./social');
+        const resolved = await social.resolveSocialMedia(d.socialUrl || d.url);
+        if (resolved && resolved.ok && resolved.formats && resolved.formats.length > 0) {
+          const streamUrl = resolved.formats[0].directUrl || resolved.formats[0].url;
+          if (streamUrl && streamUrl !== d.url && !streamUrl.includes('.m3u8')) {
+            console.log('Built-in resolver extracted direct stream, switching to turbo engine:', streamUrl);
+            d.url = streamUrl;
+            d.finalUrl = streamUrl;
+            d.referer = resolved.formats[0].referer || d.referer || '';
+            d.isSocial = false;
+            return await this._start(d);
+          }
+        }
+      } catch (resErr) {
+        console.warn('Built-in fallback resolution error:', resErr.message);
       }
       this._stop(job);
       d.status = 'error';
@@ -728,8 +741,9 @@ class DownloadManager extends EventEmitter {
     if (!d.filename) d.filename = info.filename;
     d.filename = sanitizeName(d.filename);
     d.category = categoryOf(d.filename);
-    const base = d.saveDir || this.settings.downloadDir;
-    const dir = !d.saveDir && this.settings.autoCategorize ? path.join(base, CATEGORY_DIR[d.category]) : base;
+    const os = require('os');
+    const base = d.saveDir || this.settings.downloadDir || path.join(os.homedir(), 'Downloads', 'Tayyar');
+    const dir = !d.saveDir && this.settings.autoCategorize ? path.join(base, CATEGORY_DIR[d.category] || 'General') : base;
     fs.mkdirSync(dir, { recursive: true });
     d.path = uniquePath(dir, d.filename);
     d.downloaded = 0;

@@ -111,11 +111,18 @@ public class TayyarMobilePlugin extends Plugin {
             }
         }
         if (!cleaned.contains(".")) {
-            if (url != null && (url.toLowerCase().contains(".mp3") || url.toLowerCase().contains("audio"))) {
+            String uLow = (url != null) ? url.toLowerCase() : "";
+            if (uLow.contains(".pdf")) {
+                cleaned += ".pdf";
+            } else if (uLow.contains(".zip")) {
+                cleaned += ".zip";
+            } else if (uLow.contains(".apk")) {
+                cleaned += ".apk";
+            } else if (uLow.contains(".mp3") || uLow.contains("audio")) {
                 cleaned += ".mp3";
-            } else if (url != null && (url.toLowerCase().contains(".jpg") || url.toLowerCase().contains(".jpeg"))) {
+            } else if (uLow.contains(".jpg") || uLow.contains(".jpeg")) {
                 cleaned += ".jpg";
-            } else if (url != null && url.toLowerCase().contains(".png")) {
+            } else if (uLow.contains(".png")) {
                 cleaned += ".png";
             } else {
                 cleaned += ".mp4";
@@ -136,6 +143,11 @@ public class TayyarMobilePlugin extends Plugin {
         if (lower.endsWith(".apk")) return "application/vnd.android.package-archive";
         if (lower.endsWith(".zip")) return "application/zip";
         if (lower.endsWith(".pdf")) return "application/pdf";
+        if (lower.endsWith(".doc")) return "application/msword";
+        if (lower.endsWith(".docx")) return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        if (lower.endsWith(".xls")) return "application/vnd.ms-excel";
+        if (lower.endsWith(".xlsx")) return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        if (lower.endsWith(".txt")) return "text/plain";
         if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
         if (lower.endsWith(".png")) return "image/png";
         if (lower.endsWith(".webp")) return "image/webp";
@@ -753,12 +765,14 @@ public class TayyarMobilePlugin extends Plugin {
     private ResolvedStream resolveDirectStreamIfNeeded(String initialUrl, boolean isAudio, String providedReferer, String providedUa) {
         try {
             String url = initialUrl.trim();
-            // Already a direct CDN media link
+            // Already a direct CDN media link or direct file/document link
             String low = url.toLowerCase();
-            if (low.contains("googlevideo.com") || low.contains("tikcdn.io") || low.contains("tiktokcdn") ||
+            if (low.contains("googlevideo.com") || low.contains("videoplayback") ||
+                low.contains("tikcdn.io") || low.contains("tiktokcdn") || low.contains("/video/tos/") ||
                 low.contains("cdninstagram.com") || low.contains("fbcdn.net") || low.contains("sc-cdn.net") ||
                 low.contains("twimg.com") || low.contains("v.redd.it") ||
-                low.matches(".*\\.(mp4|mp3|m4a|mkv|webm|jpg|jpeg|png|webp|apk|zip|pdf)(\\?.*)?$")) {
+                low.contains(".tiktok.com/video/tos/") || low.contains("byteoversea.com") ||
+                low.matches(".*\\.(mp4|mp3|m4a|mkv|webm|avi|mov|flv|wav|ogg|jpg|jpeg|png|webp|gif|apk|zip|rar|7z|tar|gz|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|exe|dmg|iso)(\\?.*)?$")) {
                 String ua = (providedUa != null && !providedUa.isEmpty()) ? providedUa
                     : (low.contains("googlevideo.com") ? UA_YT_ANDROID_VR : UA_CHROME_MOBILE);
                 return new ResolvedStream(url, providedReferer, ua);
