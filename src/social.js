@@ -1112,10 +1112,16 @@ async function resolveInstagramStories(input, opts = {}) {
   }
 
   // 1. Try yt-dlp (supports stories with browser cookies)
-  try {
-    const yRes = await runYtDlpStories(targetUrl, 'Instagram', opts.browserCookies);
-    if (yRes && yRes.ok && yRes.stories.length > 0) return yRes;
-  } catch (_) {}
+  const candidateBrowsers = opts.browserCookies && opts.browserCookies !== 'none'
+    ? [opts.browserCookies]
+    : ['firefox', 'edge', 'chrome', 'brave', 'opera', null];
+
+  for (const b of candidateBrowsers) {
+    try {
+      const yRes = await runYtDlpStories(targetUrl, 'Instagram', b);
+      if (yRes && yRes.ok && yRes.stories.length > 0) return yRes;
+    } catch (_) {}
+  }
 
   // 2. Try rahad-all-downloader-v2 if a direct URL was provided
   if (/^https?:\/\//i.test(targetUrl)) {
@@ -1228,10 +1234,16 @@ async function resolveFacebookStories(input, opts = {}) {
   }
 
   // 1. Try yt-dlp (with optional browser cookies for friends-only stories)
-  try {
-    const yRes = await runYtDlpStories(clean, 'Facebook', opts.browserCookies);
-    if (yRes && yRes.ok && yRes.stories.length > 0) return yRes;
-  } catch (_) {}
+  const candidateBrowsers = opts.browserCookies && opts.browserCookies !== 'none'
+    ? [opts.browserCookies]
+    : ['firefox', 'edge', 'chrome', 'brave', 'opera', null];
+
+  for (const b of candidateBrowsers) {
+    try {
+      const yRes = await runYtDlpStories(clean, 'Facebook', b);
+      if (yRes && yRes.ok && yRes.stories.length > 0) return yRes;
+    } catch (_) {}
+  }
 
   // 2. Try rahad-all-downloader-v2
   try {

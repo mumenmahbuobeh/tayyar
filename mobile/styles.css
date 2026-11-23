@@ -2278,6 +2278,10 @@ html[dir="rtl"] .ios-chev { transform: scaleX(-1); }
 }
 
 /* ==================== STELLARHUB-STYLE UPDATE POPUP (MOBILE) ==================== */
+.stellar-upd-overlay[hidden] {
+  display: none !important;
+}
+
 .stellar-upd-overlay {
   position: fixed;
   inset: 0;

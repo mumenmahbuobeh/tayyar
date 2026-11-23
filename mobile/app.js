@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.23';
+  const APP_VERSION = '1.0.24';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -143,7 +143,7 @@
       storyEmptyPromptTitle: 'Enter @username or Story Link',
       storyEmptyPromptDesc: 'Type any public Snapchat/Instagram username or paste a Story link to extract all active photos and videos.',
       storyNotFoundTitle: 'No public stories found',
-      storyAuthHint: 'This story may be private or require login. Try a public username or copy a direct public Story link.',
+      storyAuthHint: 'Instagram and Facebook Stories are 24-hour private media that require login. For Reels & Posts, paste their direct link to download in HD. For stories, open in your browser with the Tayyar extension.',
       storySavedToast: 'Story saved to Downloads/Tayyar/Stories & Gallery!',
       storiesFoundCount: 'stories found',
       waGrantedToast: 'WhatsApp folder connected!',
@@ -299,7 +299,7 @@
       storyEmptyPromptTitle: 'أدخل اسم المستخدم أو رابط الستوري',
       storyEmptyPromptDesc: 'اكتب اسم مستخدم عام في سناب شات أو انستغرام أو الصق رابط ستوري لاستخراج جميع الصور والفيديوهات النشطة.',
       storyNotFoundTitle: 'لم يتم العثور على ستوريات عامة',
-      storyAuthHint: 'قد يكون الحساب خاصاً أو يتطلب تسجيل دخول. جرّب حساباً عاماً أو الصق رابط ستوري عام مباشر.',
+      storyAuthHint: 'ستوريات إنستجرام وفيسبوك محتوى مؤقت (24 ساعة) وخاص محمي بتسجيل الدخول. بالنسبة للريلز والمنشورات العامة يمكنك تحميلها فوراً بنسخ رابط الـ Reel أو Post، أما الستوريات فيمكنك حفظها عبر فتحها بالمتصفح مع إضافة تيّار.',
       storySavedToast: 'تم حفظ الستوري في Downloads/Tayyar/Stories والمعرض!',
       storiesFoundCount: 'ستوريات متاحة',
       waGrantedToast: 'تم ربط مجلد حالات واتساب بنجاح!',
@@ -2032,11 +2032,17 @@
       if (txtNow) txtNow.textContent = isAr ? 'تثبيت الآن' : 'Install Now';
     }
 
+    updPopupOverlay.style.display = 'flex';
+    updPopupOverlay.removeAttribute('hidden');
     updPopupOverlay.hidden = false;
   }
 
   function hideUpdatePopup() {
-    if (updPopupOverlay) updPopupOverlay.hidden = true;
+    if (updPopupOverlay) {
+      updPopupOverlay.style.display = 'none';
+      updPopupOverlay.setAttribute('hidden', '');
+      updPopupOverlay.hidden = true;
+    }
   }
 
   async function runDirectMobileUpdate() {
@@ -2149,16 +2155,69 @@
       btnCheckUpdate.textContent = t('checking');
     }
     try {
-      const url = ch === 'beta'
-        ? 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases'
-        : 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases/latest';
-      const r = await httpFetch(url, { headers: { Accept: 'application/vnd.github.v3+json' } });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const payload = await r.json();
-      const rel = Array.isArray(payload)
-        ? payload.find((x) => !x.draft)
-        : (!payload.draft && (ch === 'beta' || !payload.prerelease) ? payload : null);
-      if (!rel?.tag_name) throw new Error('No release');
+      let rel = null;
+
+      // 1. Primary: GitHub Releases API
+      const endpoints = ch === 'beta'
+        ? ['https://api.github.com/repos/mumenmahbuobeh/tayyar/releases']
+        : ['https://api.github.com/repos/mumenmahbuobeh/tayyar/releases', 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases/latest'];
+      for (const url of endpoints) {
+        try {
+          const r = await httpFetch(url, { headers: { Accept: 'application/vnd.github.v3+json' } });
+          if (r.ok) {
+            const payload = await r.json();
+            if (Array.isArray(payload)) {
+              rel = payload.find((x) => !x.draft && (ch === 'beta' || !x.prerelease)) || null;
+            } else if (payload && !payload.draft && (ch === 'beta' || !payload.prerelease)) {
+              rel = payload;
+            }
+            if (rel?.tag_name) break;
+          }
+        } catch (_) {}
+      }
+
+      // 2. Fallback: jsDelivr CDN & Raw package.json (no GitHub API rate limit)
+      if (!rel) {
+        const fallbacks = [
+          'https://cdn.jsdelivr.net/gh/mumenmahbuobeh/tayyar@main/package.json',
+          'https://raw.githubusercontent.com/mumenmahbuobeh/tayyar/main/package.json'
+        ];
+        for (const fb of fallbacks) {
+          try {
+            const r = await httpFetch(fb);
+            if (r.ok) {
+              const pkg = await r.json();
+              if (pkg?.version) {
+                const ver = pkg.version;
+                const tag = `v${ver}`;
+                rel = {
+                  tag_name: tag,
+                  name: ver,
+                  html_url: `https://github.com/mumenmahbuobeh/tayyar/releases/tag/${tag}`,
+                  published_at: new Date().toISOString(),
+                  assets: [
+                    {
+                      name: `Tayyar-Android-${tag}.apk`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Android-${tag}.apk`
+                    },
+                    {
+                      name: `Tayyar-iOS-${tag}.ipa`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-iOS-${tag}.ipa`
+                    },
+                    {
+                      name: `Tayyar-Setup-${ver}.exe`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Setup-${ver}.exe`
+                    }
+                  ]
+                };
+                break;
+              }
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (!rel?.tag_name) throw new Error('No release metadata available');
 
       const latest = rel.tag_name.replace(/^v/, '');
       const isNewer = semverCompare(latest, APP_VERSION) > 0;

@@ -4675,6 +4675,10 @@ html[dir="rtl"] .glass-island-player {
 
 
 /* ==================== STELLARHUB-STYLE UPDATE POPUP ==================== */
+.stellar-upd-overlay[hidden] {
+  display: none !important;
+}
+
 .stellar-upd-overlay {
   position: fixed;
   inset: 0;

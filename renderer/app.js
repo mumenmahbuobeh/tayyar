@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.23 is the latest available release.',
+      upToDateDesc: 'Version 1.0.24 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -364,7 +364,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.23 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.24 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -2995,7 +2995,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases — Stable Default) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.23';
+  const CURRENT_APP_VERSION = '1.0.24';
   let availableUpdateRelease = null;
   let isNewerUpdateAvailable = false;
   let updateDownloadTaskId = null;
@@ -3091,51 +3091,70 @@
         }
       }
 
-      // 3. Fallback: Raw package.json (no GitHub API rate limit)
+      // 3. Fallback: jsDelivr CDN & Raw package.json (no GitHub API rate limit)
       if (!rel) {
-        try {
-          const rawRes = await fetch('https://raw.githubusercontent.com/mumenmahbuobeh/tayyar/main/package.json');
-          if (rawRes.ok) {
-            const rawPkg = await rawRes.json();
-            if (rawPkg?.version) {
-              const ver = rawPkg.version;
-              const tag = `v${ver}`;
-              rel = {
-                tag_name: tag,
-                name: ver,
-                html_url: `https://github.com/mumenmahbuobeh/tayyar/releases/tag/${tag}`,
-                published_at: new Date().toISOString(),
-                assets: [
-                  {
-                    name: `Tayyar-Setup-${ver}.exe`,
-                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Setup-${ver}.exe`
-                  },
-                  {
-                    name: `Tayyar-${ver}.exe`,
-                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.exe`
-                  },
-                  {
-                    name: `Tayyar-Android-${tag}.apk`,
-                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Android-${tag}.apk`
-                  },
-                  {
-                    name: `Tayyar-${ver}.dmg`,
-                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.dmg`
-                  },
-                  {
-                    name: `Tayyar-${ver}.AppImage`,
-                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.AppImage`
-                  },
-                  {
-                    name: `tayyar_${ver}_amd64.deb`,
-                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/tayyar_${ver}_amd64.deb`
-                  }
-                ]
-              };
+        const fallbacks = [
+          'https://cdn.jsdelivr.net/gh/mumenmahbuobeh/tayyar@main/package.json',
+          'https://raw.githubusercontent.com/mumenmahbuobeh/tayyar/main/package.json'
+        ];
+        for (const fb of fallbacks) {
+          try {
+            const rawRes = await fetch(fb);
+            if (rawRes.ok) {
+              const rawPkg = await rawRes.json();
+              if (rawPkg?.version) {
+                const ver = rawPkg.version;
+                const tag = `v${ver}`;
+                rel = {
+                  tag_name: tag,
+                  name: ver,
+                  html_url: `https://github.com/mumenmahbuobeh/tayyar/releases/tag/${tag}`,
+                  published_at: new Date().toISOString(),
+                  assets: [
+                    {
+                      name: `Tayyar-Setup-${ver}.exe`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Setup-${ver}.exe`
+                    },
+                    {
+                      name: `Tayyar-${ver}.exe`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.exe`
+                    },
+                    {
+                      name: `Tayyar-Android-${tag}.apk`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Android-${tag}.apk`
+                    },
+                    {
+                      name: `Tayyar-iOS-${tag}.ipa`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-iOS-${tag}.ipa`
+                    },
+                    {
+                      name: `Tayyar-${ver}.dmg`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.dmg`
+                    },
+                    {
+                      name: `Tayyar-${ver}.AppImage`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.AppImage`
+                    },
+                    {
+                      name: `tayyar_${ver}_amd64.deb`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/tayyar_${ver}_amd64.deb`
+                    },
+                    {
+                      name: `Tayyar-Chrome-Extension-v${ver}.zip`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Chrome-Extension-v${ver}.zip`
+                    },
+                    {
+                      name: `Tayyar-Firefox-Extension-v${ver}.zip`,
+                      browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Firefox-Extension-v${ver}.zip`
+                    }
+                  ]
+                };
+                break;
+              }
             }
+          } catch (rawErr) {
+            console.warn('Fallback package.json check failed:', rawErr.message);
           }
-        } catch (rawErr) {
-          console.warn('Raw package.json check failed:', rawErr.message);
         }
       }
 
@@ -3181,24 +3200,18 @@
     } catch (err) {
       console.warn('Update check failed:', err);
       isNewerUpdateAvailable = false;
+      availableUpdateRelease = null;
       if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? `برنامج تيّار (v${CURRENT_APP_VERSION})` : `Tayyar (v${CURRENT_APP_VERSION})`;
-      if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? 'الإصدار الحالي يعمل بأحدث التقنيات.' : 'Current version is running with latest engine.';
+      if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? 'تعذّر الاتصال بخادم التحديثات حالياً. تأكد من اتصال الإنترنت.' : 'Could not reach update server at this moment. Check your internet connection.';
       if (bInstall) {
         bInstall.style.display = 'inline-flex';
         bInstall.disabled = false;
         bInstall.className = 'pill-btn secondary sm';
         if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'معاينة نافذة التحديث' : 'View Update Modal';
       }
-      if (interactive) {
-        showDeskUpdatePopup(availableUpdateRelease || { tag_name: 'v' + CURRENT_APP_VERSION, published_at: new Date() }, channel, true);
-      }
-      isNewerUpdateAvailable = false;
-      availableUpdateRelease = null;
-      if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? `برنامج تيّار (v${CURRENT_APP_VERSION})` : `Tayyar (v${CURRENT_APP_VERSION})`;
-      if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? 'تعذّر الاتصال بخادم التحديثات حالياً.' : 'Could not reach update server at this moment.';
-      if (bInstall) bInstall.style.display = 'none';
       if (progressWrap) progressWrap.style.display = 'none';
       if (interactive) {
+        showDeskUpdatePopup(availableUpdateRelease || { tag_name: 'v' + CURRENT_APP_VERSION, published_at: new Date() }, channel, true);
         toast(S.lang === 'ar' ? 'تعذّر فحص التحديثات حالياً' : 'Failed to check updates');
       }
     } finally {
@@ -3449,12 +3462,18 @@
       if (nowTxt) nowTxt.textContent = S.lang === 'ar' ? 'تثبيت وإعادة التشغيل' : 'Install & Restart';
     }
 
+    overlay.style.display = 'flex';
+    overlay.removeAttribute('hidden');
     overlay.hidden = false;
   }
 
   function hideDeskUpdatePopup() {
     const overlay = $('#deskUpdOverlay');
-    if (overlay) overlay.hidden = true;
+    if (overlay) {
+      overlay.style.display = 'none';
+      overlay.setAttribute('hidden', '');
+      overlay.hidden = true;
+    }
   }
 
   $('#btnDeskUpdClose')?.addEventListener('click', hideDeskUpdatePopup);
@@ -3491,13 +3510,6 @@
   if (bCheckUpdate) {
     bCheckUpdate.addEventListener('click', () => {
       checkAppUpdates(true);
-    });
-  }
-
-  const bInstallUpdate = $('#bInstallUpdate');
-  if (bInstallUpdate) {
-    bInstallUpdate.addEventListener('click', () => {
-      startInAppUpdate();
     });
   }
 
@@ -4407,7 +4419,51 @@
       if (!deskStoriesList.length) {
         if (deskStoryResBar) deskStoryResBar.hidden = true;
         if (errorMsg) {
-          deskStoryGrid.innerHTML = `<div class="desk-story-empty">${errorMsg}</div>`;
+          if (deskStoryPlat === 'instagram' || deskStoryPlat === 'facebook') {
+            const rawInp = (deskStoryInput?.value || '').trim();
+            const targetUrl = /^https?:\/\//i.test(rawInp)
+              ? rawInp
+              : (deskStoryPlat === 'instagram'
+                ? `https://www.instagram.com/stories/${encodeURIComponent(rawInp.replace(/^@/, ''))}/`
+                : `https://www.facebook.com/stories/${encodeURIComponent(rawInp.replace(/^@/, ''))}/`);
+            deskStoryGrid.innerHTML = `
+              <div class="desk-story-empty" style="max-width: 680px; margin: 0 auto; text-align: start; padding: 20px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <span style="font-size:24px;">⚡</span>
+                  <b style="font-size:15px;color:#f8fafc;">${S.lang === 'ar' ? 'ستوريات إنستجرام وفيسبوك تتطلب جلسة تسجيل الدخول' : 'Instagram & Facebook Stories Require Login'}</b>
+                </div>
+                <p style="font-size:13px;line-height:1.6;color:#94a3b8;margin-bottom:16px;">
+                  ${S.lang === 'ar'
+                    ? 'الستوريات محتوى مؤقت (24 ساعة) وخاص محمي من فيسبوك وإنستجرام، ولا يمكن تصفحها برابط عام بدون حساب مسجل.'
+                    : 'Stories are ephemeral 24-hour private media protected by Instagram & Facebook, and cannot be fetched anonymously.'}
+                </p>
+                <div style="background:rgba(0,240,255,0.08);border:1px solid rgba(0,240,255,0.25);border-radius:12px;padding:14px;margin-bottom:16px;">
+                  <b style="color:#00f0ff;font-size:13px;display:block;margin-bottom:6px;">
+                    ${S.lang === 'ar' ? '💡 الطريقة الفورية والأسهل للتحميل بنقرة واحدة:' : '💡 Instant 1-Click Solution:'}
+                  </b>
+                  <p style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:10px;">
+                    ${S.lang === 'ar'
+                      ? 'افتح الستوري في متصفحك (Chrome أو Edge أو Firefox) حيث حسابك مسجل، وسيظهر لك زر تيّار العائم ⚡ لحفظ أي ستوري فيديو أو صورة فوراً!'
+                      : 'Open the story in your logged-in browser (Chrome/Edge/Firefox); the Tayyar floating badge ⚡ will appear over the story to save it in 1 click!'}
+                  </p>
+                  <button type="button" class="pill-btn primary sm" id="btnDeskOpenStoryInBrowser" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
+                    <span>🌐</span>
+                    <span>${S.lang === 'ar' ? 'فتح الستوري في المتصفح الآن' : 'Open Story in Browser'}</span>
+                  </button>
+                </div>
+                <div style="font-size:12px;color:#64748b;">
+                  ${S.lang === 'ar'
+                    ? '• أو إذا كان حسابك مسجلاً في Firefox أو Edge على جهازك، اختره من قائمة "جلسة المتصفح" بالأعلى لجلب الستوريات تلقائياً.'
+                    : '• Or if logged into Firefox/Edge on your PC, select it from "Browser Session" above to fetch automatically.'}
+                </div>
+              </div>
+            `;
+            $('#btnDeskOpenStoryInBrowser')?.addEventListener('click', () => {
+              if (window.tayyar?.openUrl) window.tayyar.openUrl(targetUrl);
+            });
+          } else {
+            deskStoryGrid.innerHTML = `<div class="desk-story-empty">${errorMsg}</div>`;
+          }
         } else {
           deskStoryGrid.innerHTML = '';
         }

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Tayyar Content Script — Next-Generation IDM-Grade Video & Media Downloader (Firefox)
+ * Tayyar Content Script — Next-Generation IDM-Grade Video & Media Downloader
  * Overcomes transparent player overlays via proximity coordinate tracking.
  * Captures HTML5 videos, MSE/Blob streams, HLS playlists, Social Media, and Fullscreen players.
  */
@@ -126,6 +126,7 @@
     qualityTagEl = badgeEl.querySelector('#tayyarQualityTag');
     labelTextEl = badgeEl.querySelector('#tayyarLabel');
 
+    // Keep badge visible when mouse enters badge or dropdown
     badgeEl.addEventListener('mouseenter', () => {
       clearTimeout(hideTimer);
     });
@@ -136,18 +137,21 @@
       }
     });
 
+    // Main 1-click Download Action
     mainActionBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       triggerBestDownload();
     });
 
+    // Dropdown Toggle
     menuToggleBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       toggleDropdown();
     });
 
+    // Footer actions
     badgeEl.querySelector('#tayyarCopyLinkBtn').addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -166,6 +170,7 @@
       closeDropdown();
     });
 
+    // Close dropdown on outside click
     document.addEventListener('click', (e) => {
       if (isMenuOpen && !badgeEl.contains(e.target)) {
         closeDropdown();
@@ -229,7 +234,8 @@
     const mediaEl = activePlayerEl ? (activePlayerEl.tagName === 'VIDEO' || activePlayerEl.tagName === 'AUDIO' ? activePlayerEl : activePlayerEl.querySelector('video, audio')) : null;
     const directSrc = mediaEl ? (mediaEl.currentSrc || mediaEl.src || mediaEl.querySelector('source')?.src || '') : '';
 
-    if (plat.isSocial) {
+    // 1. Social Platforms (when not a story page, send URL to desktop engine)
+    if (plat.isSocial && !plat.isStory && !location.pathname.includes('/stories')) {
       return {
         type: 'social',
         url: window.location.href,
@@ -240,6 +246,34 @@
       };
     }
 
+    // 1b. Story Pages (Instagram Stories, Facebook Stories, WhatsApp Web)
+    if (plat.isStory || location.pathname.includes('/stories')) {
+      const v = activePlayerEl ? (activePlayerEl.tagName === 'VIDEO' ? activePlayerEl : activePlayerEl.querySelector('video')) : document.querySelector('video');
+      if (v) {
+        const vSrc = v.currentSrc || v.src || '';
+        return {
+          type: vSrc.startsWith('blob:') ? 'blob' : 'direct',
+          url: vSrc,
+          title: `${plat.name}_Story_${Date.now()}`,
+          platform: plat.name,
+          quality: 'MP4',
+          icon: '🎬'
+        };
+      }
+      const im = activePlayerEl ? (activePlayerEl.tagName === 'IMG' ? activePlayerEl : activePlayerEl.querySelector('img')) : document.querySelector('section img, div[role="dialog"] img, img.x5yr21d');
+      if (im) {
+        return {
+          type: 'story_img',
+          url: im.currentSrc || im.src || '',
+          title: `${plat.name}_Story_${Date.now()}`,
+          platform: plat.name,
+          quality: 'JPG',
+          icon: '📸'
+        };
+      }
+    }
+
+    // 2. Intercepted HLS (.m3u8) or direct video stream from background
     if (detectedStreamsForTab.length > 0) {
       const hls = detectedStreamsForTab.find((s) => s.isHLS || s.url.includes('.m3u8'));
       if (hls) {
@@ -263,6 +297,7 @@
       };
     }
 
+    // 3. Direct HTML5 video source
     if (directSrc && !directSrc.startsWith('blob:') && !directSrc.startsWith('data:')) {
       return {
         type: 'direct',
@@ -274,6 +309,7 @@
       };
     }
 
+    // 4. Blob or fallback to current page URL
     return {
       type: directSrc.startsWith('blob:') ? 'blob' : 'page',
       url: directSrc || window.location.href,
@@ -303,6 +339,7 @@
     const plat = getPlatformInfo();
     const streams = [];
 
+    // Option 1: Full HD / 4K Lossless muxing via Tayyar Turbo Engine
     if (plat.isSocial) {
       streams.push({
         title: `أعلى جودة فائقة الوضوح (Full HD / 4K)`,
@@ -321,6 +358,7 @@
       });
     }
 
+    // Option 2: Detected Network Streams (HLS, MP4, WebM)
     detectedStreamsForTab.forEach((st, idx) => {
       const isM3u8 = st.isHLS || st.url.includes('.m3u8');
       streams.push({
@@ -332,6 +370,7 @@
       });
     });
 
+    // Option 3: Direct video src if available
     const mediaEl = activePlayerEl ? (activePlayerEl.tagName === 'VIDEO' ? activePlayerEl : activePlayerEl.querySelector('video')) : null;
     const directSrc = mediaEl ? (mediaEl.currentSrc || mediaEl.src) : '';
     if (directSrc && !directSrc.startsWith('blob:') && !streams.some(s => s.subtitle === directSrc)) {
@@ -410,6 +449,7 @@
         showStatusFeedback('✓ تم الإرسال لتيّار!', 'success');
       } else {
         showStatusFeedback('✕ شغّل تطبيق تيّار', 'offline');
+        // If desktop app is closed, offer browser fallback if direct link
         if (!isSocial && /^https?:\/\//i.test(url) && !url.includes('.m3u8')) {
           setTimeout(() => {
             fallbackBrowserDownload(url, filename);
@@ -423,26 +463,57 @@
     const best = getBestStreamInfo();
     const plat = getPlatformInfo();
 
-    const mediaEl = activePlayerEl ? (activePlayerEl.tagName === 'VIDEO' || activePlayerEl.tagName === 'IMG' ? activePlayerEl : activePlayerEl.querySelector('video, img')) : null;
-    const mediaSrc = mediaEl ? (mediaEl.currentSrc || mediaEl.src) : '';
+    // 1. Direct Instagram Stories, Facebook Stories, and WhatsApp Web Status Handling
+    if (plat.isStory || location.pathname.includes('/stories')) {
+      showStatusFeedback('⚡ حفظ الستوري...', 'default');
 
-    if (mediaSrc && (mediaSrc.startsWith('blob:') || mediaSrc.startsWith('data:')) && plat.isStory) {
-      try {
-        showStatusFeedback('⚡ حفظ الستوري...', 'default');
-        const res = mediaSrc.startsWith('data:') ? { dataUrl: mediaSrc, mime: '' } : await fetchAsDataUrl(mediaSrc);
-        const ext = res.mime.includes('video') ? 'mp4' : res.mime.includes('png') ? 'png' : 'jpg';
-        const fname = `${plat.name}_Story_${Date.now()}.${ext}`;
+      // Check for video story element
+      const v = (activePlayerEl && activePlayerEl.tagName === 'VIDEO') ? activePlayerEl : (activePlayerEl?.querySelector?.('video') || document.querySelector('section video, div[role="dialog"] video, video'));
+      if (v) {
+        const vSrc = v.currentSrc || v.src || '';
+        // Direct signed CDN URL from Instagram or Facebook!
+        if (vSrc && !vSrc.startsWith('blob:') && !vSrc.startsWith('data:')) {
+          sendDownloadToTayyar(vSrc, `${plat.name}_Story_${Date.now()}.mp4`, false);
+          return;
+        }
+        // MediaSource/Blob video stream: convert to base64 DataURL and deliver directly to Tayyar
+        if (vSrc && (vSrc.startsWith('blob:') || vSrc.startsWith('data:'))) {
+          try {
+            const res = vSrc.startsWith('data:') ? { dataUrl: vSrc, mime: 'video/mp4' } : await fetchAsDataUrl(vSrc);
+            const fname = `${plat.name}_Story_${Date.now()}.mp4`;
+            chrome.runtime.sendMessage({ type: 'SEND_BLOB', dataUrl: res.dataUrl, filename: fname }, (resp) => {
+              if (resp && resp.ok) {
+                showStatusFeedback('✓ تم حفظ الستوري!', 'success');
+              } else {
+                fallbackBrowserDownload(vSrc, fname);
+                showStatusFeedback('✓ تم الحفظ بالمتصفح', 'success');
+              }
+            });
+            return;
+          } catch (_) {}
+        }
+      }
 
-        chrome.runtime.sendMessage({ type: 'SEND_BLOB', dataUrl: res.dataUrl, filename: fname }, (resp) => {
-          if (resp && resp.ok) {
-            showStatusFeedback('✓ تم حفظ الستوري!', 'success');
-          } else {
-            fallbackBrowserDownload(mediaSrc, fname);
-            showStatusFeedback('✓ تم الحفظ بالمتصفح', 'success');
-          }
-        });
-        return;
-      } catch (_) {}
+      // Check for photo story element
+      const im = (activePlayerEl && activePlayerEl.tagName === 'IMG') ? activePlayerEl : (activePlayerEl?.querySelector?.('img') || document.querySelector('section img, div[role="dialog"] img, img.x5yr21d'));
+      if (im) {
+        const iSrc = im.currentSrc || im.src || '';
+        if (iSrc) {
+          try {
+            const res = iSrc.startsWith('data:') ? { dataUrl: iSrc, mime: 'image/jpeg' } : await fetchAsDataUrl(iSrc);
+            const fname = `${plat.name}_Story_${Date.now()}.jpg`;
+            chrome.runtime.sendMessage({ type: 'SEND_BLOB', dataUrl: res.dataUrl, filename: fname }, (resp) => {
+              if (resp && resp.ok) {
+                showStatusFeedback('✓ تم حفظ الستوري!', 'success');
+              } else {
+                fallbackBrowserDownload(iSrc, fname);
+                showStatusFeedback('✓ تم الحفظ بالمتصفح', 'success');
+              }
+            });
+            return;
+          } catch (_) {}
+        }
+      }
     }
 
     if (best.type === 'social') {
@@ -461,6 +532,37 @@
     const elUnder = document.elementFromPoint(x, y);
     if (!elUnder) return null;
 
+    const plat = getPlatformInfo();
+
+    // 0. Dedicated Story Viewer Match (Instagram Stories, Facebook Stories, WhatsApp Web)
+    if (plat.isStory || location.pathname.includes('/stories')) {
+      const storyContainer = elUnder.closest(`
+        section,
+        div[role="dialog"],
+        [data-testid="story-player"],
+        div._ac0q,
+        div._ab6-,
+        div.x1ned7t2,
+        div[role="region"],
+        div:has(> video),
+        div:has(> img)
+      `);
+      if (storyContainer) {
+        const v = storyContainer.tagName === 'VIDEO' ? storyContainer : storyContainer.querySelector('video');
+        if (v) {
+          const r = v.getBoundingClientRect();
+          if (r.width >= 100 && r.height >= 100) return v;
+        }
+        const img = storyContainer.tagName === 'IMG' ? storyContainer : storyContainer.querySelector('img');
+        if (img) {
+          const r = img.getBoundingClientRect();
+          if (r.width >= 120 && r.height >= 120) return img;
+        }
+        return storyContainer;
+      }
+    }
+
+    // 1. Direct container match
     const container = elUnder.closest(`
       video,
       audio,
@@ -486,6 +588,7 @@
       }
     }
 
+    // 2. Scan all visible videos on the page and check coordinate intersection
     const videos = document.querySelectorAll('video, audio');
     for (let i = 0; i < videos.length; i++) {
       const v = videos[i];
@@ -503,7 +606,9 @@
   function positionBadgeOnPlayer(playerEl) {
     initBadgeDOM();
     const isFs = !!document.fullscreenElement;
+    const plat = getPlatformInfo();
 
+    // Handle Fullscreen mode: append badge into fullscreen element so it never disappears!
     if (isFs && document.fullscreenElement && badgeEl.parentElement !== document.fullscreenElement) {
       document.fullscreenElement.appendChild(badgeEl);
     } else if (!isFs && badgeEl.parentElement !== document.body) {
@@ -514,6 +619,7 @@
     const scrollY = isFs ? 0 : window.scrollY;
     const scrollX = isFs ? 0 : window.scrollX;
 
+    // Position at top-right corner of player
     const topPx = Math.max(10, rect.top + scrollY + 12);
     const rightPx = Math.max(12, (isFs ? (playerEl.clientWidth - rect.right) : (window.innerWidth - (rect.right + scrollX))) + 14);
 
@@ -521,16 +627,30 @@
     badgeEl.style.right = `${rightPx}px`;
     badgeEl.style.left = 'auto';
 
+    // Tailor label for Stories vs Videos
+    if (playerEl.tagName === 'IMG') {
+      labelTextEl.textContent = 'حفظ الستوري (صورة)';
+      qualityTagEl.textContent = 'JPG';
+      qualityTagEl.style.display = 'inline-block';
+    } else if (plat.isStory || location.pathname.includes('/stories')) {
+      labelTextEl.textContent = 'حفظ الستوري (فيديو)';
+      qualityTagEl.textContent = 'MP4';
+      qualityTagEl.style.display = 'inline-block';
+    } else {
+      labelTextEl.textContent = 'تحميل الفيديو';
+      updateBadgeStreamInfo();
+    }
+
     badgeEl.classList.add('visible');
-    updateBadgeStreamInfo();
   }
 
   function handleMouseMove(e) {
     if (!isBadgeEnabled) return;
     const now = Date.now();
-    if (now - lastMoveTime < 60) return;
+    if (now - lastMoveTime < 60) return; // 60ms throttle for silky smooth 60fps
     lastMoveTime = now;
 
+    // If mouse is over the badge itself, keep it open
     if (badgeEl && badgeEl.contains(e.target)) {
       clearTimeout(hideTimer);
       return;
@@ -548,12 +668,14 @@
 
   window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
+  // Hook fullscreen changes to maintain badge visibility
   document.addEventListener('fullscreenchange', () => {
     if (activePlayerEl) {
       setTimeout(() => positionBadgeOnPlayer(activePlayerEl), 100);
     }
   });
 
+  // Hook playback start so badge is ready the moment a video plays
   document.addEventListener('play', (e) => {
     if (e.target && (e.target.tagName === 'VIDEO' || e.target.tagName === 'AUDIO')) {
       activePlayerEl = e.target;
@@ -561,5 +683,6 @@
     }
   }, true);
 
+  // Initial fetch of detected streams
   fetchTabStreams();
 })();
