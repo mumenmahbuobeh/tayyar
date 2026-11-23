@@ -887,7 +887,7 @@ async function resolveSnapchatStories(input) {
 
   if (/^https?:\/\//i.test(clean)) {
     targetUrls.push(clean);
-    const uMatch = clean.match(/snapchat\.com\/(?:add|s|story)\/([a-zA-Z0-9._-]+)/i);
+    const uMatch = clean.match(/snapchat\.com\/(?:@|add\/|s\/|story\/|spotlight\/)?([a-zA-Z0-9._-]+)/i);
     if (uMatch) username = uMatch[1];
   } else {
     username = clean.replace(/^@/, '').split(/[/?#]/)[0].trim();
@@ -913,10 +913,11 @@ async function resolveSnapchatStories(input) {
             stories: parsed.stories
           };
         }
-        // Fallback: OpenGraph video or image on direct /t/ or spotlight links
+        // Fallback 1: OpenGraph video or image (Spotlight, story shares, /t/ links)
         const ogVid = body.match(/<meta[^>]+property=["']og:video(?::secure_url|:url)?["'][^>]+content=["']([^"']+)["']/i) ||
                       body.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:video(?::secure_url|:url)?["']/i);
-        const ogImg = body.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+        const ogImg = body.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+                      body.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
         if (ogVid && ogVid[1]) {
           const vUrl = ogVid[1].replace(/&amp;/g, '&');
           return {
@@ -933,6 +934,66 @@ async function resolveSnapchatStories(input) {
             }]
           };
         }
+
+        // Fallback 2: JSON-LD VideoObject
+        const jsonLdMatch = body.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+        if (jsonLdMatch) {
+          for (const s of jsonLdMatch) {
+            try {
+              const jText = s.replace(/<script[^>]*>|<\/script>/gi, '');
+              const j = JSON.parse(jText);
+              if (j['@type'] === 'VideoObject' && (j.contentUrl || j.embedUrl || j.url)) {
+                const vidUrl = (j.contentUrl || j.url || '').replace(/&amp;/g, '&');
+                if (vidUrl.startsWith('http')) {
+                  return {
+                    ok: true,
+                    platform: 'Snapchat',
+                    username: username || 'snapchat',
+                    stories: [{
+                      id: 'snap_ld_1',
+                      type: 'video',
+                      url: vidUrl,
+                      thumbnail: j.thumbnailUrl || (ogImg ? ogImg[1].replace(/&amp;/g, '&') : ''),
+                      ext: 'mp4',
+                      filename: `Snapchat_${cleanStoryName(username || 'story', 'story')}_1.mp4`
+                    }]
+                  };
+                }
+              }
+            } catch (_) {}
+          }
+        }
+
+        // Fallback 3: Direct CDN media link regex (bolt-gcdn.sc-cdn.net / cf-st.sc-cdn.net)
+        const cdnMatches = [...body.matchAll(/https:\/\/(?:bolt-gcdn|cf-st)\.sc-cdn\.net\/[^\s"'\\]+/g)];
+        if (cdnMatches.length > 0) {
+          const stories = [];
+          const seen = new Set();
+          cdnMatches.forEach((cm, i) => {
+            const mUrl = cm[0].replace(/&amp;/g, '&').replace(/\\\//g, '/');
+            if (!seen.has(mUrl) && !mUrl.includes('.webp') && !mUrl.includes('preview')) {
+              seen.add(mUrl);
+              const isVid = mUrl.includes('.mp4') || mUrl.includes('SpotlightSharing') || mUrl.includes('DfMedia');
+              const ext = isVid ? 'mp4' : 'jpg';
+              stories.push({
+                id: `snap_cdn_${i}`,
+                type: isVid ? 'video' : 'image',
+                url: mUrl,
+                thumbnail: ogImg ? ogImg[1].replace(/&amp;/g, '&') : '',
+                ext,
+                filename: `Snapchat_${cleanStoryName(username || 'story', 'story')}_${stories.length + 1}.${ext}`
+              });
+            }
+          });
+          if (stories.length > 0) {
+            return {
+              ok: true,
+              platform: 'Snapchat',
+              username: username || 'snapchat',
+              stories
+            };
+          }
+        }
       }
     } catch (_) {}
   }
@@ -942,7 +1003,7 @@ async function resolveSnapchatStories(input) {
     platform: 'Snapchat',
     username,
     stories: [],
-    error: 'No active public Snapchat stories found for this user or link.'
+    error: 'لم يتم العثور على ستوريات أو مقاطع Spotlight عامة نشطة لهذا الحساب أو الرابط (قد تكون منتهية أو الحساب خاص).'
   };
 }
 
@@ -1016,16 +1077,41 @@ async function resolveInstagramStories(input, opts = {}) {
   let username = '';
   let targetUrl = clean;
 
+  // Direct Post, Reel, or Video URL passed into Story downloader
+  if (/(?:instagram\.com\/(?:p|reel|tv|share)\/)/i.test(clean)) {
+    try {
+      const vidRes = await resolveSocialMedia(clean);
+      if (vidRes && vidRes.ok && vidRes.formats?.length) {
+        const bestFmt = vidRes.formats.find(f => !f.id?.includes('audio') && f.url) || vidRes.formats[0];
+        if (bestFmt?.url) {
+          return {
+            ok: true,
+            platform: 'Instagram',
+            username: vidRes.author || 'instagram',
+            stories: [{
+              id: 'ig_direct_1',
+              type: 'video',
+              url: bestFmt.url,
+              thumbnail: vidRes.thumbnail || '',
+              ext: 'mp4',
+              filename: `Instagram_${cleanStoryName(vidRes.title || 'media', 'media')}.mp4`
+            }]
+          };
+        }
+      }
+    } catch (_) {}
+  }
+
   if (/^https?:\/\//i.test(clean)) {
     const m = clean.match(/instagram\.com\/(?:stories\/)?([a-zA-Z0-9._]+)/i);
     if (m && !['p', 'reel', 'tv', 'explore'].includes(m[1].toLowerCase())) username = m[1];
   } else {
     username = clean.replace(/^@/, '').split(/[/?#]/)[0].trim();
-    if (!username) return { ok: false, platform: 'Instagram', stories: [], error: 'Invalid Instagram username or Story URL' };
+    if (!username) return { ok: false, platform: 'Instagram', stories: [], error: 'يرجى إدخال اسم مستخدم صحيح أو رابط ستوري/ريلز إنستجرام' };
     targetUrl = `https://www.instagram.com/stories/${encodeURIComponent(username)}/`;
   }
 
-  // 1. Try yt-dlp (supports public stories & private stories when browserCookies is chosen!)
+  // 1. Try yt-dlp (supports stories with browser cookies)
   try {
     const yRes = await runYtDlpStories(targetUrl, 'Instagram', opts.browserCookies);
     if (yRes && yRes.ok && yRes.stories.length > 0) return yRes;
@@ -1109,9 +1195,35 @@ async function resolveInstagramStories(input, opts = {}) {
 
 async function resolveFacebookStories(input, opts = {}) {
   let clean = String(input || '').trim();
+
+  // Direct Watch, Reel, or Video URL passed into Story downloader
+  if (/(?:facebook\.com\/(?:watch|reel|videos|share)|fb\.watch\/)/i.test(clean)) {
+    try {
+      const vidRes = await resolveSocialMedia(clean);
+      if (vidRes && vidRes.ok && vidRes.formats?.length) {
+        const bestFmt = vidRes.formats.find(f => !f.id?.includes('audio') && f.url) || vidRes.formats[0];
+        if (bestFmt?.url) {
+          return {
+            ok: true,
+            platform: 'Facebook',
+            username: vidRes.author || 'facebook',
+            stories: [{
+              id: 'fb_direct_1',
+              type: 'video',
+              url: bestFmt.url,
+              thumbnail: vidRes.thumbnail || '',
+              ext: 'mp4',
+              filename: `Facebook_${cleanStoryName(vidRes.title || 'media', 'media')}.mp4`
+            }]
+          };
+        }
+      }
+    } catch (_) {}
+  }
+
   if (!/^https?:\/\//i.test(clean)) {
     const user = clean.replace(/^@/, '').trim();
-    if (!user) return { ok: false, platform: 'Facebook', stories: [], error: 'Please enter a valid Facebook Story URL' };
+    if (!user) return { ok: false, platform: 'Facebook', stories: [], error: 'يرجى إدخال اسم مستخدم صحيح أو رابط ستوري/فيديو فيسبوك' };
     clean = `https://www.facebook.com/stories/${encodeURIComponent(user)}/`;
   }
 

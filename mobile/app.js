@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.21';
+  const APP_VERSION = '1.0.22';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -2353,6 +2353,45 @@
     const stories = [];
     const seen = new Set();
 
+    // 1. Direct Reels / Posts / Videos pasted into Story Hub
+    if (plat === 'instagram' && /(?:instagram\.com\/(?:p|reel|tv|share)\/)/i.test(clean)) {
+      try {
+        const vid = await resolveStream(clean);
+        if (vid && vid.url) {
+          return {
+            ok: true,
+            stories: [{
+              id: 'ig_direct',
+              type: 'video',
+              url: vid.url,
+              thumbnail: vid.thumbnail || '',
+              ext: 'mp4',
+              filename: sanitizeName(`Instagram_${vid.title || 'media'}`, 'mp4'),
+            }]
+          };
+        }
+      } catch (_) {}
+    }
+
+    if (plat === 'facebook' && /(?:facebook\.com\/(?:watch|reel|videos|share)|fb\.watch\/)/i.test(clean)) {
+      try {
+        const vid = await resolveStream(clean);
+        if (vid && vid.url) {
+          return {
+            ok: true,
+            stories: [{
+              id: 'fb_direct',
+              type: 'video',
+              url: vid.url,
+              thumbnail: vid.thumbnail || '',
+              ext: 'mp4',
+              filename: sanitizeName(`Facebook_${vid.title || 'media'}`, 'mp4'),
+            }]
+          };
+        }
+      } catch (_) {}
+    }
+
     if (plat === 'snapchat') {
       let user = clean.replace(/^@/, '').split(/[/?#]/)[0];
       const urls = /^https?:\/\//i.test(clean)
@@ -2380,7 +2419,7 @@
                 const mUrl = snap?.snapUrls?.mediaUrl || snap?.mediaUrl || '';
                 if (!mUrl || seen.has(mUrl)) return;
                 seen.add(mUrl);
-                const isVid = snap?.snapMediaType === 1 || /\.mp4/i.test(mUrl);
+                const isVid = snap?.snapMediaType === 1 || /\.mp4/i.test(mUrl) || mUrl.includes('SpotlightSharing');
                 const ext = isVid ? 'mp4' : 'jpg';
                 stories.push({
                   id: `snap_${prefix}_${idx}`,
@@ -2396,6 +2435,23 @@
             (pp.curatedHighlights || []).forEach((h, i) => addList(h?.snapList, `hl${i + 1}`));
             (pp.spotlightHighlights || []).forEach((h, i) => addList(h?.snapList, `spot${i + 1}`));
             if (stories.length > 0) return { ok: true, stories };
+          }
+          // Fallback: OpenGraph video & JSON-LD
+          const ogV = html.match(/<meta[^>]+property=["']og:video(?::secure_url|:url)?["'][^>]+content=["']([^"']+)["']/i);
+          const ogI = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+          if (ogV && ogV[1]) {
+            const vUrl = ogV[1].replace(/&amp;/g, '&');
+            return {
+              ok: true,
+              stories: [{
+                id: 'snap_og',
+                type: 'video',
+                url: vUrl,
+                thumbnail: ogI ? ogI[1].replace(/&amp;/g, '&') : '',
+                ext: 'mp4',
+                filename: sanitizeName(`Snapchat_${user || 'story'}_1`, 'mp4'),
+              }]
+            };
           }
         } catch (_) {}
       }

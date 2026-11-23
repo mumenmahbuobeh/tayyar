@@ -134,7 +134,7 @@
       acknowledgments: 'Acknowledgments',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.21 is the latest available release.',
+      upToDateDesc: 'Version 1.0.22 is the latest available release.',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -364,7 +364,7 @@
       acknowledgments: 'شكر وتقدير',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.21 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.22 هو أحدث إصدار متوفر حالياً.',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -2995,7 +2995,7 @@
   }
 
   /* ---------------- DIRECT IN-APP UPDATER (GitHub Releases — Stable Default) ---------------- */
-  const CURRENT_APP_VERSION = '1.0.21';
+  const CURRENT_APP_VERSION = '1.0.22';
   let availableUpdateRelease = null;
   let isNewerUpdateAvailable = false;
   let updateDownloadTaskId = null;
@@ -3054,25 +3054,93 @@
     }
 
     try {
-      const endpoint = channel === 'beta'
-        ? 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases'
-        : 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases/latest';
-
-      const res = await fetch(endpoint, {
-        headers: { Accept: 'application/vnd.github.v3+json' }
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const payload = await res.json();
-
       let rel = null;
-      if (Array.isArray(payload)) {
-        rel = payload.find((r) => !r.draft) || null;
-      } else if (payload && !payload.draft && (channel === 'beta' || !payload.prerelease)) {
-        rel = payload;
+
+      // 1. Primary: Native IPC bridge (0% CSP, 0% CORS, native Node HTTPS)
+      if (window.tayyar?.checkUpdates) {
+        try {
+          const ipcRes = await window.tayyar.checkUpdates(channel);
+          if (ipcRes && ipcRes.ok && ipcRes.release) {
+            rel = ipcRes.release;
+          }
+        } catch (ipcErr) {
+          console.warn('Native checkUpdates bridge failed, trying fetch fallback:', ipcErr);
+        }
+      }
+
+      // 2. Secondary: Direct fetch (CSP connect-src enabled)
+      if (!rel) {
+        try {
+          const endpoint = channel === 'beta'
+            ? 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases'
+            : 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases/latest';
+
+          const res = await fetch(endpoint, {
+            headers: { Accept: 'application/vnd.github.v3+json' }
+          });
+          if (res.ok) {
+            const payload = await res.json();
+            if (Array.isArray(payload)) {
+              rel = payload.find((r) => !r.draft) || null;
+            } else if (payload && !payload.draft && (channel === 'beta' || !payload.prerelease)) {
+              rel = payload;
+            }
+          }
+        } catch (fErr) {
+          console.warn('Direct fetch release check failed:', fErr.message);
+        }
+      }
+
+      // 3. Fallback: Raw package.json (no GitHub API rate limit)
+      if (!rel) {
+        try {
+          const rawRes = await fetch('https://raw.githubusercontent.com/mumenmahbuobeh/tayyar/main/package.json');
+          if (rawRes.ok) {
+            const rawPkg = await rawRes.json();
+            if (rawPkg?.version) {
+              const ver = rawPkg.version;
+              const tag = `v${ver}`;
+              rel = {
+                tag_name: tag,
+                name: ver,
+                html_url: `https://github.com/mumenmahbuobeh/tayyar/releases/tag/${tag}`,
+                published_at: new Date().toISOString(),
+                assets: [
+                  {
+                    name: `Tayyar-Setup-${ver}.exe`,
+                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Setup-${ver}.exe`
+                  },
+                  {
+                    name: `Tayyar-${ver}.exe`,
+                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.exe`
+                  },
+                  {
+                    name: `Tayyar-Android-${tag}.apk`,
+                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Android-${tag}.apk`
+                  },
+                  {
+                    name: `Tayyar-${ver}.dmg`,
+                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.dmg`
+                  },
+                  {
+                    name: `Tayyar-${ver}.AppImage`,
+                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.AppImage`
+                  },
+                  {
+                    name: `tayyar_${ver}_amd64.deb`,
+                    browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/tayyar_${ver}_amd64.deb`
+                  }
+                ]
+              };
+            }
+          }
+        } catch (rawErr) {
+          console.warn('Raw package.json check failed:', rawErr.message);
+        }
       }
 
       if (!rel || !rel.tag_name) {
-        throw new Error('No release metadata');
+        throw new Error('No release metadata available');
       }
 
       const latestTag = (rel.tag_name || '').replace(/^v/, '');

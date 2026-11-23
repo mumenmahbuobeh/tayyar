@@ -109,7 +109,7 @@ function unpackExtensionFolder(type = 'chrome') {
 async function downloadExtensionZip(type = 'chrome') {
   const folderName = type === 'firefox' ? 'extension-firefox' : 'extension';
   const targetDir = unpackExtensionFolder(type);
-  const version = pkg.version || '1.0.21';
+  const version = pkg.version || '1.0.22';
   const filename = type === 'firefox'
     ? `Tayyar-Firefox-Extension-v${version}.zip`
     : `Tayyar-Chrome-Extension-v${version}.zip`;
@@ -291,6 +291,101 @@ function wireIpc() {
       return { ok: true };
     }
     return { ok: false };
+  });
+  h('app:checkUpdate', async (channel = 'stable') => {
+    const isBeta = channel === 'beta';
+    const fetchJson = (url) => new Promise((resolve, reject) => {
+      try {
+        const u = new URL(url);
+        const req = https.request(u, {
+          headers: {
+            'User-Agent': `Tayyar-App/${app.getVersion()} (Windows NT 10.0; Win64; x64)`,
+            'Accept': 'application/vnd.github.v3+json, application/json'
+          },
+          timeout: 9000
+        }, (res) => {
+          let b = '';
+          res.on('data', c => b += c);
+          res.on('end', () => {
+            if (res.statusCode >= 200 && res.statusCode < 300) {
+              try { resolve(JSON.parse(b)); } catch (e) { reject(e); }
+            } else {
+              reject(new Error(`HTTP ${res.statusCode}: ${b.slice(0, 100)}`));
+            }
+          });
+        });
+        req.on('error', reject);
+        req.on('timeout', () => { req.destroy(); reject(new Error('Update request timed out')); });
+        req.end();
+      } catch (err) {
+        reject(err);
+      }
+    });
+
+    // 1. Primary: GitHub Releases API
+    try {
+      const endpoint = isBeta
+        ? 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases'
+        : 'https://api.github.com/repos/mumenmahbuobeh/tayyar/releases/latest';
+      const payload = await fetchJson(endpoint);
+      let rel = null;
+      if (Array.isArray(payload)) {
+        rel = payload.find((r) => !r.draft) || null;
+      } else if (payload && !payload.draft && (isBeta || !payload.prerelease)) {
+        rel = payload;
+      }
+      if (rel && rel.tag_name) {
+        return { ok: true, release: rel };
+      }
+    } catch (apiErr) {
+      console.warn('GitHub Releases API check warning:', apiErr.message);
+    }
+
+    // 2. Fallback: Raw package.json (immune to 60 req/hr rate limits)
+    try {
+      const pkg = await fetchJson('https://raw.githubusercontent.com/mumenmahbuobeh/tayyar/main/package.json');
+      if (pkg && pkg.version) {
+        const ver = pkg.version;
+        const tag = `v${ver}`;
+        const fallbackRel = {
+          tag_name: tag,
+          name: ver,
+          html_url: `https://github.com/mumenmahbuobeh/tayyar/releases/tag/${tag}`,
+          published_at: new Date().toISOString(),
+          assets: [
+            {
+              name: `Tayyar-Setup-${ver}.exe`,
+              browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Setup-${ver}.exe`
+            },
+            {
+              name: `Tayyar-${ver}.exe`,
+              browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.exe`
+            },
+            {
+              name: `Tayyar-Android-${tag}.apk`,
+              browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-Android-${tag}.apk`
+            },
+            {
+              name: `Tayyar-${ver}.dmg`,
+              browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.dmg`
+            },
+            {
+              name: `Tayyar-${ver}.AppImage`,
+              browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/Tayyar-${ver}.AppImage`
+            },
+            {
+              name: `tayyar_${ver}_amd64.deb`,
+              browser_download_url: `https://github.com/mumenmahbuobeh/tayyar/releases/download/${tag}/tayyar_${ver}_amd64.deb`
+            }
+          ]
+        };
+        return { ok: true, release: fallbackRel };
+      }
+    } catch (rawErr) {
+      console.error('Raw package.json check failed:', rawErr.message);
+    }
+
+    return { ok: false, error: 'Could not fetch latest release' };
   });
   h('trackers:fetch', async () => {
     const urls = [

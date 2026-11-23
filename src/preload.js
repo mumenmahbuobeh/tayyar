@@ -28,6 +28,7 @@ const bridge = {
   downloadExtensionZip: inv('extension:downloadZip'),
   openBrowserExtensionsPage: inv('extension:openBrowserPage'),
   openUrl: inv('openUrl'),
+  checkUpdates: inv('app:checkUpdate'),
   installUpdate: inv('installUpdate'),
   fetchTrackers: inv('trackers:fetch'),
   socialDetect: inv('social:detect'),
