@@ -87,7 +87,7 @@
           <img src="docs/screenshots/about-update-modal.jpg" alt="StellarHub-Inspired Update Modal" width="100%" style="border-radius: 8px;"/>
         </a>
         <br>
-        <sub><b>StellarHub-Inspired Update Modal (v1.0.20)</b><br>4-stage stepper pipeline (Download ➜ Check ➜ Install ➜ Reopen) with on-demand preview</sub>
+        <sub><b>StellarHub-Inspired Update Modal (v1.0.21)</b><br>4-stage stepper pipeline (Download ➜ Check ➜ Install ➜ Reopen) with on-demand preview</sub>
       </td>
     </tr>
     <tr>
@@ -111,20 +111,20 @@
 
 ---
 
-## 📥 Downloads & Binary Packages (v1.0.20)
+## 📥 Downloads & Binary Packages (v1.0.21)
 
-Ready-to-use binaries are available on [GitHub Releases v1.0.20](https://github.com/mumenmahbuobeh/tayyar/releases/tag/v1.0.20):
+Ready-to-use binaries are available on [GitHub Releases v1.0.21](https://github.com/mumenmahbuobeh/tayyar/releases/tag/v1.0.21):
 
 | Platform | Package Format | Direct Download Link | Status |
 | :--- | :--- | :--- | :--- |
-| **Windows** | `.exe` (Installer) | [📥 Download Tayyar-Setup-1.0.20.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-Setup-1.0.20.exe) | ✅ Official Release |
-| **Windows** | `.exe` (Portable) | [📥 Download Tayyar-1.0.20.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-1.0.20.exe) | ✅ Official Release |
-| **Android** | `.apk` (Mobile) | [📱 Download Tayyar-Android-v1.0.20.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-Android-v1.0.20.apk) | ✅ Official Release |
-| **macOS** | `.dmg` (Universal) | [🍎 Download Tayyar-1.0.20.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-1.0.20.dmg) | ✅ Official Release |
-| **Linux** | `.AppImage` | [🐧 Download Tayyar-1.0.20.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-1.0.20.AppImage) | ✅ Official Release |
-| **Linux** | `.deb` (Debian/Ubuntu) | [📦 Download tayyar_1.0.20_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/tayyar_1.0.20_amd64.deb) | ✅ Official Release |
-| **Browser Extension** | `.zip` (Chrome, Edge, Brave, Opera) | [🧩 Download Tayyar-Chrome-Extension-v1.0.20.zip](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-Chrome-Extension-v1.0.20.zip) | ✅ Ready to Load |
-| **Browser Extension** | `.zip` (Mozilla Firefox) | [🦊 Download Tayyar-Firefox-Extension-v1.0.20.zip](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-Firefox-Extension-v1.0.20.zip) | ✅ Ready to Load |
+| **Windows** | `.exe` (Installer) | [📥 Download Tayyar-Setup-1.0.21.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.21/Tayyar-Setup-1.0.21.exe) | ✅ Official Release |
+| **Windows** | `.exe` (Portable) | [📥 Download Tayyar-1.0.21.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.21/Tayyar-1.0.21.exe) | ✅ Official Release |
+| **Android** | `.apk` (Mobile) | [📱 Download Tayyar-Android-v1.0.21.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.21/Tayyar-Android-v1.0.21.apk) | ✅ Official Release |
+| **macOS** | `.dmg` (Universal) | [🍎 Download Tayyar-1.0.21.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.21/Tayyar-1.0.21.dmg) | ✅ Official Release |
+| **Linux** | `.AppImage` | [🐧 Download Tayyar-1.0.21.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.21/Tayyar-1.0.21.AppImage) | ✅ Official Release |
+| **Linux** | `.deb` (Debian/Ubuntu) | [📦 Download tayyar_1.0.21_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.21/tayyar_1.0.21_amd64.deb) | ✅ Official Release |
+| **Browser Extension** | `.zip` (Chrome, Edge, Brave, Opera) | [🧩 Download Tayyar-Chrome-Extension-v1.0.21.zip](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.21/Tayyar-Chrome-Extension-v1.0.21.zip) | ✅ Ready to Load |
+| **Browser Extension** | `.zip` (Mozilla Firefox) | [🦊 Download Tayyar-Firefox-Extension-v1.0.21.zip](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.21/Tayyar-Firefox-Extension-v1.0.21.zip) | ✅ Ready to Load |
 | **iOS** | Xcode Project | Build via `npm run build:ios` (Source in `ios/App`) | 🛠️ Source Ready |
 
 ---
@@ -136,7 +136,7 @@ Ready-to-use binaries are available on [GitHub Releases v1.0.20](https://github.
 * **Smart End-Game Acceleration:** Automatically sub-divides remaining slow segments across faster idle threads to prevent hanging downloads.
 * **Resumable Transfers:** Full session persistence across network dropouts, app restarts, or crashes.
 
-### 2. Social Video Downloader & Stories Saver (v1.0.20)
+### 2. Social Video Downloader & Stories Saver (v1.0.21)
 * **Watermark-Free Downloads:** Direct video extraction from TikTok, Instagram Reels, YouTube Shorts, Facebook, Snapchat, Twitter/X, and Pinterest.
 * **Stories Range Selector:** Choose precisely how many stories to download from user profiles with a clean batch range picker.
 * **Direct Gallery Saving:** Downloaded media on mobile is directly indexed into the system Gallery under `Movies/Tayyar`.

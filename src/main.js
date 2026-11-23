@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const archiver = require('archiver');
+const { zipDirectory } = require('./zip');
 const { DownloadManager, isDownloadableUrl } = require('./engine');
 const social = require('./social');
 const pkg = require('../package.json');
@@ -109,40 +109,27 @@ function unpackExtensionFolder(type = 'chrome') {
 async function downloadExtensionZip(type = 'chrome') {
   const folderName = type === 'firefox' ? 'extension-firefox' : 'extension';
   const targetDir = unpackExtensionFolder(type);
-  const version = pkg.version || '1.0.20';
+  const version = pkg.version || '1.0.21';
   const filename = type === 'firefox'
     ? `Tayyar-Firefox-Extension-v${version}.zip`
     : `Tayyar-Chrome-Extension-v${version}.zip`;
   const downloadsDir = app.getPath('downloads');
   const zipPath = path.join(downloadsDir, filename);
 
-  return new Promise((resolve) => {
-    try {
-      const output = fs.createWriteStream(zipPath);
-      const archive = archiver('zip', { zlib: { level: 9 } });
-
-      output.on('close', () => {
-        try { shell.showItemInFolder(zipPath); } catch (_) {}
-        if (Notification.isSupported()) {
-          new Notification({
-            title: 'Tayyar Extension Ready',
-            body: `Saved ${filename} to Downloads. Ready to load in browser!`
-          }).show();
-        }
-        resolve({ ok: true, path: zipPath, filename, size: archive.pointer() });
-      });
-
-      archive.on('error', (err) => {
-        resolve({ ok: false, error: err.message });
-      });
-
-      archive.pipe(output);
-      archive.directory(targetDir, false);
-      archive.finalize();
-    } catch (err) {
-      resolve({ ok: false, error: err.message });
+  try {
+    const res = zipDirectory(targetDir, zipPath);
+    try { shell.showItemInFolder(zipPath); } catch (_) {}
+    if (Notification.isSupported()) {
+      new Notification({
+        title: 'Tayyar Extension Ready',
+        body: `Saved ${filename} to Downloads. Ready to load in browser!`
+      }).show();
     }
-  });
+    return { ok: true, path: zipPath, filename, size: res.size };
+  } catch (err) {
+    console.error('Failed to create extension zip:', err);
+    return { ok: false, error: err.message };
+  }
 }
 
 /** Local bridge so the browser extension can hand links to the app (like IDM's browser integration). */

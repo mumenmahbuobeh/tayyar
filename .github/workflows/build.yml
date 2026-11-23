@@ -75,6 +75,7 @@ jobs:
             npm run dist:linux
             find dist -type f -name "*.blockmap" -delete || true
           fi
+          npm run pack:ext || true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPIMAGE_EXTRACT_AND_RUN: 1
@@ -255,7 +256,9 @@ jobs:
 
       - name: Flatten & Collect All Release Assets
         run: |
+          npm run pack:ext || true
           mkdir -p final-release
+          cp dist/Tayyar-*-Extension-*.zip final-release/ 2>/dev/null || true
           find release-assets -type f -exec cp -v {} final-release/ \;
           cd final-release
           # Strip any blockmap files and duplicate space-separated filenames
@@ -287,8 +290,12 @@ jobs:
             * **Linux:**
               * [Tayyar-${{ env.VERSION }}.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/Tayyar-${{ env.VERSION }}.AppImage)
               * [tayyar_${{ env.VERSION }}_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/tayyar_${{ env.VERSION }}_amd64.deb)
+            * **Browser Extensions:**
+              * [Tayyar-Chrome-Extension-v${{ env.VERSION }}.zip](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/Tayyar-Chrome-Extension-v${{ env.VERSION }}.zip) (Chrome, Edge, Brave, Opera)
+              * [Tayyar-Firefox-Extension-v${{ env.VERSION }}.zip](https://github.com/mumenmahbuobeh/tayyar/releases/download/${{ env.tag_name }}/Tayyar-Firefox-Extension-v${{ env.VERSION }}.zip) (Firefox)
 
             ### ✨ Key Improvements & Fixes in ${{ env.tag_name }}
+            * **Hotfix: Zero-Dependency Zip Engine:** Replaced external archiver library with a pure Node.js in-process zip generator (`src/zip.js`), completely eliminating the desktop startup crash (`Cannot find module 'archiver'`) in packaged ASAR builds.
             * **StellarHub-Inspired Pro Update Modal (Desktop & Mobile):** Dark OLED update card featuring an orange-accented 4-stage pipeline stepper (Download ➜ Check ➜ Install ➜ Reopen), slim progress bar, real-time downloaded byte readouts, and automatic restart notification. Can be previewed and tested anytime directly from Settings.
             * **Universal Zero-CORS Mobile Stream Resolving:** Integrated native `CapacitorHttp` routing on Android and iOS to completely eliminate webview CORS blocks when querying social APIs (YouTube, TikTok, Facebook, Instagram, Snapchat).
             * **Built-in Pure Node.js InnerTube Resolver on Desktop:** Added standalone progressive MP4 extraction in `src/social.js` with full audio muxing, allowing desktop downloads without relying on external system binaries.

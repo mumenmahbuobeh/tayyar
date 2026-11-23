@@ -1,7 +1,7 @@
 {
   "name": "tayyar-download-manager",
   "productName": "Tayyar",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "author": {
     "name": "Mu'men Mahbuobeh",
     "email": "mumenmahbuobeh@users.noreply.github.com"
@@ -16,7 +16,7 @@
   "scripts": {
     "start": "electron .",
     "test": "node test/engine.test.js",
-    "pack:ext": "node -e \"const fs=require('fs'),arch=require('archiver'); fs.mkdirSync('dist',{recursive:true}); ['extension','extension-firefox'].forEach(f=>{ const n=f==='extension'?'Chrome':'Firefox'; const o=fs.createWriteStream('dist/Tayyar-'+n+'-Extension-v'+require('./package.json').version+'.zip'); const a=arch('zip',{zlib:{level:9}}); a.pipe(o); a.directory(f,false); a.finalize(); });\"",
+    "pack:ext": "node -e \"const { zipDirectory } = require('./src/zip'); const fs = require('fs'); fs.mkdirSync('dist', { recursive: true }); zipDirectory('extension', 'dist/Tayyar-Chrome-Extension-v' + require('./package.json').version + '.zip'); zipDirectory('extension-firefox', 'dist/Tayyar-Firefox-Extension-v' + require('./package.json').version + '.zip');\"",
     "dist": "npm run pack:ext && electron-builder",
     "dist:win": "npm run pack:ext && electron-builder --win",
     "dist:linux": "npm run pack:ext && electron-builder --linux",
