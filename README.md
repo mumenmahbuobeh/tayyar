@@ -19,19 +19,111 @@
 
 ---
 
-## 📥 Downloads & Binary Releases
+## 📸 Screenshots & UI Showcase (معرض واجهات طيّار)
 
-Download the official ready-to-run packages directly from [GitHub Releases v1.0.19](https://github.com/mumenmahbuobeh/tayyar/releases/tag/v1.0.19):
+> **Modern Dark OLED Aesthetics:** Designed with custom Glassmorphism, real-time telemetry tiles, native English (LTR) / Arabic (RTL) localization, and ultra-smooth responsive layouts.  
+> *(Click any image below to view it in full high resolution)*
 
-| Platform | Format | Direct Download / Package | Release Status |
+<div align="center">
+  <table>
+    <tr>
+      <td width="50%" align="center">
+        <a href="docs/screenshots/dashboard-en.jpg" target="_blank">
+          <img src="docs/screenshots/dashboard-en.jpg" alt="Dashboard (English LTR)" width="100%" style="border-radius: 8px;"/>
+        </a>
+        <br>
+        <sub><b>Modern Bento Dashboard (English LTR)</b><br>Real-time engine status, activity heatmap & download telemetry</sub>
+      </td>
+      <td width="50%" align="center">
+        <a href="docs/screenshots/dashboard-ar.jpg" target="_blank">
+          <img src="docs/screenshots/dashboard-ar.jpg" alt="Dashboard (Arabic RTL)" width="100%" style="border-radius: 8px;"/>
+        </a>
+        <br>
+        <sub><b>لوحة التحكم بتصميم عربي متكامل (RTL)</b><br>محاذاة كاملة لليمين مع تكامل فوري ومؤشرات حية لكافة العمليات</sub>
+      </td>
+    </tr>
+    <tr>
+      <td width="50%" align="center">
+        <a href="docs/screenshots/social-video-downloader.jpg" target="_blank">
+          <img src="docs/screenshots/social-video-downloader.jpg" alt="Social Video Downloader" width="100%" style="border-radius: 8px;"/>
+        </a>
+        <br>
+        <sub><b>Social Video & Stories Extractor</b><br>Direct HD downloads without watermarks (TikTok, IG, YouTube, Facebook, Snapchat)</sub>
+      </td>
+      <td width="50%" align="center">
+        <a href="docs/screenshots/downloads-manager.png" target="_blank">
+          <img src="docs/screenshots/downloads-manager.png" alt="Downloads Manager" width="100%" style="border-radius: 8px;"/>
+        </a>
+        <br>
+        <sub><b>Multi-Threaded Downloads Manager</b><br>Category tabs, instant task adding & multi-source bandwidth controls</sub>
+      </td>
+    </tr>
+    <tr>
+      <td width="50%" align="center">
+        <a href="docs/screenshots/trackers-probing.jpg" target="_blank">
+          <img src="docs/screenshots/trackers-probing.jpg" alt="Live Trackers Probing & Latency" width="100%" style="border-radius: 8px;"/>
+        </a>
+        <br>
+        <sub><b>Real-Time Tracker Health & Probing</b><br>Curated tracker injection, live latency stats & multi-source peering</sub>
+      </td>
+      <td width="50%" align="center">
+        <a href="docs/screenshots/plugins-store.jpg" target="_blank">
+          <img src="docs/screenshots/plugins-store.jpg" alt="Extensible Plugins Ecosystem" width="100%" style="border-radius: 8px;"/>
+        </a>
+        <br>
+        <sub><b>Extensible Plugins Ecosystem</b><br>Smart link resolvers, page scrapers, auto-categorizers & premium debriders</sub>
+      </td>
+    </tr>
+    <tr>
+      <td width="50%" align="center">
+        <a href="docs/screenshots/settings-grid.jpg" target="_blank">
+          <img src="docs/screenshots/settings-grid.jpg" alt="Settings Bento Grid" width="100%" style="border-radius: 8px;"/>
+        </a>
+        <br>
+        <sub><b>Comprehensive Bento Grid Settings</b><br>Fine-tuned network concurrency, RPC persistence & appearance themes</sub>
+      </td>
+      <td width="50%" align="center">
+        <a href="docs/screenshots/about-update-modal.jpg" target="_blank">
+          <img src="docs/screenshots/about-update-modal.jpg" alt="StellarHub-Inspired Update Modal" width="100%" style="border-radius: 8px;"/>
+        </a>
+        <br>
+        <sub><b>StellarHub-Inspired Update Modal (v1.0.20)</b><br>4-stage stepper pipeline (Download ➜ Check ➜ Install ➜ Reopen) with on-demand preview</sub>
+      </td>
+    </tr>
+    <tr>
+      <td width="50%" align="center">
+        <a href="docs/screenshots/dashboard-collapsed.jpg" target="_blank">
+          <img src="docs/screenshots/dashboard-collapsed.jpg" alt="Compact Dock Mode" width="100%" style="border-radius: 8px;"/>
+        </a>
+        <br>
+        <sub><b>Compact Dock & Collapsible Sidebar Mode</b><br>Minimalist 68px icon dock maximizing screen real estate</sub>
+      </td>
+      <td width="50%" align="center">
+        <a href="docs/screenshots/notifications-center.png" target="_blank">
+          <img src="docs/screenshots/notifications-center.png" alt="Notification Center" width="100%" style="border-radius: 8px;"/>
+        </a>
+        <br>
+        <sub><b>Unified Notification Center</b><br>Task completion alerts, update announcements & system notifications</sub>
+      </td>
+    </tr>
+  </table>
+</div>
+
+---
+
+## 📥 Downloads & Binary Packages (v1.0.20)
+
+Ready-to-use binaries are available on [GitHub Releases v1.0.20](https://github.com/mumenmahbuobeh/tayyar/releases/tag/v1.0.20):
+
+| Platform | Package Format | Direct Download Link | Status |
 | :--- | :--- | :--- | :--- |
-| **Windows** | `.exe` (Installer) | [📥 Download Tayyar-Setup-1.0.19.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-Setup-1.0.19.exe) | ✅ Available |
-| **Windows** | `.exe` (Portable) | [📥 Download Tayyar-1.0.19.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-1.0.19.exe) | ✅ Available |
-| **Android** | `.apk` (Mobile) | [📱 Download Tayyar-Android-v1.0.19.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-Android-v1.0.19.apk) | ✅ Available |
-| **iOS** | `.ipa` (iPhone/iPad) | [🍏 Download Tayyar-iOS-v1.0.19.ipa](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-iOS-v1.0.19.ipa) | ✅ Available |
-| **macOS** | `.dmg` (Universal) | [🍎 Download Tayyar-1.0.19.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-1.0.19.dmg) | ✅ Available |
-| **Linux** | `.AppImage` | [🐧 Download Tayyar-1.0.19.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/Tayyar-1.0.19.AppImage) | ✅ Available |
-| **Linux** | `.deb` (Debian/Ubuntu) | [📦 Download tayyar_1.0.19_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.19/tayyar_1.0.19_amd64.deb) | ✅ Available |
+| **Windows** | `.exe` (Installer) | [📥 Download Tayyar-Setup-1.0.20.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-Setup-1.0.20.exe) | ✅ Official Release |
+| **Windows** | `.exe` (Portable) | [📥 Download Tayyar-1.0.20.exe](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-1.0.20.exe) | ✅ Official Release |
+| **Android** | `.apk` (Mobile) | [📱 Download Tayyar-Android-v1.0.20.apk](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-Android-v1.0.20.apk) | ✅ Official Release |
+| **macOS** | `.dmg` (Universal) | [🍎 Download Tayyar-1.0.20.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-1.0.20.dmg) | ✅ Official Release |
+| **Linux** | `.AppImage` | [🐧 Download Tayyar-1.0.20.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-1.0.20.AppImage) | ✅ Official Release |
+| **Linux** | `.deb` (Debian/Ubuntu) | [📦 Download tayyar_1.0.20_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/tayyar_1.0.20_amd64.deb) | ✅ Official Release |
+| **iOS** | Xcode Project | Build via `npm run build:ios` (Source in `ios/App`) | 🛠️ Source Ready |
 
 ---
 
@@ -42,31 +134,33 @@ Download the official ready-to-run packages directly from [GitHub Releases v1.0.
 * **Smart End-Game Acceleration:** Automatically sub-divides remaining slow segments across faster idle threads to prevent hanging downloads.
 * **Resumable Transfers:** Full session persistence across network dropouts, app restarts, or crashes.
 
-### 2. Universal Support for 200+ File Formats
-Tayyar natively identifies, captures, and categorizes over 200 file formats into dedicated directories:
-* **Archives & Compressed:** `7Z`, `ZIP`, `RAR`, `TAR`, `GZ`, `BZ2`, `XZ`, `ZST`, `ISO`, `DMG`, `CAB`, `ARJ`, `CPIO`, `00*`, `R0*–R9*`
-* **Video & Streams:** `MP4`, `MKV`, `AVI`, `WEBM`, `MOV`, `FLV`, `TS`, `M2TS`, `VOB`, `WMV`, `3GP`, `MPEG`, `MXF`
-* **Audio & Lossless:** `MP3`, `FLAC`, `WAV`, `AAC`, `OGG`, `M4A`, `OPUS`, `AIFF`, `APE`, `TTA`, `WV`
-* **Documents & E-Books:** `PDF`, `DOCX`, `XLSX`, `PPTX`, `EPUB`, `MOBI`, `AZW3`, `DJVU`, `FB2`, `RTF`, `CSV`, `JSONL`
-* **AI & Machine Learning Models:** `GGUF`, `GGML`, `SAFETENSORS`, `CKPT`, `ONNX`, `PT`, `PTH`, `BIN`, `TFLITE`, `PARQUET`, `ARROW`
-* **Applications & Installers:** `EXE`, `MSI`, `APK`, `APKM`, `APKS`, `AAB`, `DEB`, `RPM`, `APPIMAGE`, `SNAP`, `FLATPAK`, `PKG`, `DMG`
-* **3D, CAD & Graphics:** `BLEND`, `OBJ`, `FBX`, `GLTF`, `GLB`, `STL`, `STEP`, `STP`, `DWG`, `DXF`, `USDZ`, `C4D`, `MAX`, `MA`
+### 2. Social Video Downloader & Stories Saver (v1.0.20)
+* **Watermark-Free Downloads:** Direct video extraction from TikTok, Instagram Reels, YouTube Shorts, Facebook, Snapchat, Twitter/X, and Pinterest.
+* **Stories Range Selector:** Choose precisely how many stories to download from user profiles with a clean batch range picker.
+* **Direct Gallery Saving:** Downloaded media on mobile is directly indexed into the system Gallery under `Movies/Tayyar`.
+* **Zero-CORS Native Bridge:** Powered by native network interceptors on Android/iOS and pure Node.js InnerTube extractors on Desktop.
 
-### 3. Worldwide Server Resilience (Russian, Chinese, Iranian & Restricted CDNs)
-* **Regional CA Resilience:** Transparent handling of servers using sovereign or self-signed TLS certificates (e.g. Russian MinTsifry/GOST, Iranian national infrastructure, Chinese academic/corporate CDNs).
-* **Anti-Hotlinking Spoofing:** Dynamic `User-Agent` and `Referer` spoofing for services that restrict downloads to active browser sessions (e.g., Yandex Disk, Baidu Wangpan, 1fichier, Rapidgator, Aparat).
-* **Cross-Encoding Resilient Filename Parser:** Seamlessly handles filenames in UTF-8, RFC 5987, Windows-1256 (Arabic), Windows-1251 (Cyrillic), and GBK/GB2312 (Chinese).
+### 3. StellarHub-Inspired Update Experience
+* **4-Stage Pipeline Stepper:** Visual stages displaying `Download` ➜ `Check` ➜ `Install` ➜ `Reopen`.
+* **Real-time Download Metrics:** Displays downloaded megabytes, speed, and smooth percentage progress bar.
+* **On-Demand Preview:** Test and inspect the update window anytime via the **"معاينة / Preview"** button in Settings.
 
-### 4. Browser Integration & Extensions
-Ready-to-use extension integration for all major web browsers:
-* **Supported Browsers:** Google Chrome, Microsoft Edge, Mozilla Firefox, Apple Safari, Brave, Opera, Vivaldi, Arc.
-* **Features:**
-  * One-click download interception.
-  * Floating media sniffer button (IDM-style) on HTML5 video & audio elements.
-  * Context menu integration (`Download with Tayyar`).
+### 4. Universal Support for 200+ File Formats
+Tayyar natively identifies, captures, and categorizes over 200 file formats:
+* **Documents & E-Books:** `PDF`, `DOCX`, `XLSX`, `PPTX`, `EPUB`, `MOBI`, `AZW3`, `CSV` (with download progress modal & completion alert).
+* **Archives & Compressed:** `7Z`, `ZIP`, `RAR`, `TAR`, `GZ`, `BZ2`, `XZ`, `ZST`, `ISO`, `DMG`, `CAB`.
+* **Video & Streams:** `MP4`, `MKV`, `AVI`, `WEBM`, `MOV`, `FLV`, `TS`, `M2TS`, `VOB`, `WMV`.
+* **Audio & Lossless:** `MP3`, `FLAC`, `WAV`, `AAC`, `OGG`, `M4A`, `OPUS`, `AIFF`.
+* **AI & Machine Learning Models:** `GGUF`, `GGML`, `SAFETENSORS`, `CKPT`, `ONNX`, `PT`, `BIN`, `PARQUET`.
+* **Applications & Packages:** `EXE`, `MSI`, `APK`, `AAB`, `DEB`, `RPM`, `APPIMAGE`, `DMG`.
 
-### 5. Modern Bilingual Bento Grid UI
-* **Bilingual Experience:** Native toggle between English (`LTR`) and Arabic (`RTL`) with layout realignment.
+### 5. Worldwide Server Resilience
+* **Regional CA Resilience:** Transparent handling of servers using sovereign or self-signed TLS certificates (GOST, Iranian national CDNs, Chinese academic repositories).
+* **Anti-Hotlinking Spoofing:** Dynamic `User-Agent` and `Referer` spoofing for restricted file hosts (Yandex Disk, Baidu, 1fichier, Rapidgator).
+* **Cross-Encoding Resilient Filename Parser:** Seamlessly handles filenames in UTF-8, RFC 5987, Windows-1256 (Arabic), Windows-1251 (Cyrillic), and GBK (Chinese).
+
+### 6. Modern Bilingual Bento Grid UI
+* **Bilingual Experience:** Instant toggle between English (`LTR`) and Arabic (`RTL`) with realigned layouts.
 * **Collapsible Sidebar:** Toggle between full-width drawer and compact 68px icon dock.
 * **Customizable Dashboard:** Real-time speed charts, NAT status, activity heatmap, transfer metrics, and speed limiter presets (Unlimited 🐇, Eco 🐢, Slow 🐌).
 * **Built-in Tracker & Plugin Management:** Real-time BitTorrent / acceleration tracker probing with health latency status.
@@ -88,7 +182,7 @@ Ready-to-use extension integration for all major web browsers:
 ### Prerequisites
 * [Node.js](https://nodejs.org/) v20+
 * [npm](https://www.npmjs.com/) v10+
-* (For Android APK builds) Java JDK 17 & Android Studio / Android SDK
+* (For Android APK builds) Java JDK 21 & Android SDK 35
 
 ### 1. Clone & Install
 ```bash
