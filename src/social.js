@@ -1114,7 +1114,7 @@ async function resolveInstagramStories(input, opts = {}) {
   // 1. Try yt-dlp (supports stories with browser cookies)
   const candidateBrowsers = opts.browserCookies && opts.browserCookies !== 'none'
     ? [opts.browserCookies]
-    : ['firefox', 'edge', 'chrome', 'brave', 'opera', null];
+    : [null];
 
   for (const b of candidateBrowsers) {
     try {
@@ -1236,7 +1236,7 @@ async function resolveFacebookStories(input, opts = {}) {
   // 1. Try yt-dlp (with optional browser cookies for friends-only stories)
   const candidateBrowsers = opts.browserCookies && opts.browserCookies !== 'none'
     ? [opts.browserCookies]
-    : ['firefox', 'edge', 'chrome', 'brave', 'opera', null];
+    : [null];
 
   for (const b of candidateBrowsers) {
     try {

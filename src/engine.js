@@ -601,13 +601,22 @@ class DownloadManager extends EventEmitter {
       const dir = !d.saveDir && this.settings.autoCategorize ? path.join(base, CATEGORY_DIR[d.category] || 'Video') : base;
       fs.mkdirSync(dir, { recursive: true });
 
-      if (!d.filename) {
-        d.filename = `Tayyar_Media_${Date.now()}.mp4`;
+      const isAudio = d.filename.endsWith('.mp3') || d.filename.endsWith('.m4a') || d.category === 'audio' || d.formatId === 'audio';
+
+      if (isAudio) {
+        if (!d.filename.endsWith('.mp3') && !d.filename.endsWith('.m4a')) {
+          d.filename = d.filename.replace(/\.[a-z0-9]+$/i, '') + '.mp3';
+        }
+      } else {
+        if (!path.extname(d.filename)) d.filename += '.mp4';
       }
-      if (!path.extname(d.filename)) d.filename += '.mp4';
       if (!d.path) {
         d.path = uniquePath(dir, d.filename);
       }
+
+      const dirName = path.dirname(d.path);
+      const ext = path.extname(d.path) || (isAudio ? '.mp3' : '.mp4');
+      const baseName = path.basename(d.path, ext);
 
       const args = [
         '--newline',
@@ -621,19 +630,23 @@ class DownloadManager extends EventEmitter {
         args.push('--ffmpeg-location', ffmpegDir);
       }
 
-      if (d.formatId && d.formatId !== 'best' && d.formatId !== 'direct') {
-        args.push('-f', `${d.formatId}+bestaudio/bestvideo+bestaudio/best`);
+      if (isAudio) {
+        args.push('-f', 'bestaudio/best');
+        args.push('-x', '--audio-format', 'mp3');
+      } else if (d.formatId && d.formatId !== 'best' && d.formatId !== 'direct') {
+        if (d.formatId.includes('+') || d.formatId.includes('[') || d.formatId.includes('/')) {
+          args.push('-f', d.formatId);
+        } else {
+          args.push('-f', `${d.formatId}+bestaudio/bestvideo+bestaudio/best`);
+        }
+        args.push('--merge-output-format', 'mp4');
       } else {
         args.push('-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best[ext=mp4]/best');
-      }
-
-      if (d.filename.endsWith('.mp3') || d.filename.endsWith('.m4a')) {
-        args.push('-x', '--audio-format', 'mp3');
-      } else {
         args.push('--merge-output-format', 'mp4');
       }
 
-      args.push('-o', d.path);
+      // Output template: let yt-dlp manage container extension cleanly
+      args.push('-o', path.join(dirName, `${baseName}.%(ext)s`));
       args.push(d.socialUrl || d.url);
 
       await new Promise((resolve, reject) => {
@@ -645,16 +658,17 @@ class DownloadManager extends EventEmitter {
         proc.stdout.on('data', (chunk) => {
           if (job.stopped) return;
           const text = chunk.toString();
-          const match = text.match(/progress:(\d+)\/(\d+)\|(\d+\.?\d*)\|(\d+)/);
+          const match = text.match(/progress:(\d+)\/(\d+|NA)\|([0-9.]+|NA)\|([0-9.]+|NA)/);
           if (match) {
             d.downloaded = parseInt(match[1], 10);
-            d.size = parseInt(match[2], 10);
-            const spd = parseFloat(match[3]);
+            if (match[2] !== 'NA') d.size = parseInt(match[2], 10);
+            const spd = match[3] !== 'NA' ? parseFloat(match[3]) : 0;
             d.speed = Number.isFinite(spd) ? spd : 0;
             job.speed = d.speed;
-            d.eta = parseInt(match[4], 10) || -1;
-            this.emit('update', this._pub(d));
-            this.emit('progress', [this._pub(d)]);
+            d.eta = match[4] !== 'NA' ? parseInt(match[4], 10) : -1;
+            const pub = this._pub(d);
+            this.emit('update', pub);
+            this.emit('progress', [pub]);
           }
         });
 
@@ -672,17 +686,29 @@ class DownloadManager extends EventEmitter {
           if (job.stopped) return resolve();
           if (code === 0) {
             let finalPath = d.path;
+
+            // Check if finalPath exists, or check expected extensions / candidate files
             if (!fs.existsSync(finalPath)) {
-              const dirName = path.dirname(d.path);
-              const baseName = path.basename(d.path, path.extname(d.path));
-              try {
-                const candidates = fs.readdirSync(dirName).filter((f) => f.startsWith(baseName) && !f.endsWith('.part') && !f.endsWith('.ytdl'));
-                if (candidates.length > 0) {
-                  finalPath = path.join(dirName, candidates[0]);
+              const expectedExts = isAudio ? ['.mp3', '.m4a', '.webm', '.opus'] : ['.mp4', '.mkv', '.webm'];
+              for (const ex of expectedExts) {
+                const cand = path.join(dirName, `${baseName}${ex}`);
+                if (fs.existsSync(cand)) {
+                  finalPath = cand;
                   d.path = finalPath;
                   d.filename = path.basename(finalPath);
+                  break;
                 }
-              } catch (_) {}
+              }
+              if (!fs.existsSync(finalPath)) {
+                try {
+                  const candidates = fs.readdirSync(dirName).filter((f) => f.startsWith(baseName) && !f.endsWith('.part') && !f.endsWith('.ytdl'));
+                  if (candidates.length > 0) {
+                    finalPath = path.join(dirName, candidates[0]);
+                    d.path = finalPath;
+                    d.filename = path.basename(finalPath);
+                  }
+                } catch (_) {}
+              }
             }
 
             if (fs.existsSync(finalPath)) {
@@ -690,11 +716,13 @@ class DownloadManager extends EventEmitter {
               d.size = stat.size;
               d.downloaded = stat.size;
               d.speed = 0;
-              d.eta = -1;
+              d.eta = 0;
               d.status = 'completed';
               d.completedAt = Date.now();
-              this.emit('update', this._pub(d));
-              this.emit('complete', this._pub(d));
+              const pub = this._pub(d);
+              this.emit('update', pub);
+              this.emit('progress', [pub]);
+              this.emit('complete', pub);
               return resolve();
             }
           }
@@ -724,8 +752,10 @@ class DownloadManager extends EventEmitter {
       this._stop(job);
       d.status = 'error';
       d.error = e.message || String(e);
-      this.emit('update', this._pub(d));
-      this.emit('error-download', this._pub(d));
+      const pub = this._pub(d);
+      this.emit('update', pub);
+      this.emit('progress', [pub]);
+      this.emit('error-download', pub);
     } finally {
       if (this.active.get(d.id) === job) this.active.delete(d.id);
       this._saveSoon();

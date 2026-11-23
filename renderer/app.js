@@ -4247,6 +4247,7 @@
       let downloadUrl = u;
       let filename = `${plat.name}_${Date.now()}.mp4`;
       let referer = '';
+      let chosenFmt = null;
 
       if (currentResolved && currentResolved.formats?.length) {
         const formats = currentResolved.formats;
@@ -4257,16 +4258,29 @@
 
         if (isAudioOnly) {
           const audioFmt = formats.find(f => f.id === 'audio' || f.ext === 'mp3' || f.ext === 'm4a') || formats[0];
+          chosenFmt = audioFmt;
           downloadUrl = audioFmt.directUrl || audioFmt.url || u;
           referer = audioFmt.referer || '';
           filename = `${plat.name}_${rawTitle}.mp3`;
         } else {
           const videoFmt = formats.find(f => f.id !== 'audio' && f.ext === 'mp4') || formats[0];
+          chosenFmt = videoFmt;
           downloadUrl = videoFmt.directUrl || videoFmt.url || u;
           referer = videoFmt.referer || '';
           filename = `${plat.name}_${rawTitle}.mp4`;
         }
       }
+
+      // Check if downloadUrl is a direct media stream (progressive MP4/MP3)
+      const isDirectStream = !!(chosenFmt?.directUrl && !chosenFmt.directUrl.includes('.m3u8')) ||
+        (downloadUrl && downloadUrl !== u && (
+          downloadUrl.includes('.googlevideo.com') ||
+          downloadUrl.includes('.tiktokcdn.com') ||
+          downloadUrl.includes('.fbcdn.net') ||
+          downloadUrl.includes('.cdninstagram.com') ||
+          downloadUrl.includes('.twimg.com') ||
+          /\.(mp4|mp3|m4a|webm|mov)(\?|$)/i.test(downloadUrl)
+        ));
 
       if (progressCard) progressCard.hidden = false;
       if (spStatus) {
@@ -4282,13 +4296,13 @@
       if (window.tayyar?.add) {
         try {
           const res = await window.tayyar.add({
-            url: downloadUrl,
+            url: isDirectStream ? downloadUrl : u,
             socialUrl: u,
             filename,
             userFileName: filename,
             referer: referer || undefined,
-            isSocial: true,
-            formatId: isAudioOnly ? 'audio' : 'best'
+            isSocial: !isDirectStream,
+            formatId: isAudioOnly ? 'audio' : (chosenFmt?.formatId || chosenFmt?.id || 'best')
           });
 
           const dlItem = res?.item || res;
@@ -4296,24 +4310,36 @@
           if (dlId) {
             S.items.set(dlId, dlItem);
             openActiveDownloadModal(dlId);
+
+            const handleItemUpdate = (item) => {
+              if (!item || item.id !== dlId) return;
+              const pct = item.size > 0 ? Math.min(100, Math.round((item.downloaded / item.size) * 100)) : (item.status === 'completed' ? 100 : 0);
+              if (spBar) spBar.style.width = `${pct}%`;
+              if (spPercent) spPercent.textContent = `${pct}%`;
+              if (spSpeed) spSpeed.textContent = fmtSpeed(item.speed || 0);
+              if (spSize) spSize.textContent = `${fmtSize(item.downloaded || 0)} / ${item.size > 0 ? fmtSize(item.size) : '...'}`;
+
+              if (item.status === 'completed') {
+                if (spStatus) spStatus.textContent = S.lang === 'ar' ? '✅ اكتمل التحميل وحُفظ بنجاح!' : '✅ Download completed!';
+                if (spBar) spBar.style.width = '100%';
+                if (spPercent) spPercent.textContent = '100%';
+                toast(S.lang === 'ar' ? '✅ اكتمل تحميل الملف وحُفظ في التنزيلات بنجاح!' : '✅ Media downloaded successfully!');
+              } else if (item.status === 'error') {
+                if (spStatus) spStatus.textContent = (S.lang === 'ar' ? '❌ فشل التحميل: ' : '❌ Download failed: ') + (item.error || 'Unknown error');
+                toast(S.lang === 'ar' ? `❌ فشل التحميل: ${item.error || ''}` : `❌ Download failed: ${item.error || ''}`);
+              }
+            };
+
             window.tayyar.on('dl:progress', (items) => {
               const list = Array.isArray(items) ? items : [items];
               const match = list.find(it => it.id === dlId);
-              if (match) {
-                const pct = match.size > 0 ? Math.min(100, Math.round((match.downloaded / match.size) * 100)) : 0;
-                if (spBar) spBar.style.width = `${pct}%`;
-                if (spPercent) spPercent.textContent = `${pct}%`;
-                if (spSpeed) spSpeed.textContent = fmtSpeed(match.speed || 0);
-                if (spSize) spSize.textContent = `${fmtSize(match.downloaded || 0)} / ${match.size > 0 ? fmtSize(match.size) : '...'}`;
-
-                if (match.status === 'completed') {
-                  if (spStatus) spStatus.textContent = S.lang === 'ar' ? '✅ اكتمل التحميل وحُفظ بنجاح!' : '✅ Download completed!';
-                  toast(S.lang === 'ar' ? '✅ اكتمل تحميل الفيديو وحُفظ في المعرض ومجلد التحميلات!' : '✅ Video downloaded to Gallery & Downloads!');
-                }
-              }
+              if (match) handleItemUpdate(match);
             });
+            window.tayyar.on('dl:update', (item) => handleItemUpdate(item));
+            window.tayyar.on('dl:complete', (item) => handleItemUpdate(item));
           }
         } catch (e) {
+          if (spStatus) spStatus.textContent = `❌ Error: ${e.message}`;
           toast(`Download error: ${e.message}`);
         }
       }

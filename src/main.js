@@ -109,7 +109,7 @@ function unpackExtensionFolder(type = 'chrome') {
 async function downloadExtensionZip(type = 'chrome') {
   const folderName = type === 'firefox' ? 'extension-firefox' : 'extension';
   const targetDir = unpackExtensionFolder(type);
-  const version = pkg.version || '1.0.24';
+  const version = pkg.version || '1.0.25';
   const filename = type === 'firefox'
     ? `Tayyar-Firefox-Extension-v${version}.zip`
     : `Tayyar-Chrome-Extension-v${version}.zip`;
