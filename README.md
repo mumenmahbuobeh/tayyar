@@ -123,6 +123,8 @@ Ready-to-use binaries are available on [GitHub Releases v1.0.20](https://github.
 | **macOS** | `.dmg` (Universal) | [🍎 Download Tayyar-1.0.20.dmg](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-1.0.20.dmg) | ✅ Official Release |
 | **Linux** | `.AppImage` | [🐧 Download Tayyar-1.0.20.AppImage](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-1.0.20.AppImage) | ✅ Official Release |
 | **Linux** | `.deb` (Debian/Ubuntu) | [📦 Download tayyar_1.0.20_amd64.deb](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/tayyar_1.0.20_amd64.deb) | ✅ Official Release |
+| **Browser Extension** | `.zip` (Chrome, Edge, Brave, Opera) | [🧩 Download Tayyar-Chrome-Extension-v1.0.20.zip](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-Chrome-Extension-v1.0.20.zip) | ✅ Ready to Load |
+| **Browser Extension** | `.zip` (Mozilla Firefox) | [🦊 Download Tayyar-Firefox-Extension-v1.0.20.zip](https://github.com/mumenmahbuobeh/tayyar/releases/download/v1.0.20/Tayyar-Firefox-Extension-v1.0.20.zip) | ✅ Ready to Load |
 | **iOS** | Xcode Project | Build via `npm run build:ios` (Source in `ios/App`) | 🛠️ Source Ready |
 
 ---

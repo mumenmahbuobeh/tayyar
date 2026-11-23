@@ -25,6 +25,8 @@ const bridge = {
   reveal: inv('reveal'),
   chooseDir: inv('chooseDir'),
   openExtensionFolder: inv('openExtensionFolder'),
+  downloadExtensionZip: inv('extension:downloadZip'),
+  openBrowserExtensionsPage: inv('extension:openBrowserPage'),
   openUrl: inv('openUrl'),
   installUpdate: inv('installUpdate'),
   fetchTrackers: inv('trackers:fetch'),

@@ -90,6 +90,7 @@ jobs:
             dist/Tayyar-*.AppImage
             dist/*.deb
             dist/latest*.yml
+            dist/Tayyar-*-Extension-*.zip
           if-no-files-found: ignore
 
   build-android:

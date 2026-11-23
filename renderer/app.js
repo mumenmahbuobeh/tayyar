@@ -3569,9 +3569,27 @@
         extModalSubhead.textContent = S.lang === 'ar' ? 'ربط التحميلات التلقائية مع تطبيق تيّار' : 'Seamless multi-connection download capture';
       }
 
+      const txtDownload = $('#txtDownloadExtZip');
+      if (txtDownload) {
+        txtDownload.textContent = S.lang === 'ar' ? 'تحميل الإضافة (.ZIP)' : 'Download Extension (.ZIP)';
+      }
+      const txtBrowserPage = $('#txtOpenBrowserPage');
+      if (txtBrowserPage) {
+        txtBrowserPage.textContent = S.lang === 'ar' ? 'فتح صفحة الإضافات' : 'Open Extensions Page';
+      }
+
       const steps = S.lang === 'ar' ? bInfo.stepsAr : bInfo.stepsEn;
       if (extModalBody) {
         extModalBody.innerHTML = `
+          <div style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 13px; font-weight: 700; color: #ffffff;">${S.lang === 'ar' ? '📦 تحميل حزمة الإضافة مباشرة' : '📦 Direct Extension Download'}</span>
+              <span style="font-size: 11px; color: #94a3b8;">${S.lang === 'ar' ? 'احصل على ملف .ZIP جاهز للتثبيت بنقرة واحدة داخل المتصفح' : 'Get ready-to-load extension ZIP file instantly'}</span>
+            </div>
+            <button type="button" class="pill-btn primary sm" id="bBannerDownloadZip" style="white-space: nowrap;">
+              ${S.lang === 'ar' ? 'تحميل الآن (.ZIP)' : 'Download Now (.ZIP)'}
+            </button>
+          </div>
           <div class="ext-steps-list">
             ${steps.map((st, i) => `
               <div class="ext-step-item">
@@ -3581,18 +3599,52 @@
             `).join('')}
           </div>
         `;
+
+        $('#bBannerDownloadZip')?.addEventListener('click', triggerDownloadZip);
       }
 
       if (extInstallModal) extInstallModal.showModal();
     });
   });
 
+  async function triggerDownloadZip() {
+    const targetFolder = currentExtBrowser === 'firefox' ? 'firefox' : 'chrome';
+    toast(S.lang === 'ar' ? 'جارٍ تحضير وتنزيل ملف الإضافة المضغوط...' : 'Packaging and downloading extension .ZIP...');
+    if (window.tayyar?.downloadExtensionZip) {
+      try {
+        const res = await window.tayyar.downloadExtensionZip(targetFolder);
+        if (res && res.ok) {
+          toast(S.lang === 'ar' 
+            ? `✓ تم تحميل ملف الإضافة بنجاح إلى مجلد التحميلات: ${res.filename}` 
+            : `✓ Saved extension to Downloads: ${res.filename}`);
+        } else {
+          toast(S.lang === 'ar' ? 'تعذر إنشاء ملف الـ ZIP' : 'Could not create ZIP', 'error');
+        }
+      } catch (e) {
+        toast(String(e.message || e), 'error');
+      }
+    } else {
+      window.open('https://github.com/mumenmahbuobeh/tayyar/releases/latest', '_system');
+    }
+  }
+
+  $('#bDownloadExtZip')?.addEventListener('click', triggerDownloadZip);
+
+  $('#bOpenBrowserExtPage')?.addEventListener('click', () => {
+    if (window.tayyar?.openBrowserExtensionsPage) {
+      window.tayyar.openBrowserExtensionsPage(currentExtBrowser);
+      toast(S.lang === 'ar' ? 'تم فتح صفحة إضافات المتصفح' : 'Opened browser extensions page');
+    } else {
+      toast(S.lang === 'ar' ? 'اكتب chrome://extensions في متصفحك' : 'Type chrome://extensions in your browser');
+    }
+  });
+
   if (bOpenExtFolder) {
-    bOpenExtFolder.addEventListener('click', () => {
+    bOpenExtFolder.addEventListener('click', async () => {
       const targetFolder = currentExtBrowser === 'firefox' ? 'firefox' : 'chrome';
       if (window.tayyar?.openExtensionFolder) {
-        window.tayyar.openExtensionFolder(targetFolder);
-        toast(S.lang === 'ar' ? 'تم فتح مجلد الإضافة في مستكشف الملفات' : 'Opened extension folder in Explorer');
+        await window.tayyar.openExtensionFolder(targetFolder);
+        toast(S.lang === 'ar' ? 'تم فك وتجهيز مجلد الإضافة وفتحه في مستكشف الملفات' : 'Unpacked extension folder and opened in Explorer');
       }
     });
   }

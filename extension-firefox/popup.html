@@ -8,45 +8,63 @@
 </head>
 <body>
   <div class="popup-wrap">
-    <!-- Header -->
+    <!-- Brand Header -->
     <header class="popup-header">
       <div class="brand-row">
         <div class="brand-logo">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <rect width="24" height="24" rx="6" fill="#06b6d4"/>
-            <path d="M12 5v10m0 0l-3.5-3.5m3.5 3.5l3.5-3.5M6 18h12" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span class="brand-title">Tayyar</span>
+          <div class="brand-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="brand-info">
+            <div class="brand-title-wrap">
+              <span class="brand-title">Tayyar</span>
+              <span class="brand-badge">PRO</span>
+            </div>
+            <p class="tagline" id="txtTagline">Next Gen Download Manager</p>
+          </div>
         </div>
-        <button class="lang-pill" id="bLang">AR</button>
+        <button type="button" class="lang-pill" id="bLang" title="Switch Language / تبديل اللغة">AR</button>
       </div>
-      <p class="tagline" id="txtTagline">Next Gen Download Manager</p>
     </header>
 
-    <!-- Connection Status Banner -->
-    <div class="status-banner" id="statusBanner">
-      <span class="status-dot" id="statusDot"></span>
-      <span class="status-txt" id="statusTxt">Checking connection...</span>
+    <!-- Connection Status Bento Card -->
+    <div class="status-card" id="statusCard">
+      <div class="status-left">
+        <span class="status-pulse-dot" id="statusDot"></span>
+        <div class="status-meta">
+          <span class="status-title" id="statusTxt">Connecting to Desktop App...</span>
+          <span class="status-sub" id="statusSub">Bridge (127.0.0.1:6824)</span>
+        </div>
+      </div>
+      <span class="status-tag" id="statusTag">ONLINE</span>
     </div>
 
-    <!-- Quick Add Form -->
-    <div class="quick-add-box">
-      <label class="field-label" id="lblQuickAdd">Quick Download</label>
-      <div class="input-row">
-        <input type="url" id="quickUrlInput" placeholder="https://example.com/file.zip" autocomplete="off">
-        <button class="btn-primary" id="bSendDownload">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    <!-- Quick Download Bento Card -->
+    <div class="bento-card quick-download-card">
+      <div class="card-head">
+        <span class="card-title" id="lblQuickAdd">Quick Download</span>
+        <span class="card-hint" id="lblQuickHint">Direct URL & Streams</span>
+      </div>
+      <div class="input-wrap">
+        <input type="url" id="quickUrlInput" placeholder="https://example.com/file.zip" autocomplete="off" spellcheck="false">
+        <button type="button" class="btn-cyan-add" id="bSendDownload" title="Send to Tayyar">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
         </button>
       </div>
       <div class="feedback-msg" id="feedbackMsg" hidden></div>
     </div>
 
-    <!-- Settings Toggles -->
-    <div class="settings-group">
+    <!-- Integration Settings Bento Card -->
+    <div class="bento-card settings-card">
       <div class="toggle-row">
-        <div>
-          <span class="toggle-label" id="lblCapture">Intercept Downloads</span>
-          <div class="toggle-desc" id="descCapture">Capture browser downloads automatically</div>
+        <div class="toggle-info">
+          <span class="toggle-title" id="lblCapture">Intercept Downloads</span>
+          <span class="toggle-desc" id="descCapture">Capture browser downloads automatically</span>
         </div>
         <label class="switch">
           <input type="checkbox" id="chkCapture" checked>
@@ -54,10 +72,12 @@
         </label>
       </div>
 
+      <div class="divider"></div>
+
       <div class="toggle-row">
-        <div>
-          <span class="toggle-label" id="lblVideoBadge">Floating Video Button</span>
-          <div class="toggle-desc" id="descVideoBadge">Show quick download badge on video players</div>
+        <div class="toggle-info">
+          <span class="toggle-title" id="lblVideoBadge">Floating Video Button</span>
+          <span class="toggle-desc" id="descVideoBadge">Show quick download badge on video players</span>
         </div>
         <label class="switch">
           <input type="checkbox" id="chkVideoBadge" checked>
@@ -66,9 +86,22 @@
       </div>
     </div>
 
+    <!-- Quick Actions / App Controls -->
+    <div class="actions-row">
+      <button type="button" class="action-btn" id="bOpenDesktop" title="Bring Tayyar Desktop to Front">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+        <span id="txtOpenDesk">Open Desktop App</span>
+      </button>
+      <button type="button" class="action-btn" id="bDownloadZip" title="Download Extension .ZIP Package">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        <span id="txtDownloadZip">Export .ZIP</span>
+      </button>
+    </div>
+
     <!-- Footer -->
     <footer class="popup-footer">
-      <span class="version-txt">v1.0.6 · Tayyar Desktop Bridge</span>
+      <span class="footer-engine">⚡ Tayyar Turbo Engine</span>
+      <span class="version-txt">v1.0.20</span>
     </footer>
   </div>
 

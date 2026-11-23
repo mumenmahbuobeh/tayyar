@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
+const archiver = require('archiver');
 const { DownloadManager, isDownloadableUrl } = require('./engine');
 const social = require('./social');
 const pkg = require('../package.json');
@@ -70,6 +71,80 @@ function createWindow() {
   console.log('loadFile dispatched');
 }
 
+/**
+ * Unpacks the extension folder to a real physical directory on disk (outside ASAR archive),
+ * ensuring Chrome / Edge / Firefox can load it with 'Load unpacked' without any file system errors.
+ */
+function unpackExtensionFolder(type = 'chrome') {
+  const folderName = type === 'firefox' ? 'extension-firefox' : 'extension';
+  const targetDir = path.join(app.getPath('userData'), 'browser-extensions', folderName);
+  const sourceDir = path.join(__dirname, '..', folderName);
+
+  function copyDirRecursive(src, dest) {
+    if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+    const entries = fs.readdirSync(src, { withFileTypes: true });
+    for (const entry of entries) {
+      const srcPath = path.join(src, entry.name);
+      const destPath = path.join(dest, entry.name);
+      if (entry.isDirectory()) {
+        copyDirRecursive(srcPath, destPath);
+      } else {
+        fs.copyFileSync(srcPath, destPath);
+      }
+    }
+  }
+
+  try {
+    copyDirRecursive(sourceDir, targetDir);
+    return targetDir;
+  } catch (err) {
+    console.warn('Failed to unpack extension to userData, falling back to sourceDir:', err);
+    return sourceDir;
+  }
+}
+
+/**
+ * Creates a clean, distributable ZIP of the browser extension directly in the user's Downloads directory.
+ */
+async function downloadExtensionZip(type = 'chrome') {
+  const folderName = type === 'firefox' ? 'extension-firefox' : 'extension';
+  const targetDir = unpackExtensionFolder(type);
+  const version = pkg.version || '1.0.20';
+  const filename = type === 'firefox'
+    ? `Tayyar-Firefox-Extension-v${version}.zip`
+    : `Tayyar-Chrome-Extension-v${version}.zip`;
+  const downloadsDir = app.getPath('downloads');
+  const zipPath = path.join(downloadsDir, filename);
+
+  return new Promise((resolve) => {
+    try {
+      const output = fs.createWriteStream(zipPath);
+      const archive = archiver('zip', { zlib: { level: 9 } });
+
+      output.on('close', () => {
+        try { shell.showItemInFolder(zipPath); } catch (_) {}
+        if (Notification.isSupported()) {
+          new Notification({
+            title: 'Tayyar Extension Ready',
+            body: `Saved ${filename} to Downloads. Ready to load in browser!`
+          }).show();
+        }
+        resolve({ ok: true, path: zipPath, filename, size: archive.pointer() });
+      });
+
+      archive.on('error', (err) => {
+        resolve({ ok: false, error: err.message });
+      });
+
+      archive.pipe(output);
+      archive.directory(targetDir, false);
+      archive.finalize();
+    } catch (err) {
+      resolve({ ok: false, error: err.message });
+    }
+  });
+}
+
 /** Local bridge so the browser extension can hand links to the app (like IDM's browser integration). */
 function startBridge() {
   const srv = http.createServer((req, res) => {
@@ -84,6 +159,12 @@ function startBridge() {
     if (req.method === 'GET' && (req.url === '/ping' || req.url === '/status')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ ok: true, app: 'Tayyar', version: pkg.version, bridge: true, stories: true }));
+    }
+
+    if (req.method === 'POST' && req.url === '/show-app') {
+      if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ ok: true }));
     }
 
     // Receive Story/Status media blob (WhatsApp Web, Instagram/Facebook/Snapchat Web Stories)
@@ -191,11 +272,28 @@ function wireIpc() {
     const r = await dialog.showOpenDialog(win, { properties: ['openDirectory', 'createDirectory'] });
     return r.canceled ? null : r.filePaths[0];
   });
-  h('openExtensionFolder', (type) => {
-    const folder = type === 'firefox' ? 'extension-firefox' : 'extension';
-    const p = path.join(__dirname, '..', folder);
-    shell.openPath(p);
+  h('openExtensionFolder', async (type) => {
+    const p = unpackExtensionFolder(type);
+    await shell.openPath(p);
     return { ok: true, path: p };
+  });
+  h('extension:downloadZip', async (type) => {
+    return await downloadExtensionZip(type);
+  });
+  h('extension:openBrowserPage', (browser) => {
+    const b = String(browser || 'chrome').toLowerCase();
+    const urls = {
+      chrome: 'chrome://extensions',
+      edge: 'edge://extensions',
+      brave: 'brave://extensions',
+      opera: 'opera://extensions',
+      vivaldi: 'vivaldi://extensions',
+      firefox: 'about:debugging#/runtime/this-firefox',
+      safari: 'https://support.apple.com/guide/safari/safari-extensions-sfri32508/mac'
+    };
+    const targetUrl = urls[b] || 'chrome://extensions';
+    shell.openExternal(targetUrl).catch(() => {});
+    return { ok: true, url: targetUrl };
   });
   h('openUrl', (u) => {
     if (/^https?:\/\//i.test(u)) shell.openExternal(u);
