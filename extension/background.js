@@ -2,7 +2,7 @@
 
 /**
  * Tayyar Browser Extension — Background Service Worker
- * Coordinates link interception, context menus, and communication with the Tayyar desktop app.
+ * Coordinates link interception, context menus, media sniffing, and communication with the Tayyar desktop app.
  */
 
 const BRIDGE_ADD = 'http://127.0.0.1:6824/add';
@@ -29,7 +29,7 @@ async function pingTayyar() {
   }
 }
 
-async function sendToTayyar(url, referer, filename = '') {
+async function sendToTayyar(url, referer, filename = '', isSocial = false) {
   if (!url || typeof url !== 'string') return false;
   try {
     const res = await fetch(BRIDGE_ADD, {
@@ -42,6 +42,7 @@ async function sendToTayyar(url, referer, filename = '') {
         url: url.trim(),
         referer: referer || '',
         filename: filename || '',
+        isSocial: !!isSocial,
       }),
     });
     return res.ok;
@@ -103,7 +104,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
-// Network Media Sniffer (inspired by AB Download Manager MediaRegistry & HLS sniffer)
+// Network Media Sniffer (captures HLS, DASH, direct MP4, WebM, audio streams)
 const tabMediaRegistry = new Map();
 
 if (chrome.webRequest?.onHeadersReceived) {
@@ -120,9 +121,13 @@ if (chrome.webRequest?.onHeadersReceived) {
         const mime = ctHeader?.value?.toLowerCase() || '';
         const size = clHeader ? parseInt(clHeader.value, 10) : 0;
 
-        const isVideoAudio = mime.startsWith('video/') || mime.startsWith('audio/') ||
-          mime.includes('mpegurl') || mime.includes('x-mpegurl');
-        const isMediaExt = /\.(m3u8|mp4|webm|m4s|ts|m4a|mp3|flv|mkv)(\?|$)/i.test(url);
+        const isHLS = mime.includes('mpegurl') || mime.includes('x-mpegurl') || url.includes('.m3u8');
+        const isDASH = mime.includes('dash+xml') || url.includes('.mpd');
+        const isVideoAudio = mime.startsWith('video/') || mime.startsWith('audio/') || isHLS || isDASH;
+        const isMediaExt = /\.(m3u8|mpd|mp4|webm|m4s|ts|m4a|mp3|flv|mkv|aac|ogg)(\?|$)/i.test(url);
+
+        // Ignore tiny tracking segments or images
+        if (size > 0 && size < 4096 && !isHLS && !isDASH) return;
 
         if (isVideoAudio || isMediaExt) {
           if (!tabMediaRegistry.has(details.tabId)) {
@@ -130,15 +135,24 @@ if (chrome.webRequest?.onHeadersReceived) {
           }
           const list = tabMediaRegistry.get(details.tabId);
           if (!list.some((m) => m.url === url)) {
+            let guessTitle = 'media_stream';
+            try {
+              const uObj = new URL(url);
+              const pathEnd = uObj.pathname.split('/').filter(Boolean).pop();
+              if (pathEnd) guessTitle = decodeURIComponent(pathEnd).split('?')[0];
+            } catch (_) {}
+
             const item = {
               url,
-              mime,
+              mime: mime || (isHLS ? 'application/x-mpegurl' : 'video/mp4'),
               size,
-              isHLS: mime.includes('mpegurl') || url.includes('.m3u8'),
-              title: url.split('/').pop().split('?')[0] || 'media_stream'
+              isHLS,
+              isDASH,
+              title: guessTitle,
+              timestamp: Date.now()
             };
-            list.push(item);
-            if (list.length > 30) list.shift();
+            list.unshift(item);
+            if (list.length > 30) list.pop();
 
             try {
               chrome.tabs.sendMessage(details.tabId, {
@@ -209,7 +223,7 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
     return true;
   }
   if (req.type === 'SEND_URL') {
-    sendToTayyar(req.url, req.referer || sender?.tab?.url).then((ok) => sendResponse({ ok }));
+    sendToTayyar(req.url, req.referer || sender?.tab?.url, req.filename, req.isSocial).then((ok) => sendResponse({ ok }));
     return true;
   }
   if (req.type === 'SEND_BLOB') {
@@ -217,9 +231,17 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
     return true;
   }
   if (req.type === 'GET_TAB_MEDIA') {
-    const list = tabMediaRegistry.get(sender?.tab?.id) || [];
-    sendResponse({ media: list });
-    return false;
+    const tabId = sender?.tab?.id;
+    if (tabId) {
+      sendResponse({ media: tabMediaRegistry.get(tabId) || [] });
+      return false;
+    }
+    // Fallback query active tab
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const activeId = tabs?.[0]?.id;
+      sendResponse({ media: (activeId ? tabMediaRegistry.get(activeId) : []) || [] });
+    });
+    return true;
   }
   if (req.type === 'UPDATE_BADGE') {
     updateBadge();

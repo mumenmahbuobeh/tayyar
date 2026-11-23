@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const APP_VERSION = '1.0.22';
+  const APP_VERSION = '1.0.23';
   const STORAGE_KEY_DLS = 'tayyar_mobile_downloads_v2';
   const STORAGE_KEY_LANG = 'tayyar_lang';
   const STORAGE_KEY_AURA = 'tayyar_mobile_aura_oled';
@@ -973,6 +973,68 @@
       }
     }
 
+    if (plat.id === 'snapchat') {
+      try {
+        let snapUrl = cleanUrl;
+        const rPage = await httpFetch(snapUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          }
+        });
+        if (rPage.ok) {
+          const html = await rPage.text();
+          let directMediaUrl = '';
+          let thumb = '';
+          let title = 'Snapchat Video';
+
+          // 1. __NEXT_DATA__ extraction
+          const mNext = html.match(/<script[^>]+id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
+          if (mNext && mNext[1]) {
+            try {
+              const jData = JSON.parse(mNext[1]);
+              const pp = jData?.props?.pageProps || {};
+              const spotlight = pp.spotlightStory || pp.storyResponse || pp.userProfile;
+              const snaps = pp.storyResponse?.story?.snaps || pp.curatedSnaps || [];
+              if (snaps.length && snaps[0]?.snapUrls?.mediaUrl) {
+                directMediaUrl = snaps[0].snapUrls.mediaUrl;
+                thumb = snaps[0].snapUrls.mediaPreviewUrl?.value || '';
+              } else if (spotlight?.mediaUrl) {
+                directMediaUrl = spotlight.mediaUrl;
+              }
+              if (pp.userProfile?.userInfo?.displayName) {
+                title = `Snapchat - ${pp.userProfile.userInfo.displayName}`;
+              }
+            } catch (_) {}
+          }
+
+          // 2. OpenGraph / JSON-LD / CDN extraction
+          if (!directMediaUrl) {
+            const mOg = html.match(/<meta[^>]+property=["'](?:og:video|og:video:url|og:video:secure_url)["'][^>]+content=["']([^"']+)["']/i) ||
+                        html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["'](?:og:video|og:video:url|og:video:secure_url)["']/i);
+            if (mOg && mOg[1]) directMediaUrl = mOg[1].replace(/&amp;/g, '&');
+          }
+          if (!directMediaUrl) {
+            const mCdn = html.match(/https:\/\/(?:bolt-gcdn\.sc-cdn\.net|cf-st\.sc-cdn\.net)\/[^\s"'\\]+/i);
+            if (mCdn && mCdn[0]) directMediaUrl = mCdn[0].replace(/\\u0026/g, '&').replace(/\\\//g, '/');
+          }
+
+          if (directMediaUrl) {
+            return {
+              ok: true,
+              platform: 'Snapchat',
+              platformId: 'snapchat',
+              platformIcon: '👻',
+              title,
+              author: 'Snapchat',
+              thumbnail: thumb,
+              formats: [{ id: 'video', ext: 'mp4', url: directMediaUrl, directUrl: directMediaUrl }]
+            };
+          }
+        }
+      } catch (_) {}
+    }
+
     if (plat.id === 'facebook') {
       try {
         const rFb = await httpFetch('https://fdown.co.in/ajax', {
@@ -1000,6 +1062,30 @@
           }
         }
       } catch (_) {}
+
+      // Fallback Facebook OpenGraph
+      try {
+        const rOg = await httpFetch(cleanUrl, {
+          headers: { 'User-Agent': 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)' }
+        });
+        if (rOg.ok) {
+          const html = await rOg.text();
+          const m = html.match(/<meta[^>]+property=["'](?:og:video|og:video:url|og:video:secure_url)["'][^>]+content=["']([^"']+)["']/i);
+          if (m && m[1]) {
+            const directUrl = m[1].replace(/&amp;/g, '&');
+            return {
+              ok: true,
+              platform: 'Facebook',
+              platformId: 'facebook',
+              platformIcon: '📘',
+              title: 'Facebook Video',
+              author: 'Facebook',
+              thumbnail: '',
+              formats: [{ id: 'video', ext: 'mp4', url: directUrl, directUrl }],
+            };
+          }
+        }
+      } catch (_) {}
     }
 
     if (plat.id === 'instagram') {
@@ -1021,6 +1107,32 @@
                 platformIcon: '📷',
                 title: `Instagram_${sc[1]}`,
                 author: 'Instagram',
+                thumbnail: iUrl,
+                formats: [{ id: vUrl ? 'video' : 'image', ext: vUrl ? 'mp4' : 'jpg', url: vUrl || iUrl, directUrl: vUrl || iUrl }],
+              };
+            }
+          }
+        }
+      } catch (_) {}
+
+      // Fallback via DDInstagram / InstaFix API
+      try {
+        const sc = cleanUrl.match(/\/(?:p|reel|tv)\/([A-Za-z0-9_-]+)/);
+        if (sc) {
+          const rDd = await httpFetch(`https://api.ddinstagram.com/v1/post/${sc[1]}`);
+          if (rDd.ok) {
+            const jDd = await rDd.json();
+            const media = jDd?.item || jDd;
+            const vUrl = media?.video_url || media?.videos?.[0]?.url || '';
+            const iUrl = media?.image_url || media?.images?.[0]?.url || '';
+            if (vUrl || iUrl) {
+              return {
+                ok: true,
+                platform: 'Instagram',
+                platformId: 'instagram',
+                platformIcon: '📷',
+                title: `Instagram_${sc[1]}`,
+                author: media?.user?.username || 'Instagram',
                 thumbnail: iUrl,
                 formats: [{ id: vUrl ? 'video' : 'image', ext: vUrl ? 'mp4' : 'jpg', url: vUrl || iUrl, directUrl: vUrl || iUrl }],
               };
@@ -1080,7 +1192,7 @@
 
     // If the URL is from a social media platform and failed to extract a stream,
     // do NOT treat the web page HTML as an MP4! Throw a descriptive error.
-    if (['youtube', 'tiktok', 'facebook', 'instagram', 'twitter', 'reddit'].includes(plat.id)) {
+    if (['youtube', 'tiktok', 'facebook', 'instagram', 'twitter', 'reddit', 'snapchat', 'pinterest'].includes(plat.id)) {
       throw new Error(t('streamExtractFailed') || 'Could not extract direct media stream (link may be private, restricted, or invalid)');
     }
 

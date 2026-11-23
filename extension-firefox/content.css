@@ -1,49 +1,314 @@
-/* Tayyar Floating Media Download Badge - Modern Dark OLED Glass Pill */
-.tayyar-media-badge {
+/* =========================================================================
+   Tayyar Floating Video Download Badge — Next-Gen IDM-Grade OLED Glassmorphism
+   Compatible with HTML5 Video, MSE/HLS Streams, Social Players & Fullscreen
+   ========================================================================= */
+
+.tayyar-floating-video-badge {
   position: absolute;
   z-index: 2147483647;
-  display: none;
-  align-items: center;
-  gap: 7px;
-  background: rgba(8, 12, 22, 0.92);
-  color: #ffffff;
-  border: 1px solid rgba(0, 240, 255, 0.45);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 14px rgba(0, 240, 255, 0.25);
-  backdrop-filter: blur(12px);
-  border-radius: 9999px;
-  padding: 6px 14px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Cairo", sans-serif;
   font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
+  line-height: 1.4;
+  user-select: none;
+  -webkit-user-select: none;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-4px);
-  transition: opacity 0.2s ease, transform 0.2s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-  user-select: none;
+  transform: translateY(-6px) scale(0.97);
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  direction: ltr; /* base layout */
 }
 
-.tayyar-media-badge.visible {
+.tayyar-floating-video-badge.visible {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
-.tayyar-media-badge:hover {
-  background: rgba(13, 20, 38, 0.98);
+/* Primary Glass Pill Container */
+.tayyar-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(8, 12, 22, 0.94);
+  border: 1px solid rgba(0, 240, 255, 0.45);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.85),
+              0 0 16px rgba(0, 240, 255, 0.3);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 9999px;
+  padding: 3px 5px 3px 12px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tayyar-badge-pill:hover {
+  background: rgba(12, 18, 34, 0.98);
   border-color: #00f0ff;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 240, 255, 0.45);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.92),
+              0 0 24px rgba(0, 240, 255, 0.55);
   transform: translateY(-1px);
 }
 
-.tayyar-badge-icon {
-  font-size: 13px;
-  color: #00f0ff;
+.tayyar-badge-main-action {
   display: flex;
   align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 6px;
+  outline: none;
 }
 
-.tayyar-badge-text {
-  letter-spacing: 0.01em;
+.tayyar-badge-bolt {
+  font-size: 13px;
+  color: #00f0ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+  animation: tayyarBoltGlow 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes tayyarBoltGlow {
+  0% { transform: scale(1); text-shadow: 0 0 8px rgba(0, 240, 255, 0.6); }
+  100% { transform: scale(1.15); text-shadow: 0 0 14px rgba(0, 240, 255, 0.95); }
+}
+
+.tayyar-badge-label {
   color: #f8fafc;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.tayyar-badge-quality-tag {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(59, 130, 246, 0.25));
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  color: #00f0ff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  margin-left: 4px;
+}
+
+/* Dropdown Toggle Button */
+.tayyar-badge-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(0, 240, 255, 0.3);
+  margin: 0 3px;
+}
+
+.tayyar-badge-menu-toggle {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.2s ease;
+  outline: none;
+}
+
+.tayyar-badge-menu-toggle:hover {
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.12);
+}
+
+.tayyar-badge-menu-toggle svg {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tayyar-floating-video-badge.menu-open .tayyar-badge-menu-toggle svg {
+  transform: rotate(180deg);
+}
+
+/* Glass Dropdown Menu */
+.tayyar-badge-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 260px;
+  max-width: 340px;
+  background: rgba(8, 12, 22, 0.96);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.95),
+              0 0 20px rgba(0, 240, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 14px;
+  padding: 8px;
+  z-index: 2147483647;
+  overflow: hidden;
+  animation: tayyarDropIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tayyarDropIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tayyar-floating-video-badge.menu-open .tayyar-badge-dropdown {
+  display: block;
+}
+
+.tayyar-menu-header {
+  padding: 6px 10px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tayyar-menu-header-title {
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tayyar-menu-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.tayyar-menu-items-list::-webkit-scrollbar {
+  width: 4px;
+}
+.tayyar-menu-items-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.3);
+  border-radius: 4px;
+}
+
+.tayyar-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #e2e8f0;
+  text-decoration: none;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.tayyar-menu-item:hover {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.35);
+  color: #ffffff;
+  transform: translateX(-2px);
+}
+
+.tayyar-menu-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.tayyar-menu-item-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.tayyar-menu-item-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tayyar-menu-item-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tayyar-menu-item-subtitle {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.tayyar-menu-item-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.tayyar-menu-footer {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tayyar-menu-footer-btn {
+  background: none;
+  border: none;
+  color: #00f0ff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 4px;
+}
+
+.tayyar-menu-footer-btn:hover {
+  text-decoration: underline;
+}
+
+/* Success & Status Animation States */
+.tayyar-badge-pill.status-success {
+  background: rgba(6, 44, 30, 0.95);
+  border-color: #10b981;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+}
+
+.tayyar-badge-pill.status-success .tayyar-badge-bolt {
+  color: #10b981;
+}
+
+.tayyar-badge-pill.status-offline {
+  background: rgba(45, 15, 15, 0.95);
+  border-color: #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+.tayyar-badge-pill.status-offline .tayyar-badge-bolt {
+  color: #ef4444;
 }
