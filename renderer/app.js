@@ -4859,10 +4859,10 @@
 
   /* ---------------- IPC & INITIALIZATION ---------------- */
   async function init() {
-    const isMobileDevice = window.tayyar?.isMobile || 
-                           window.Capacitor?.isNativePlatform?.() || 
-                           window.innerWidth <= 768 ||
-                           /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isMobileDevice = !window.tayyar && (
+      window.Capacitor?.isNativePlatform?.() || 
+      /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    );
     if (isMobileDevice) {
       document.body.classList.add('is-mobile');
       setTimeout(() => {

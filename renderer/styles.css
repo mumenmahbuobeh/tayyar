@@ -208,10 +208,6 @@ html[dir="rtl"] .app-layout.sidebar-collapsed {
   align-items: center;
 }
 
-.sidebar-collapsed .brand-dropdown .chevron-ic {
-  display: none !important;
-}
-
 .sidebar-collapsed .sidebar-top-actions {
   flex-direction: column;
   gap: 8px;
@@ -281,29 +277,15 @@ html[dir="rtl"] .app-layout.sidebar-collapsed {
 .sidebar-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 0 4px 6px;
-}
-
-.brand-dropdown {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  color: var(--text-main);
-  padding: 4px 6px;
-  border-radius: var(--radius-sm);
-  transition: background 0.15s ease;
-}
-
-.brand-dropdown:hover {
-  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .sidebar-top-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  width: 100%;
 }
 
 .lang-toggle-btn {
@@ -3472,14 +3454,12 @@ html[dir="rtl"] .glass-island-player {
   display: none;
 }
 
-@media (max-width: 768px), (pointer: coarse) {
-  body.is-mobile .window-controls,
-  .window-controls {
+@media (max-width: 768px) {
+  body.is-mobile .window-controls {
     display: none !important;
   }
 
-  body.is-mobile .sidebar,
-  .sidebar {
+  body.is-mobile .sidebar {
     display: none !important;
   }
 

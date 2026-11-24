@@ -928,7 +928,7 @@ async function resolveSnapchatStories(input) {
               id: 'snap_og_1',
               type: 'video',
               url: vUrl,
-              thumbnail: ogImg ? ogImg[1].replace(/&amp;/g, '&') : '',
+              thumbnail: (ogImg && !ogImg[1].includes('facebook') && !ogImg[1].includes('default-preview')) ? ogImg[1].replace(/&amp;/g, '&') : '',
               ext: 'mp4',
               filename: `Snapchat_${cleanStoryName(username || 'story', 'story')}_1.mp4`
             }]
@@ -953,7 +953,7 @@ async function resolveSnapchatStories(input) {
                       id: 'snap_ld_1',
                       type: 'video',
                       url: vidUrl,
-                      thumbnail: j.thumbnailUrl || (ogImg ? ogImg[1].replace(/&amp;/g, '&') : ''),
+                      thumbnail: j.thumbnailUrl || ((ogImg && !ogImg[1].includes('facebook') && !ogImg[1].includes('default-preview')) ? ogImg[1].replace(/&amp;/g, '&') : ''),
                       ext: 'mp4',
                       filename: `Snapchat_${cleanStoryName(username || 'story', 'story')}_1.mp4`
                     }]
@@ -971,15 +971,25 @@ async function resolveSnapchatStories(input) {
           const seen = new Set();
           cdnMatches.forEach((cm, i) => {
             const mUrl = cm[0].replace(/&amp;/g, '&').replace(/\\\//g, '/');
-            if (!seen.has(mUrl) && !mUrl.includes('.webp') && !mUrl.includes('preview')) {
+            if (!seen.has(mUrl) && 
+                !mUrl.includes('.vtt') && 
+                !mUrl.includes('.webp') && 
+                !mUrl.includes('preview') && 
+                !mUrl.includes('facebook') && 
+                !mUrl.includes('.27.') && 
+                !mUrl.includes('.256.') && 
+                !mUrl.includes('logo') && 
+                !mUrl.includes('icon')) {
               seen.add(mUrl);
               const isVid = mUrl.includes('.mp4') || mUrl.includes('SpotlightSharing') || mUrl.includes('DfMedia');
               const ext = isVid ? 'mp4' : 'jpg';
+              const rawThumb = ogImg ? ogImg[1].replace(/&amp;/g, '&') : '';
+              const validThumb = (rawThumb && !rawThumb.includes('default-preview') && !rawThumb.includes('facebook')) ? rawThumb : (isVid ? '' : mUrl);
               stories.push({
-                id: `snap_cdn_${i}`,
+                id: `snap_cdn_${stories.length + 1}`,
                 type: isVid ? 'video' : 'image',
                 url: mUrl,
-                thumbnail: ogImg ? ogImg[1].replace(/&amp;/g, '&') : '',
+                thumbnail: validThumb,
                 ext,
                 filename: `Snapchat_${cleanStoryName(username || 'story', 'story')}_${stories.length + 1}.${ext}`
               });
