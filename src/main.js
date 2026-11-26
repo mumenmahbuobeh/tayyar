@@ -109,7 +109,7 @@ function unpackExtensionFolder(type = 'chrome') {
 async function downloadExtensionZip(type = 'chrome') {
   const folderName = type === 'firefox' ? 'extension-firefox' : 'extension';
   const targetDir = unpackExtensionFolder(type);
-  const version = pkg.version || '1.0.26';
+  const version = pkg.version || '1.0.27';
   const filename = type === 'firefox'
     ? `Tayyar-Firefox-Extension-v${version}.zip`
     : `Tayyar-Chrome-Extension-v${version}.zip`;
@@ -231,6 +231,7 @@ function watchClipboard() {
 
 function wireIpc() {
   const h = (name, fn) => ipcMain.handle(name, (_e, ...a) => fn(...a));
+  h('app:version', () => pkg.version);
   h('list', () => mgr.list());
   h('platform', () => process.platform);
   h('settings:get', () => mgr.settings);

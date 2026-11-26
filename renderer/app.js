@@ -137,7 +137,7 @@
       acknowledgments: 'License (MIT)',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.26 is the latest available release.',
+      upToDateDesc: 'Version 1.0.27 is the latest available release.',
       updateNow: 'Update Now',
       downloadingUpdate: 'Downloading update directly...',
       check: 'Check',
@@ -372,7 +372,7 @@
       acknowledgments: 'الترخيص (MIT)',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.26 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.27 هو أحدث إصدار متوفر حالياً.',
       updateNow: 'تحديث الآن',
       downloadingUpdate: 'جاري تحميل التحديث مباشرة...',
       check: 'فحص',
@@ -3908,12 +3908,17 @@
       try {
         const resp = await fetch(d.url);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const ct = (resp.headers.get('content-type') || '').toLowerCase();
+        if (ct.includes('text/html') && !/\.html?$/i.test(d.filename)) {
+          throw new Error('Server returned HTML page instead of media/archive file');
+        }
         const contentLength = resp.headers.get('content-length');
         if (contentLength) d.size = parseInt(contentLength, 10);
 
         const reader = resp.body ? resp.body.getReader() : null;
         if (!reader) {
           const blob = await resp.blob();
+          if (blob.size <= 0) throw new Error('Downloaded file is empty (0 B)');
           d.downloaded = blob.size;
           d.size = blob.size;
           d.status = 'completed';
@@ -3955,6 +3960,7 @@
         }
 
         const blob = new Blob(chunks);
+        if (blob.size <= 0) throw new Error('Downloaded file is empty (0 B)');
         d.downloaded = blob.size;
         d.size = blob.size;
         d.status = 'completed';

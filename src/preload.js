@@ -5,7 +5,8 @@ const EVENTS = ['dl:update', 'dl:progress', 'dl:removed', 'dl:complete', 'settin
 const inv = (name) => (...args) => ipcRenderer.invoke(name, ...args);
 
 const bridge = {
-  version: require('../package.json').version,
+  version: '1.0.27',
+  getVersion: inv('app:version'),
   list: inv('list'),
   platform: inv('platform'),
   settings: {

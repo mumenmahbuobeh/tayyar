@@ -1092,8 +1092,29 @@
     }
 
     if (plat.id === 'instagram') {
+      if (/\/stories\//i.test(cleanUrl)) {
+        try {
+          const stRes = await resolveStoriesViaJs(cleanUrl, 'instagram');
+          if (stRes?.ok && stRes.stories?.length) {
+            const s = stRes.stories[0];
+            return {
+              ok: true,
+              platform: 'Instagram',
+              platformId: 'instagram',
+              platformIcon: '📷',
+              title: s.filename || 'Instagram_Story',
+              author: 'Instagram',
+              thumbnail: s.thumbnail || '',
+              formats: [{ id: s.type || 'video', ext: s.ext || 'mp4', url: s.url, directUrl: s.url }],
+            };
+          }
+        } catch (_) {}
+        throw new Error(state.lang === 'ar'
+          ? 'ستوري إنستجرام محمي بتسجيل الدخول؛ استخدم زر الإضافة من المتصفح أو رابط ريلز/منشور عام.'
+          : 'Instagram Stories require a logged-in session; use the browser extension or a public Reel/Post link.');
+      }
       try {
-        const sc = cleanUrl.match(/\/(?:p|reel|tv)\/([A-Za-z0-9_-]+)/);
+        const sc = cleanUrl.match(/\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/);
         if (sc) {
           const rIg = await httpFetch(`https://www.instagram.com/p/${sc[1]}/embed/captioned/`);
           if (rIg.ok) {
