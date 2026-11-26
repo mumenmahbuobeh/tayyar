@@ -1946,22 +1946,38 @@ public class TayyarMobilePlugin extends Plugin {
 
     /* ==================== MULTI-PLATFORM STORY RESOLVER (SNAPCHAT / INSTAGRAM / FACEBOOK) ==================== */
 
+    private String extractSnapchatUrlValue(Object val) {
+        if (val instanceof String) {
+            return ((String) val).trim();
+        }
+        if (val instanceof org.json.JSONObject) {
+            Object inner = ((org.json.JSONObject) val).opt("value");
+            if (inner instanceof String) {
+                return ((String) inner).trim();
+            }
+        }
+        return "";
+    }
+
     private void appendSnapchatSnapList(org.json.JSONArray snapList, String username, String prefix, String avatar, Set<String> seen, JSArray outStories) {
         if (snapList == null) return;
         for (int i = 0; i < snapList.length(); i++) {
             try {
-                org.json.JSONObject snap = snapList.getJSONObject(i);
+                org.json.JSONObject snap = snapList.optJSONObject(i);
+                if (snap == null) continue;
                 org.json.JSONObject snapUrls = snap.optJSONObject("snapUrls");
-                String mediaUrl = snapUrls != null ? snapUrls.optString("mediaUrl", "") : snap.optString("mediaUrl", "");
+                String mediaUrl = snapUrls != null ? extractSnapchatUrlValue(snapUrls.opt("mediaUrl")) : "";
+                if (mediaUrl.isEmpty()) {
+                    mediaUrl = extractSnapchatUrlValue(snap.opt("mediaUrl"));
+                }
                 if (mediaUrl.isEmpty() || seen.contains(mediaUrl)) continue;
                 seen.add(mediaUrl);
 
                 int mediaType = snap.optInt("snapMediaType", -1);
                 boolean isVideo = mediaType == 1 || mediaUrl.toLowerCase().contains(".mp4") || mediaUrl.toLowerCase().contains("mp4");
-                String thumb = "";
-                if (snapUrls != null && snapUrls.has("mediaPreviewUrl")) {
-                    org.json.JSONObject pv = snapUrls.optJSONObject("mediaPreviewUrl");
-                    if (pv != null) thumb = pv.optString("value", "");
+                String thumb = snapUrls != null ? extractSnapchatUrlValue(snapUrls.opt("mediaPreviewUrl")) : "";
+                if (thumb.isEmpty()) {
+                    thumb = extractSnapchatUrlValue(snap.opt("thumbnailUrl"));
                 }
                 if (thumb.isEmpty()) thumb = isVideo ? avatar : mediaUrl;
 
@@ -2034,8 +2050,10 @@ public class TayyarMobilePlugin extends Plugin {
                                             org.json.JSONObject pub = up.optJSONObject("publicProfileInfo");
                                             if (pub == null) pub = up.optJSONObject("userInfo");
                                             if (pub != null) {
-                                                detectedUser = pub.optString("username", detectedUser);
+                                                String uName = pub.optString("username", "");
+                                                if (!uName.isEmpty()) detectedUser = uName;
                                                 avatar = pub.optString("profilePictureUrl", pub.optString("squareHeroImageUrl", ""));
+                                                appendSnapchatSnapList(pub.optJSONArray("snapList"), detectedUser, "prof", avatar, seen, stories);
                                             }
                                         }
                                         org.json.JSONObject st = pp.optJSONObject("story");

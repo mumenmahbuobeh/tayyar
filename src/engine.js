@@ -268,7 +268,7 @@ function uniquePath(dir, name) {
  * - Anti-hotlink header spoofing (Referer, Sec-CH-UA, Chrome 131 User-Agent)
  * - Connection timeouts & high latency resilience
  */
-function request(urlStr, { headers = {}, redirects = 10, timeout = 30000, cookies = [] } = {}) {
+function request(urlStr, { headers = {}, redirects = 10, timeout = 30000, cookies = [], userAgent = '', isMedia = false } = {}) {
   return new Promise((resolve, reject) => {
     let u;
     try { u = new URL(urlStr); } catch (_) { return reject(new Error('Invalid URL')); }
@@ -281,9 +281,17 @@ function request(urlStr, { headers = {}, redirects = 10, timeout = 30000, cookie
     // Cookie jar accumulation across redirects
     const cookieHeader = cookies.length ? { Cookie: cookies.join('; ') } : {};
 
-    // Standard modern browser headers for maximum compatibility across Russian, Chinese, Iranian & global servers
-    const reqHeaders = {
-      'User-Agent': DEFAULT_UA,
+    // Standard modern browser headers for maximum compatibility across global servers
+    const reqHeaders = isMedia ? {
+      'User-Agent': userAgent || DEFAULT_UA,
+      'Accept': '*/*',
+      'Accept-Language': 'en-US,en;q=0.9,ar;q=0.8',
+      'Accept-Encoding': 'identity',
+      'Referer': u.origin + '/',
+      ...cookieHeader,
+      ...headers,
+    } : {
+      'User-Agent': userAgent || DEFAULT_UA,
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
       'Accept-Language': 'en-US,en;q=0.9,ar;q=0.8,ru;q=0.7,zh-CN;q=0.6,fa;q=0.5',
       'Accept-Encoding': 'identity',
@@ -321,7 +329,7 @@ function request(urlStr, { headers = {}, redirects = 10, timeout = 30000, cookie
         if (redirects <= 0) return reject(new Error('Too many redirects'));
         const nextUrl = new URL(res.headers.location, u).toString();
         const nextHeaders = { ...headers, Referer: u.toString() };
-        return resolve(request(nextUrl, { headers: nextHeaders, redirects: redirects - 1, timeout, cookies }));
+        return resolve(request(nextUrl, { headers: nextHeaders, redirects: redirects - 1, timeout, cookies, userAgent, isMedia }));
       }
       res.finalUrl = u.toString();
       resolve({ req, res });
@@ -409,16 +417,17 @@ class DownloadManager extends EventEmitter {
     return this.settings;
   }
 
-  async probe(url, referer = '') {
+  async probe(url, referer = '', userAgent = '') {
     let resObj;
+    const isMediaUrl = /\.(mp4|mkv|avi|mov|webm|mp3|m4a|wav|flac|aac|ogg)(\?|$)/i.test(url);
     try {
-      resObj = await request(url, { headers: { Range: 'bytes=0-0', ...(referer ? { Referer: referer } : {}) } });
+      resObj = await request(url, { headers: { Range: 'bytes=0-0', ...(referer ? { Referer: referer } : {}) }, userAgent, isMedia: isMediaUrl });
       if (resObj.res.statusCode >= 400 && resObj.res.statusCode !== 416) {
         throw new Error(`HTTP ${resObj.res.statusCode}`);
       }
     } catch (_) {
       // Fallback: request without Range for servers rejecting byte ranges on probe (common on PDF/docs portals)
-      resObj = await request(url, { headers: { ...(referer ? { Referer: referer } : {}) } });
+      resObj = await request(url, { headers: { ...(referer ? { Referer: referer } : {}) }, userAgent, isMedia: isMediaUrl });
     }
     const { req, res } = resObj;
     const h = res.headers;
@@ -441,7 +450,7 @@ class DownloadManager extends EventEmitter {
     return { finalUrl: res.finalUrl, size, resumable, filename: filenameFrom(h, res.finalUrl), mime: h['content-type'] || '' };
   }
 
-  add({ url, referer = '', filename = '', saveDir = '', connections, startNow = true, startAt = 0, isSocial = false, socialUrl = '', formatId = '' }) {
+  add({ url, referer = '', userAgent = '', filename = '', saveDir = '', dir = '', connections, startNow = true, startAt = 0, isSocial = false, socialUrl = '', formatId = '' }) {
     const u = new URL(url);
     if (!/^https?:$/.test(u.protocol)) throw new Error('Only http/https links are supported');
     const name = filename ? sanitizeName(filename) : '';
@@ -454,8 +463,8 @@ class DownloadManager extends EventEmitter {
     } catch (_) {}
     const d = {
       id: crypto.randomUUID(),
-      url: u.toString(), finalUrl: '', referer,
-      filename: name, saveDir, path: '',
+      url: u.toString(), finalUrl: '', referer, userAgent,
+      filename: name, saveDir: saveDir || dir || '', path: '',
       category: isSocialDownload ? (name.endsWith('.mp3') || name.endsWith('.m4a') ? 'audio' : 'video') : (name ? categoryOf(name) : categoryOf(path.basename(u.pathname))),
       connections: clamp(+connections || this.settings.connections, 1, 32),
       size: -1, downloaded: 0, resumable: isSocialDownload ? true : false, segments: [],
@@ -551,6 +560,10 @@ class DownloadManager extends EventEmitter {
     if (changed) { this._schedule(); this._saveSoon(); }
     const batch = [];
     for (const job of this.active.values()) {
+      if (job.proc || typeof job.bytes !== 'number') {
+        batch.push(this._pub(job.d));
+        continue;
+      }
       const dt = (now - job.lastT) / 1000 || 0.5;
       const inst = (job.bytes - job.lastBytes) / dt;
       job.speed = job.speed ? job.speed * 0.6 + inst * 0.4 : inst;
@@ -601,8 +614,11 @@ class DownloadManager extends EventEmitter {
       const dir = !d.saveDir && this.settings.autoCategorize ? path.join(base, CATEGORY_DIR[d.category] || 'Video') : base;
       fs.mkdirSync(dir, { recursive: true });
 
-      const isAudio = d.filename.endsWith('.mp3') || d.filename.endsWith('.m4a') || d.category === 'audio' || d.formatId === 'audio';
+      const isAudio = d.filename.endsWith('.mp3') || d.filename.endsWith('.m4a') || d.category === 'audio' || d.formatId === 'audio' || d.formatId === 'audio_m4a';
 
+      if (!d.filename || d.filename.startsWith('.')) {
+        d.filename = `Tayyar_Media_${Date.now()}${isAudio ? '.mp3' : '.mp4'}`;
+      }
       if (isAudio) {
         if (!d.filename.endsWith('.mp3') && !d.filename.endsWith('.m4a')) {
           d.filename = d.filename.replace(/\.[a-z0-9]+$/i, '') + '.mp3';
@@ -616,28 +632,37 @@ class DownloadManager extends EventEmitter {
 
       const dirName = path.dirname(d.path);
       const ext = path.extname(d.path) || (isAudio ? '.mp3' : '.mp4');
-      const baseName = path.basename(d.path, ext);
+      const baseName = path.basename(d.path, ext) || `Tayyar_Media_${Date.now()}`;
 
       const args = [
         '--newline',
         '--no-colors',
         '--no-playlist',
         '--continue',
-        '--progress-template', 'progress:%(progress.downloaded_bytes)s/%(progress.total_bytes)s|%(progress.speed)s|%(progress.eta)s',
+        '--progress-template', 'progress:%(progress.downloaded_bytes)s/%(progress.total_bytes,progress.total_bytes_estimate)s|%(progress.speed)s|%(progress.eta)s',
       ];
 
+      if (d.referer) {
+        args.push('--referer', d.referer);
+      }
+      if (d.userAgent) {
+        args.push('--user-agent', d.userAgent);
+      }
       if (ffmpegDir && fs.existsSync(ffmpegDir)) {
         args.push('--ffmpeg-location', ffmpegDir);
       }
 
+      const placeholderIds = new Set(['best', 'direct', 'nowm', 'wm', 'hd', 'og-direct', 'video_adaptive']);
+      const isPlaceholderFormat = !d.formatId || placeholderIds.has(d.formatId) || /^video_\d+p?$/i.test(d.formatId);
+
       if (isAudio) {
         args.push('-f', 'bestaudio/best');
         args.push('-x', '--audio-format', 'mp3');
-      } else if (d.formatId && d.formatId !== 'best' && d.formatId !== 'direct') {
+      } else if (!isPlaceholderFormat) {
         if (d.formatId.includes('+') || d.formatId.includes('[') || d.formatId.includes('/')) {
           args.push('-f', d.formatId);
         } else {
-          args.push('-f', `${d.formatId}+bestaudio/bestvideo+bestaudio/best`);
+          args.push('-f', `${d.formatId}+bestaudio/${d.formatId}/bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best`);
         }
         args.push('--merge-output-format', 'mp4');
       } else {
@@ -658,14 +683,14 @@ class DownloadManager extends EventEmitter {
         proc.stdout.on('data', (chunk) => {
           if (job.stopped) return;
           const text = chunk.toString();
-          const match = text.match(/progress:(\d+)\/(\d+|NA)\|([0-9.]+|NA)\|([0-9.]+|NA)/);
+          const match = text.match(/progress:(\d+|NA)\/(\d+(?:\.\d+)?|NA)\|([0-9.]+|NA)\|([0-9.]+|NA)/);
           if (match) {
-            d.downloaded = parseInt(match[1], 10);
-            if (match[2] !== 'NA') d.size = parseInt(match[2], 10);
+            if (match[1] !== 'NA') d.downloaded = parseInt(match[1], 10);
+            if (match[2] !== 'NA') d.size = Math.round(parseFloat(match[2]));
             const spd = match[3] !== 'NA' ? parseFloat(match[3]) : 0;
             d.speed = Number.isFinite(spd) ? spd : 0;
             job.speed = d.speed;
-            d.eta = match[4] !== 'NA' ? parseInt(match[4], 10) : -1;
+            d.eta = match[4] !== 'NA' ? Math.round(parseFloat(match[4])) : -1;
             const pub = this._pub(d);
             this.emit('update', pub);
             this.emit('progress', [pub]);
@@ -699,9 +724,9 @@ class DownloadManager extends EventEmitter {
                   break;
                 }
               }
-              if (!fs.existsSync(finalPath)) {
+              if (!fs.existsSync(finalPath) && baseName) {
                 try {
-                  const candidates = fs.readdirSync(dirName).filter((f) => f.startsWith(baseName) && !f.endsWith('.part') && !f.endsWith('.ytdl'));
+                  const candidates = fs.readdirSync(dirName).filter((f) => f.startsWith(baseName + '.') && !f.endsWith('.part') && !f.endsWith('.ytdl'));
                   if (candidates.length > 0) {
                     finalPath = path.join(dirName, candidates[0]);
                     d.path = finalPath;
@@ -713,17 +738,21 @@ class DownloadManager extends EventEmitter {
 
             if (fs.existsSync(finalPath)) {
               const stat = fs.statSync(finalPath);
-              d.size = stat.size;
-              d.downloaded = stat.size;
-              d.speed = 0;
-              d.eta = 0;
-              d.status = 'completed';
-              d.completedAt = Date.now();
-              const pub = this._pub(d);
-              this.emit('update', pub);
-              this.emit('progress', [pub]);
-              this.emit('complete', pub);
-              return resolve();
+              if (stat.size > 0) {
+                d.size = stat.size;
+                d.downloaded = stat.size;
+                d.speed = 0;
+                d.eta = 0;
+                d.status = 'completed';
+                d.completedAt = Date.now();
+                const pub = this._pub(d);
+                this.emit('update', pub);
+                this.emit('progress', [pub]);
+                this.emit('complete', pub);
+                return resolve();
+              }
+              try { fs.unlinkSync(finalPath); } catch (_) {}
+              return reject(new Error('Downloaded file is empty (0 bytes)'));
             }
           }
           reject(new Error(stderrBuf.trim() || `Download process exited with code ${code}`));
@@ -736,13 +765,21 @@ class DownloadManager extends EventEmitter {
         const social = require('./social');
         const resolved = await social.resolveSocialMedia(d.socialUrl || d.url);
         if (resolved && resolved.ok && resolved.formats && resolved.formats.length > 0) {
-          const streamUrl = resolved.formats[0].directUrl || resolved.formats[0].url;
-          if (streamUrl && streamUrl !== d.url && !streamUrl.includes('.m3u8')) {
+          const isAudio = d.filename.endsWith('.mp3') || d.filename.endsWith('.m4a') || d.category === 'audio' || d.formatId === 'audio' || d.formatId === 'audio_m4a';
+          const chosen = isAudio
+            ? (resolved.formats.find((f) => f.id === 'audio' || f.ext === 'mp3' || f.ext === 'm4a') || resolved.formats[0])
+            : (resolved.formats.find((f) => !String(f.id || '').includes('audio')) || resolved.formats[0]);
+          const streamUrl = chosen.directUrl || chosen.url;
+          const origUrl = d.socialUrl || d.url;
+          if (streamUrl && streamUrl !== origUrl && streamUrl !== d.url && !streamUrl.includes('.m3u8') && !streamUrl.includes('.mpd')) {
             console.log('Built-in resolver extracted direct stream, switching to turbo engine:', streamUrl);
             d.url = streamUrl;
             d.finalUrl = streamUrl;
-            d.referer = resolved.formats[0].referer || d.referer || '';
+            d.referer = chosen.referer || d.referer || '';
+            d.userAgent = chosen.userAgent || d.userAgent || '';
             d.isSocial = false;
+            d.segments = [];
+            d.path = '';
             return await this._start(d);
           }
         }
@@ -764,12 +801,18 @@ class DownloadManager extends EventEmitter {
   }
 
   async _prepare(d) {
-    const info = await this.probe(d.url, d.referer);
+    const info = await this.probe(d.url, d.referer, d.userAgent);
     d.finalUrl = info.finalUrl;
     d.size = info.size;
     d.resumable = info.resumable;
     if (!d.filename) d.filename = info.filename;
     d.filename = sanitizeName(d.filename);
+    const ct = (info.mime || '').toLowerCase();
+    if (d.filename && /\.(mp4|mkv|avi|mov|webm|flv|ts|mp3|m4a|wav|aac|ogg|flac|zip|rar|7z|iso|exe|dmg|apk|pdf)$/i.test(d.filename)) {
+      if (ct.includes('text/html') || ct.includes('application/xhtml+xml') || ct.includes('application/vnd.apple.mpegurl') || ct.includes('application/x-mpegurl') || ct.includes('application/dash+xml')) {
+        throw new Error(`Server returned ${ct} instead of downloadable file`);
+      }
+    }
     d.category = categoryOf(d.filename);
     const os = require('os');
     const base = d.saveDir || this.settings.downloadDir || path.join(os.homedir(), 'Downloads', 'Tayyar');
@@ -894,7 +937,8 @@ class DownloadManager extends EventEmitter {
       if (d.resumable) headers.Range = `bytes=${seg.pos}-${seg.end >= 0 ? seg.end : ''}`;
       else { d.downloaded = 0; seg.pos = 0; }
 
-      request(d.finalUrl || d.url, { headers }).then(({ req, res }) => {
+      const isMedia = d.category === 'video' || d.category === 'audio' || /\.(mp4|mkv|avi|mov|webm|mp3|m4a|wav|aac)(\?|$)/i.test(d.filename || d.url);
+      request(d.finalUrl || d.url, { headers, userAgent: d.userAgent || '', isMedia }).then(({ req, res }) => {
         job.reqs.add(req);
         const done = (fn, arg) => { job.reqs.delete(req); fn(arg); };
         if (d.resumable && res.statusCode !== 206) {

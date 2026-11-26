@@ -273,16 +273,16 @@
       }
     }
 
-    // 2. Intercepted HLS (.m3u8) or direct video stream from background
+    // 2. Intercepted HLS (.m3u8), DASH (.mpd), or direct video stream from background
     if (detectedStreamsForTab.length > 0) {
-      const hls = detectedStreamsForTab.find((s) => s.isHLS || s.url.includes('.m3u8'));
+      const hls = detectedStreamsForTab.find((s) => s.isHLS || s.isDASH || s.url.includes('.m3u8') || s.url.includes('.mpd'));
       if (hls) {
         return {
           type: 'hls',
           url: hls.url,
-          title: document.title || 'HLS Live Stream',
-          platform: 'HLS Stream',
-          quality: 'M3U8',
+          title: document.title || 'HLS/DASH Stream',
+          platform: 'HLS/DASH Stream',
+          quality: hls.isDASH || hls.url.includes('.mpd') ? 'MPD' : 'M3U8',
           icon: '📡'
         };
       }
@@ -360,13 +360,13 @@
 
     // Option 2: Detected Network Streams (HLS, MP4, WebM)
     detectedStreamsForTab.forEach((st, idx) => {
-      const isM3u8 = st.isHLS || st.url.includes('.m3u8');
+      const isM3u8 = st.isHLS || st.isDASH || st.url.includes('.m3u8') || st.url.includes('.mpd');
       streams.push({
-        title: isM3u8 ? `بث مباشر HLS Stream (.m3u8)` : `فيديو مسار مباشر (${st.mime || 'MP4'})`,
+        title: isM3u8 ? `بث مباشر HLS/DASH Stream` : `فيديو مسار مباشر (${st.mime || 'MP4'})`,
         subtitle: st.url.length > 55 ? st.url.slice(0, 52) + '...' : st.url,
-        badge: isM3u8 ? 'M3U8' : 'DIRECT',
+        badge: isM3u8 ? 'STREAM' : 'DIRECT',
         icon: isM3u8 ? '📡' : '📹',
-        action: () => sendDownloadToTayyar(st.url, document.title || `stream_${idx + 1}.mp4`, false)
+        action: () => sendDownloadToTayyar(st.url, document.title || `stream_${idx + 1}.mp4`, isM3u8)
       });
     });
 
@@ -518,7 +518,9 @@
 
     if (best.type === 'social') {
       sendDownloadToTayyar(window.location.href, best.title, true);
-    } else if (best.type === 'hls' || best.type === 'stream' || best.type === 'direct') {
+    } else if (best.type === 'hls') {
+      sendDownloadToTayyar(best.url, best.title, true);
+    } else if (best.type === 'stream' || best.type === 'direct') {
       sendDownloadToTayyar(best.url, best.title, false);
     } else {
       sendDownloadToTayyar(window.location.href, document.title, true);
@@ -658,7 +660,10 @@
 
     const player = findVideoPlayerUnderPoint(e.clientX, e.clientY);
     if (player) {
-      activePlayerEl = player;
+      if (activePlayerEl !== player) {
+        activePlayerEl = player;
+        fetchTabStreams();
+      }
       clearTimeout(hideTimer);
       positionBadgeOnPlayer(player);
     } else if (!isMenuOpen) {

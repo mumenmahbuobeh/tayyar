@@ -2352,22 +2352,30 @@
   const probeSizeBadge = $('#probeSizeBadge');
   const addErrMsg = $('#addErrMsg');
 
-  function openAddModal(initialUrl = '', initialFilename = '') {
+  let pendingAddReferer = '';
+  let pendingAddIsSocial = false;
+  let pendingAddHasCustomName = false;
+
+  function openAddModal(initialUrl = '', initialFilename = '', initialReferer = '', initialIsSocial = false) {
     if (!addModal) return;
+    pendingAddReferer = initialReferer || '';
+    pendingAddIsSocial = !!initialIsSocial;
+    pendingAddHasCustomName = !!initialFilename;
     addModal.showModal();
-    if (taskUrlInput) {
-      taskUrlInput.value = initialUrl;
-      taskUrlInput.focus();
-      if (initialUrl) {
-        taskUrlInput.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-    }
     if (probeBox) {
       if (initialFilename) {
         if (probeFileName) probeFileName.value = initialFilename;
         probeBox.hidden = false;
       } else {
+        if (probeFileName) probeFileName.value = '';
         probeBox.hidden = true;
+      }
+    }
+    if (taskUrlInput) {
+      taskUrlInput.value = initialUrl;
+      taskUrlInput.focus();
+      if (initialUrl) {
+        taskUrlInput.dispatchEvent(new Event('input', { bubbles: true }));
       }
     }
     const socialBox = $('#socialMediaBox');
@@ -2421,9 +2429,9 @@
   const SOCIAL_PLATFORMS = [
     { id: 'youtube', name: 'YouTube', icon: '🎬', color: '#ff0000', pattern: /(?:youtube\.com\/(?:watch\?|shorts\/|live\/|embed\/)|youtu\.be\/)/i },
     { id: 'tiktok', name: 'TikTok', icon: '🎵', color: '#00f2fe', pattern: /(?:tiktok\.com\/|vt\.tiktok\.com\/|vm\.tiktok\.com\/)/i },
-    { id: 'instagram', name: 'Instagram', icon: '📸', color: '#e1306c', pattern: /(?:instagram\.com\/(?:p|reel|tv|stories)\/)/i },
-    { id: 'facebook', name: 'Facebook', icon: '📘', color: '#1877f2', pattern: /(?:facebook\.com\/(?:watch|reel|videos|stories)|fb\.watch\/)/i },
-    { id: 'snapchat', name: 'Snapchat', icon: '👻', color: '#fffc00', pattern: /(?:snapchat\.com\/(?:spotlight|t|add|story)\/)/i },
+    { id: 'instagram', name: 'Instagram', icon: '📸', color: '#e1306c', pattern: /(?:instagram\.com\/(?:p|reel|reels|tv|stories|share|s)\/)/i },
+    { id: 'facebook', name: 'Facebook', icon: '📘', color: '#1877f2', pattern: /(?:facebook\.com\/(?:watch|reel|videos|stories|share)|m\.facebook\.com\/stories|fb\.watch\/)/i },
+    { id: 'snapchat', name: 'Snapchat', icon: '👻', color: '#fffc00', pattern: /(?:(?:www\.|story\.|t\.)?snapchat\.com\/(?:spotlight|t|add|story|s|@)|t\.snapchat\.com\/)/i },
     { id: 'twitter', name: 'X / Twitter', icon: '🐦', color: '#1da1f2', pattern: /(?:twitter\.com|x\.com)\/[^/]+\/status\//i },
     { id: 'pinterest', name: 'Pinterest', icon: '📌', color: '#e60023', pattern: /(?:pinterest\.com\/pin\/|pin\.it\/)/i },
     { id: 'reddit', name: 'Reddit', icon: '🤖', color: '#ff4500', pattern: /(?:reddit\.com\/r\/[^/]+\/comments\/|v\.redd\.it\/)/i },
@@ -2480,7 +2488,7 @@
     const cleanUrl = url.trim();
 
     // A. YouTube via Piped instances
-    if (platform.id === 'youtube') {
+    if (plat.id === 'youtube') {
       const m = cleanUrl.match(/(?:watch\?v=|shorts\/|live\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
       if (m) {
         const id = m[1];
@@ -2531,7 +2539,7 @@
     }
 
     // B. Twitter / X Video direct API
-    if (platform.id === 'twitter') {
+    if (plat.id === 'twitter') {
       try {
         const m = cleanUrl.match(/(?:twitter\.com|x\.com)\/([^/]+)\/status\/(\d+)/i);
         if (m) {
@@ -2559,7 +2567,7 @@
     }
 
     // C. Reddit Video direct API
-    if (platform.id === 'reddit') {
+    if (plat.id === 'reddit') {
       try {
         const jsonUrl = cleanUrl.split('?')[0].replace(/\/$/, '') + '.json';
         const redRes = await fetch(jsonUrl);
@@ -2584,7 +2592,7 @@
     }
 
     // D. TikTok via TikWM & TikMate API
-    if (platform.id === 'tiktok') {
+    if (plat.id === 'tiktok') {
       try {
         const twRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`);
         if (twRes.ok) {
@@ -2660,7 +2668,7 @@
     }
 
     // E. Instagram / Facebook / Snapchat via OpenGraph
-    if (['instagram', 'facebook', 'snapchat'].includes(platform.id)) {
+    if (['instagram', 'facebook', 'snapchat'].includes(plat.id)) {
       try {
         const ogRes = await fetch(cleanUrl, {
           headers: {
@@ -2675,10 +2683,10 @@
           if (videoMatch && videoMatch[1]) {
             let vidUrl = videoMatch[1].replace(/&amp;/g, '&');
             const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
-            const title = titleMatch ? titleMatch[1].trim() : `${platform.name}_Video`;
+            const title = titleMatch ? titleMatch[1].trim() : `${plat.name}_Video`;
             return {
               ok: true,
-              platform: platform.name,
+              platform: plat.name,
               title,
               formats: [{
                 id: 'direct',
@@ -2694,15 +2702,16 @@
 
     return {
       ok: true,
-      platform: platform.name,
-      title: `${platform.name}_Video`,
-      author: platform.name,
+      platform: plat.name,
+      title: `${plat.name}_Video`,
+      author: plat.name,
       formats: [{
-        id: 'direct',
-        quality: S.lang === 'ar' ? '🎬 تحميل البث المباشر (Direct MP4)' : '🎬 Direct Stream Download (MP4)',
+        id: 'best',
+        formatId: 'best',
+        quality: S.lang === 'ar' ? '🎬 تحميل البث المباشر (MP4)' : '🎬 Direct Stream Download (MP4)',
         ext: 'mp4',
         url: cleanUrl,
-        directUrl: cleanUrl
+        directUrl: ''
       }]
     };
   }
@@ -2772,15 +2781,17 @@
         activeSocialData = null;
       }
 
-      // Standard HTTP/HTTPS probe
-      if (/^https?:\/\//i.test(url) && window.tayyar?.probe) {
+      // Standard HTTP/HTTPS probe (skip if extension already flagged as social/HLS/DASH stream)
+      if (/^https?:\/\//i.test(url) && !pendingAddIsSocial && window.tayyar?.probe) {
         probeTimer = setTimeout(async () => {
           try {
             if (probeBox) probeBox.hidden = false;
             if (probeSizeBadge) probeSizeBadge.textContent = 'Checking...';
-            const info = await window.tayyar.probe(url);
+            const info = await window.tayyar.probe(url, pendingAddReferer);
             if (info && !info.error) {
-              if (probeFileName) probeFileName.value = info.filename || '';
+              if (probeFileName && (!pendingAddHasCustomName || !probeFileName.value.trim())) {
+                probeFileName.value = info.filename || '';
+              }
               if (probeSizeBadge) probeSizeBadge.textContent = fmtSize(info.size);
             }
           } catch (_) { }
@@ -2809,8 +2820,9 @@
       for (const u of urls) {
         let finalDownloadUrl = u;
         let finalFilename = '';
-        let referer = '';
-        let isSocialDownload = false;
+        let referer = pendingAddReferer || '';
+        let userAgent = '';
+        let isSocialDownload = !!pendingAddIsSocial;
         let socialUrl = '';
         let socialFormatId = '';
 
@@ -2838,16 +2850,18 @@
               .trim();
             finalFilename = `${activeSocialData.platform || 'Tayyar'}_${cleanTitle}.${ext}`;
 
-            if (fmt.directUrl && !fmt.directUrl.includes('.m3u8')) {
+            if (fmt.directUrl && fmt.directUrl !== u && !fmt.directUrl.includes('.m3u8') && !fmt.directUrl.includes('.mpd') && fmt.isSocial !== true) {
               finalDownloadUrl = fmt.directUrl;
-              referer = fmt.referer || '';
-              isSocialDownload = false; // Direct stream ready for multi-segment acceleration!
+              referer = fmt.referer || referer || '';
+              userAgent = fmt.userAgent || '';
+              isSocialDownload = false;
             } else {
-              finalDownloadUrl = (fmt.url && !fmt.url.includes('.m3u8')) ? fmt.url : u;
-              referer = fmt.referer || '';
+              finalDownloadUrl = (fmt.url && fmt.url !== u && !fmt.url.includes('.m3u8') && !fmt.isSocial) ? fmt.url : u;
+              referer = fmt.referer || referer || '';
+              userAgent = fmt.userAgent || '';
             }
           } else {
-            console.warn('Social resolution not pre-extracted, proceeding with direct download');
+            console.warn('Social resolution not pre-extracted, proceeding with yt-dlp');
             toast(S.lang === 'ar' ? 'جاري بدء التحميل المباشر...' : 'Starting direct download...');
           }
         }
@@ -2859,6 +2873,8 @@
             filename: finalFilename || customProbeName || undefined,
             userFileName: finalFilename || customProbeName || undefined,
             referer: referer || undefined,
+            userAgent: userAgent || undefined,
+            saveDir: dir || undefined,
             dir: dir || undefined,
             connections: conns,
             isSocial: isSocialDownload,
@@ -2871,6 +2887,9 @@
           }
         }
       }
+      pendingAddReferer = '';
+      pendingAddIsSocial = false;
+      pendingAddHasCustomName = false;
 
       closeAddModal();
       toast(S.lang === 'ar' ? `بدأ تحميل ${urls.length} مهمة بنجاح` : `Started ${urls.length} download task(s)`);
@@ -4271,11 +4290,15 @@
         }
       }
 
-      // Check if downloadUrl is a direct media stream (progressive MP4/MP3)
-      const isDirectStream = !!(chosenFmt?.directUrl && !chosenFmt.directUrl.includes('.m3u8')) ||
+      // Only bypass yt-dlp for verified non-social direct streams (never for webpage URLs, m3u8, or audio requiring MP3 transcoding)
+      const needsTranscode = isAudioOnly && chosenFmt?.ext !== 'mp3';
+      const isDirectStream = !needsTranscode &&
+        chosenFmt?.isSocial !== true &&
+        !!(chosenFmt?.directUrl && chosenFmt.directUrl !== u && !chosenFmt.directUrl.includes('.m3u8') && !chosenFmt.directUrl.includes('.mpd')) &&
         (downloadUrl && downloadUrl !== u && (
           downloadUrl.includes('.googlevideo.com') ||
           downloadUrl.includes('.tiktokcdn.com') ||
+          downloadUrl.includes('.tikcdn.io') ||
           downloadUrl.includes('.fbcdn.net') ||
           downloadUrl.includes('.cdninstagram.com') ||
           downloadUrl.includes('.twimg.com') ||
@@ -4301,6 +4324,7 @@
             filename,
             userFileName: filename,
             referer: referer || undefined,
+            userAgent: chosenFmt?.userAgent || undefined,
             isSocial: !isDirectStream,
             formatId: isAudioOnly ? 'audio' : (chosenFmt?.formatId || chosenFmt?.id || 'best')
           });
@@ -4549,9 +4573,12 @@
           if (!st || !st.url) return;
           window.tayyar?.add?.({
             url: st.url,
+            socialUrl: st.sourceUrl || st.url,
             filename: st.filename || `Story_${Date.now()}.${st.ext || 'mp4'}`,
             userFileName: st.filename || `Story_${Date.now()}.${st.ext || 'mp4'}`,
-            isSocial: false,
+            referer: st.referer || undefined,
+            userAgent: st.userAgent || undefined,
+            isSocial: !!st.isSocial,
           });
           toast(S.lang === 'ar' ? 'بدأ تحميل الستوري!' : 'Story download started!');
         });
@@ -4629,9 +4656,12 @@
         setTimeout(() => {
           window.tayyar?.add?.({
             url: st.url,
+            socialUrl: st.sourceUrl || st.url,
             filename: st.filename || `Story_${Date.now()}_${idx + 1}.${st.ext || 'mp4'}`,
             userFileName: st.filename || `Story_${Date.now()}_${idx + 1}.${st.ext || 'mp4'}`,
-            isSocial: false,
+            referer: st.referer || undefined,
+            userAgent: st.userAgent || undefined,
+            isSocial: !!st.isSocial,
           });
         }, idx * 200);
       });
@@ -4731,8 +4761,11 @@
     if (barEl) {
       if (segs.length > 0) {
         barEl.innerHTML = segs.map((s) => {
-          const totalChunk = Math.max(1, (s.end >= 0 ? s.end : (d.size || 1)) - s.start + 1);
-          const chunkDone = Math.max(0, s.pos - s.start);
+          const sStart = Array.isArray(s) ? s[0] : (s.start || 0);
+          const sEnd = Array.isArray(s) ? s[1] : s.end;
+          const sPos = Array.isArray(s) ? s[2] : (s.pos || 0);
+          const totalChunk = Math.max(1, (sEnd >= 0 ? sEnd : (d.size || 1)) - sStart + 1);
+          const chunkDone = Math.max(0, sPos - sStart);
           const chunkPct = Math.min(100, Math.round((chunkDone / totalChunk) * 100));
           return `
             <div class="active-dl-segment-pill" title="Chunk: ${chunkPct}%">
@@ -4994,8 +5027,8 @@
       }, 2500);
     }
 
-    window.tayyar.on('ui:add-url', ({ url, filename }) => {
-      openAddModal(url, filename);
+    window.tayyar.on('ui:add-url', ({ url, filename, referer, isSocial }) => {
+      openAddModal(url, filename, referer, isSocial);
     });
 
     window.tayyar.on('ui:clip-url', ({ url }) => {

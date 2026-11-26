@@ -204,8 +204,9 @@ function startBridge() {
         const url = String(payload.url || '');
         const referer = String(payload.referer || '');
         const filename = String(payload.filename || '');
+        const isSocial = !!payload.isSocial;
         if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); }
-        send('ui:add-url', { url, referer, filename });
+        send('ui:add-url', { url, referer, filename, isSocial });
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: true }));
       } catch (_) { res.writeHead(400); res.end(); }

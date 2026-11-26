@@ -996,11 +996,14 @@
               const pp = jData?.props?.pageProps || {};
               const spotlight = pp.spotlightStory || pp.storyResponse || pp.userProfile;
               const snaps = pp.storyResponse?.story?.snaps || pp.curatedSnaps || [];
-              if (snaps.length && snaps[0]?.snapUrls?.mediaUrl) {
-                directMediaUrl = snaps[0].snapUrls.mediaUrl;
-                thumb = snaps[0].snapUrls.mediaPreviewUrl?.value || '';
-              } else if (spotlight?.mediaUrl) {
-                directMediaUrl = spotlight.mediaUrl;
+              const rawSnapUrl = snaps.length ? (snaps[0]?.snapUrls?.mediaUrl?.value || snaps[0]?.snapUrls?.mediaUrl) : '';
+              const rawSpotUrl = spotlight?.mediaUrl?.value || spotlight?.mediaUrl || '';
+              if (typeof rawSnapUrl === 'string' && rawSnapUrl) {
+                directMediaUrl = rawSnapUrl;
+                const rawPreview = snaps[0]?.snapUrls?.mediaPreviewUrl?.value || snaps[0]?.snapUrls?.mediaPreviewUrl || '';
+                thumb = typeof rawPreview === 'string' ? rawPreview : '';
+              } else if (typeof rawSpotUrl === 'string' && rawSpotUrl) {
+                directMediaUrl = rawSpotUrl;
               }
               if (pp.userProfile?.userInfo?.displayName) {
                 title = `Snapchat - ${pp.userProfile.userInfo.displayName}`;
@@ -2521,23 +2524,28 @@
   // Cross-platform JS fallback for iOS (CapacitorHttp handles zero-CORS natively!)
   async function resolveStoriesViaJs(rawInput, plat) {
     const clean = rawInput.trim();
+    if (/snapchat\.com|t\.snapchat\.com/i.test(clean)) plat = 'snapchat';
+    else if (/instagram\.com/i.test(clean)) plat = 'instagram';
+    else if (/facebook\.com|fb\.watch/i.test(clean)) plat = 'facebook';
     const stories = [];
     const seen = new Set();
 
     // 1. Direct Reels / Posts / Videos pasted into Story Hub
-    if (plat === 'instagram' && /(?:instagram\.com\/(?:p|reel|tv|share)\/)/i.test(clean)) {
+    if (plat === 'instagram' && /(?:instagram\.com\/(?:p|reel|reels|tv|share|s)\/)/i.test(clean)) {
       try {
-        const vid = await resolveStream(clean);
-        if (vid && vid.url) {
+        const res = await resolveMediaUrl(clean);
+        const fmt = res?.formats?.find((f) => f.id !== 'audio' && (f.directUrl || f.url)) || res?.formats?.[0];
+        const vidUrl = fmt?.directUrl || fmt?.url || '';
+        if (vidUrl && vidUrl !== clean) {
           return {
             ok: true,
             stories: [{
               id: 'ig_direct',
               type: 'video',
-              url: vid.url,
-              thumbnail: vid.thumbnail || '',
+              url: vidUrl,
+              thumbnail: res.thumbnail || '',
               ext: 'mp4',
-              filename: sanitizeName(`Instagram_${vid.title || 'media'}`, 'mp4'),
+              filename: sanitizeName(`Instagram_${res.title || 'media'}`, 'mp4'),
             }]
           };
         }
@@ -2546,17 +2554,19 @@
 
     if (plat === 'facebook' && /(?:facebook\.com\/(?:watch|reel|videos|share)|fb\.watch\/)/i.test(clean)) {
       try {
-        const vid = await resolveStream(clean);
-        if (vid && vid.url) {
+        const res = await resolveMediaUrl(clean);
+        const fmt = res?.formats?.find((f) => f.id !== 'audio' && (f.directUrl || f.url)) || res?.formats?.[0];
+        const vidUrl = fmt?.directUrl || fmt?.url || '';
+        if (vidUrl && vidUrl !== clean) {
           return {
             ok: true,
             stories: [{
               id: 'fb_direct',
               type: 'video',
-              url: vid.url,
-              thumbnail: vid.thumbnail || '',
+              url: vidUrl,
+              thumbnail: res.thumbnail || '',
               ext: 'mp4',
-              filename: sanitizeName(`Facebook_${vid.title || 'media'}`, 'mp4'),
+              filename: sanitizeName(`Facebook_${res.title || 'media'}`, 'mp4'),
             }]
           };
         }
@@ -2565,8 +2575,10 @@
 
     if (plat === 'snapchat') {
       let user = clean.replace(/^@/, '').split(/[/?#]/)[0];
+      const uMatch = clean.match(/snapchat\.com\/(?:@|add\/|s\/|story\/|spotlight\/)([a-zA-Z0-9._-]+)/i);
+      if (uMatch && !/^(?:t|spotlight|add|story|s)$/i.test(uMatch[1])) user = uMatch[1];
       const urls = /^https?:\/\//i.test(clean)
-        ? [clean]
+        ? [clean, ...(user && !clean.includes('/@') ? [`https://www.snapchat.com/@${encodeURIComponent(user)}`] : [])]
         : [
             `https://www.snapchat.com/@${encodeURIComponent(user)}`,
             `https://www.snapchat.com/add/${encodeURIComponent(user)}`,
@@ -2579,35 +2591,39 @@
           const html = await r.text();
           const m = html.match(/<script[^>]+id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
           if (m && m[1]) {
-            const j = JSON.parse(m[1]);
-            const pp = j?.props?.pageProps || {};
-            const prof = pp.userProfile?.publicProfileInfo || pp.userProfile?.userInfo || {};
-            const uname = prof.username || user || 'snapchat';
-            const avatar = prof.profilePictureUrl || '';
-            const addList = (arr, prefix) => {
-              if (!Array.isArray(arr)) return;
-              arr.forEach((snap, idx) => {
-                const mUrl = snap?.snapUrls?.mediaUrl || snap?.mediaUrl || '';
-                if (!mUrl || seen.has(mUrl)) return;
-                seen.add(mUrl);
-                const isVid = snap?.snapMediaType === 1 || /\.mp4/i.test(mUrl) || mUrl.includes('SpotlightSharing');
-                const ext = isVid ? 'mp4' : 'jpg';
-                stories.push({
-                  id: `snap_${prefix}_${idx}`,
-                  type: isVid ? 'video' : 'image',
-                  url: mUrl,
-                  thumbnail: snap?.snapUrls?.mediaPreviewUrl?.value || (isVid ? avatar : mUrl),
-                  ext,
-                  filename: sanitizeName(`Snapchat_${uname}_${prefix}_${idx + 1}`, ext),
+            try {
+              const j = JSON.parse(m[1]);
+              const pp = j?.props?.pageProps || {};
+              const prof = pp.userProfile?.publicProfileInfo || pp.userProfile?.userInfo || {};
+              const uname = prof.username || user || 'snapchat';
+              const avatar = prof.profilePictureUrl || prof.squareHeroImageUrl || '';
+              const addList = (arr, prefix) => {
+                if (!Array.isArray(arr)) return;
+                arr.forEach((snap, idx) => {
+                  const rawMUrl = snap?.snapUrls?.mediaUrl?.value || snap?.snapUrls?.mediaUrl || snap?.mediaUrl?.value || snap?.mediaUrl || '';
+                  const mUrl = typeof rawMUrl === 'string' ? rawMUrl : '';
+                  if (!mUrl || seen.has(mUrl)) return;
+                  seen.add(mUrl);
+                  const isVid = snap?.snapMediaType === 1 || /\.mp4/i.test(mUrl) || mUrl.includes('SpotlightSharing');
+                  const ext = isVid ? 'mp4' : 'jpg';
+                  stories.push({
+                    id: `snap_${prefix}_${idx}`,
+                    type: isVid ? 'video' : 'image',
+                    url: mUrl,
+                    thumbnail: snap?.snapUrls?.mediaPreviewUrl?.value || (isVid ? avatar : mUrl),
+                    ext,
+                    filename: sanitizeName(`Snapchat_${uname}_${prefix}_${idx + 1}`, ext),
+                  });
                 });
-              });
-            };
-            addList(pp.story?.snapList, 'story');
-            (pp.curatedHighlights || []).forEach((h, i) => addList(h?.snapList, `hl${i + 1}`));
-            (pp.spotlightHighlights || []).forEach((h, i) => addList(h?.snapList, `spot${i + 1}`));
-            if (stories.length > 0) return { ok: true, stories };
+              };
+              addList(pp.story?.snapList, 'story');
+              addList(prof.snapList, 'prof');
+              (pp.curatedHighlights || []).forEach((h, i) => addList(h?.snapList, `hl${i + 1}`));
+              (pp.spotlightHighlights || []).forEach((h, i) => addList(h?.snapList, `spot${i + 1}`));
+              if (stories.length > 0) return { ok: true, stories };
+            } catch (_) {}
           }
-          // Fallback: OpenGraph video & JSON-LD
+          // Fallback 1: OpenGraph video
           const ogV = html.match(/<meta[^>]+property=["']og:video(?::secure_url|:url)?["'][^>]+content=["']([^"']+)["']/i);
           const ogI = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
           if (ogV && ogV[1]) {
@@ -2618,12 +2634,31 @@
                 id: 'snap_og',
                 type: 'video',
                 url: vUrl,
-                thumbnail: ogI ? ogI[1].replace(/&amp;/g, '&') : '',
+                thumbnail: (ogI && !ogI[1].includes('default-preview')) ? ogI[1].replace(/&amp;/g, '&') : '',
                 ext: 'mp4',
                 filename: sanitizeName(`Snapchat_${user || 'story'}_1`, 'mp4'),
               }]
             };
           }
+          // Fallback 2: Direct sc-cdn.net media links
+          const cdnMatches = [...html.matchAll(/https:\/\/(?:bolt-gcdn|cf-st)\.sc-cdn\.net\/[^\s"'\\]+/g)];
+          for (const cm of cdnMatches) {
+            const mUrl = cm[0].replace(/&amp;/g, '&').replace(/\\\//g, '/');
+            if (!seen.has(mUrl) && !mUrl.includes('.vtt') && !mUrl.includes('.webp') && !mUrl.includes('preview') && !mUrl.includes('logo') && !mUrl.includes('icon') && !mUrl.includes('.27.') && !mUrl.includes('.256.')) {
+              seen.add(mUrl);
+              const isVid = mUrl.includes('.mp4') || mUrl.includes('SpotlightSharing') || mUrl.includes('DfMedia');
+              const ext = isVid ? 'mp4' : 'jpg';
+              stories.push({
+                id: `snap_cdn_${stories.length + 1}`,
+                type: isVid ? 'video' : 'image',
+                url: mUrl,
+                thumbnail: isVid ? '' : mUrl,
+                ext,
+                filename: sanitizeName(`Snapchat_${user || 'story'}_${stories.length + 1}`, ext),
+              });
+            }
+          }
+          if (stories.length > 0) return { ok: true, stories };
         } catch (_) {}
       }
       return { ok: false, stories: [] };

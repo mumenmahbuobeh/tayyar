@@ -123,8 +123,9 @@ if (chrome.webRequest?.onHeadersReceived) {
 
         const isHLS = mime.includes('mpegurl') || mime.includes('x-mpegurl') || url.includes('.m3u8');
         const isDASH = mime.includes('dash+xml') || url.includes('.mpd');
-        const isVideoAudio = mime.startsWith('video/') || mime.startsWith('audio/') || isHLS || isDASH;
-        const isMediaExt = /\.(m3u8|mpd|mp4|webm|m4s|ts|m4a|mp3|flv|mkv|aac|ogg)(\?|$)/i.test(url);
+        const isSegment = /\.(ts|m4s)(\?|$)/i.test(url) && !isHLS && !isDASH;
+        const isVideoAudio = !isSegment && (mime.startsWith('video/') || mime.startsWith('audio/') || isHLS || isDASH);
+        const isMediaExt = !isSegment && /\.(m3u8|mpd|mp4|webm|m4a|mp3|flv|mkv|aac|ogg)(\?|$)/i.test(url);
 
         // Ignore tiny tracking segments or images
         if (size > 0 && size < 4096 && !isHLS && !isDASH) return;

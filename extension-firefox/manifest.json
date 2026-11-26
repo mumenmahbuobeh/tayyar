@@ -37,6 +37,7 @@
       "css": [
         "content.css"
       ],
+      "all_frames": true,
       "run_at": "document_idle"
     }
   ],
