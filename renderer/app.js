@@ -126,15 +126,20 @@
       progressInterval: 'Progress save interval (s)',
       setAboutTitle: 'About',
       setAboutDesc: 'Version, updates, source code and manual',
+      appName: 'Tayyar',
+      versionWord: 'Version',
+      mitOpenSource: 'MIT Open Source',
       aboutTagline: 'Before content collapses, preserve what truly matters, let beauty enter your orbit of preservation.',
       createdBy: 'Created & Developed by',
       officialWebsite: 'Official website',
       manual: 'Manual',
       changelog: 'Changelog',
-      acknowledgments: 'Acknowledgments',
+      acknowledgments: 'License (MIT)',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.24 is the latest available release.',
+      upToDateDesc: 'Version 1.0.25 is the latest available release.',
+      updateNow: 'Update Now',
+      downloadingUpdate: 'Downloading update directly...',
       check: 'Check',
       betaWarning: "Beta may be less stable. You'll also receive newer stable releases. Switching back stops beta updates without downgrading.",
       checkAuto: 'Check automatically',
@@ -356,15 +361,20 @@
       progressInterval: 'فترة الحفظ التلقائي (ثوانٍ)',
       setAboutTitle: 'حول البرنامج',
       setAboutDesc: 'الإصدار، التحديثات، كود المصدر والدليل',
+      appName: 'تيّار',
+      versionWord: 'الإصدار',
+      mitOpenSource: 'مفتوح المصدر (MIT)',
       aboutTagline: 'تيّار — مدير تحميلات حديث متطور متعدد الاتصالات فائق السرعة، يحفظ بياناتك بأعلى كفاءة.',
       createdBy: 'تطوير وبرمجة',
       officialWebsite: 'الموقع الرسمي',
       manual: 'دليل الاستخدام',
       changelog: 'سجل التغييرات',
-      acknowledgments: 'شكر وتقدير',
+      acknowledgments: 'الترخيص (MIT)',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.24 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.25 هو أحدث إصدار متوفر حالياً.',
+      updateNow: 'تحديث الآن',
+      downloadingUpdate: 'جاري تحميل التحديث مباشرة...',
       check: 'فحص',
       betaWarning: 'النسخ التجريبية قد تحتوي على ميزات أحدث ولكنها قيد الاختبار.',
       checkAuto: 'فحص التحديثات تلقائياً',
@@ -619,6 +629,15 @@
     // Update settings select
     const langSelect = $('#cfgLang');
     if (langSelect) langSelect.value = normalized;
+
+    // Preserve dynamic update banner text if a newer update was detected
+    if (typeof isNewerUpdateAvailable !== 'undefined' && isNewerUpdateAvailable && typeof availableUpdateRelease !== 'undefined' && availableUpdateRelease) {
+      const latestTag = (availableUpdateRelease.tag_name || '').replace(/^v/, '');
+      const uTitle = $('#updateTitleText');
+      const uDesc = $('#updateDescText');
+      if (uTitle && latestTag) uTitle.textContent = normalized === 'ar' ? `تحديث جديد متوفر: v${latestTag}` : `New Update Available: v${latestTag}`;
+      if (uDesc) uDesc.textContent = normalized === 'ar' ? 'انقر على "تحديث الآن" للتحميل والتثبيت المباشر من داخل البرنامج.' : 'Click "Update Now" to download and install directly inside Tayyar.';
+    }
 
     // Refresh heatmap, dashboard dynamic texts, widget picker & mobile liquid indicator
     initHeatmap();
@@ -3195,10 +3214,8 @@
           bInstall.className = 'pill-btn primary sm';
           if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'تحديث الآن' : 'Update Now';
         }
-        let skippedVer = '';
-        try { skippedVer = localStorage.getItem('tayyar_skipped_update_ver') || ''; } catch (_) {}
-        if (interactive || skippedVer !== latestTag) {
-          showDeskUpdatePopup(rel, channel, false);
+        if (interactive) {
+          toast(S.lang === 'ar' ? `يتوفر تحديث جديد: v${latestTag}` : `New update available: v${latestTag}`);
         }
       } else {
         downloadedUpdatePath = null;
@@ -3206,14 +3223,11 @@
         if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? 'برنامج تيّار محدّث لأحدث إصدار' : 'Tayyar is up to date';
         if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? `الإصدار ${CURRENT_APP_VERSION} هو أحدث إصدار مستقر متوفر.` : `Version ${CURRENT_APP_VERSION} is the latest available release.`;
         if (bInstall) {
-          bInstall.style.display = 'inline-flex';
-          bInstall.disabled = false;
-          bInstall.className = 'pill-btn secondary sm';
-          if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'معاينة نافذة التحديث' : 'View Update Modal';
+          bInstall.style.display = 'none';
         }
         if (progressWrap) progressWrap.style.display = 'none';
         if (interactive) {
-          showDeskUpdatePopup(rel, channel, true);
+          toast(S.lang === 'ar' ? `أنت تستخدم أحدث إصدار (v${CURRENT_APP_VERSION})` : `Tayyar is up to date (v${CURRENT_APP_VERSION})`);
         }
       }
     } catch (err) {
@@ -3223,14 +3237,10 @@
       if (updateTitle) updateTitle.textContent = S.lang === 'ar' ? `برنامج تيّار (v${CURRENT_APP_VERSION})` : `Tayyar (v${CURRENT_APP_VERSION})`;
       if (updateDesc) updateDesc.textContent = S.lang === 'ar' ? 'تعذّر الاتصال بخادم التحديثات حالياً. تأكد من اتصال الإنترنت.' : 'Could not reach update server at this moment. Check your internet connection.';
       if (bInstall) {
-        bInstall.style.display = 'inline-flex';
-        bInstall.disabled = false;
-        bInstall.className = 'pill-btn secondary sm';
-        if (bInstallText) bInstallText.textContent = S.lang === 'ar' ? 'معاينة نافذة التحديث' : 'View Update Modal';
+        bInstall.style.display = 'none';
       }
       if (progressWrap) progressWrap.style.display = 'none';
       if (interactive) {
-        showDeskUpdatePopup(availableUpdateRelease || { tag_name: 'v' + CURRENT_APP_VERSION, published_at: new Date() }, channel, true);
         toast(S.lang === 'ar' ? 'تعذّر فحص التحديثات حالياً' : 'Failed to check updates');
       }
     } finally {
@@ -3517,12 +3527,9 @@
   });
 
   $('#bInstallUpdate')?.addEventListener('click', () => {
-    const ch = (cfgChannel && cfgChannel.value === 'beta') ? 'beta' : 'stable';
-    showDeskUpdatePopup(availableUpdateRelease || { tag_name: 'v' + CURRENT_APP_VERSION }, ch, !isNewerUpdateAvailable);
-  });
-  $('#bPreviewUpdateModal')?.addEventListener('click', () => {
-    const ch = (cfgChannel && cfgChannel.value === 'beta') ? 'beta' : 'stable';
-    showDeskUpdatePopup(availableUpdateRelease || { tag_name: 'v' + CURRENT_APP_VERSION }, ch, !isNewerUpdateAvailable);
+    if (isNewerUpdateAvailable && availableUpdateRelease) {
+      startInAppUpdate();
+    }
   });
 
   const bCheckUpdate = $('#bCheckUpdate');

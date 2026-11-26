@@ -2348,14 +2348,14 @@ html[dir="rtl"] .ios-chev { transform: scaleX(-1); }
   width: 52px;
   height: 52px;
   border-radius: 16px;
-  background: #181920;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FF5A36;
+  color: #38bdf8;
   flex-shrink: 0;
-  box-shadow: 0 8px 20px rgba(255, 90, 54, 0.15);
+  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.18);
 }
 
 .stellar-upd-icon svg {
@@ -2372,7 +2372,7 @@ html[dir="rtl"] .ios-chev { transform: scaleX(-1); }
   display: inline-block;
   font-size: 11px;
   font-weight: 700;
-  color: #FF5A36;
+  color: #38bdf8;
   letter-spacing: 0.3px;
   margin-bottom: 2px;
 }
@@ -2415,9 +2415,9 @@ html[dir="rtl"] .ios-chev { transform: scaleX(-1); }
 }
 
 .stellar-ver-badge.new {
-  background: rgba(255, 90, 54, 0.16);
-  color: #FF7A59;
-  border: 1px solid rgba(255, 90, 54, 0.35);
+  background: rgba(6, 182, 212, 0.16);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
 }
 
 .stellar-upd-date {
@@ -2473,10 +2473,10 @@ html[dir="rtl"] .ios-chev { transform: scaleX(-1); }
 
 /* Stepper States */
 .stellar-step.active .stellar-step-bubble {
-  background: rgba(255, 90, 54, 0.16);
-  border-color: #FF5A36;
-  color: #FF7A59;
-  box-shadow: 0 0 14px rgba(255, 90, 54, 0.28);
+  background: rgba(6, 182, 212, 0.16);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.28);
 }
 
 .stellar-step.active .stellar-step-name {
@@ -2503,7 +2503,7 @@ html[dir="rtl"] .ios-chev { transform: scaleX(-1); }
 }
 
 .stellar-step-connector.active {
-  background: linear-gradient(90deg, #FF5A36, rgba(255, 90, 54, 0.4));
+  background: linear-gradient(90deg, #06b6d4, rgba(56, 189, 248, 0.45));
 }
 
 /* Thin Progress Bar */
@@ -2518,10 +2518,10 @@ html[dir="rtl"] .ios-chev { transform: scaleX(-1); }
 
 .stellar-prog-fill {
   height: 100%;
-  background: linear-gradient(90deg, #FF5A36, #FF8C6B);
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
   border-radius: 999px;
   transition: width 0.2s ease-out;
-  box-shadow: 0 0 8px rgba(255, 90, 54, 0.5);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
 }
 
 /* Status Row */
@@ -2587,7 +2587,7 @@ html[dir="rtl"] .ios-chev { transform: scaleX(-1); }
 }
 
 .stellar-btn-primary {
-  background: #FF5A36;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
   border: none;
   color: #ffffff;
   font-size: 13px;
@@ -2595,13 +2595,13 @@ html[dir="rtl"] .ios-chev { transform: scaleX(-1); }
   padding: 9px 18px;
   border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(255, 90, 54, 0.35);
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.35);
   transition: all 0.2s ease;
 }
 
 .stellar-btn-primary:active {
-  background: #ff6e4d;
-  box-shadow: 0 6px 20px rgba(255, 90, 54, 0.5);
+  background: linear-gradient(135deg, #22d3ee, #60a5fa);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
   transform: translateY(-1px);
 }
 

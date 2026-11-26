@@ -2231,11 +2231,8 @@
         $('#updStatusTitle').textContent = `${t('newVerAvailable')} v${latest}`;
         $('#updStatusDesc').textContent = `v${APP_VERSION} → v${latest}`;
         if (updActionRow) updActionRow.hidden = false;
-
-        let skipped = '';
-        try { skipped = localStorage.getItem(STORAGE_KEY_SKIPPED_VER) || ''; } catch (_) {}
-        if (interactive || skipped !== latest) {
-          showUpdatePopup(rel, false);
+        if (interactive) {
+          toast(`${t('newVerAvailable')} v${latest}`);
         }
       } else {
         state.updateRelease = rel;
@@ -2244,14 +2241,14 @@
         $('#updStatusDesc').textContent = t('upToDateDesc');
         if (updActionRow) updActionRow.hidden = true;
         if (interactive) {
-          showUpdatePopup(rel, true);
+          toast(t('upToDate'));
         }
       }
     } catch (_) {
       state.hasNewerUpdate = false;
       if (updActionRow) updActionRow.hidden = true;
       if (interactive) {
-        showUpdatePopup(state.updateRelease || { tag_name: 'v' + APP_VERSION, published_at: new Date() }, true);
+        toast(state.lang === 'ar' ? 'تعذّر فحص التحديثات حالياً' : 'Failed to check updates');
       }
     } finally {
       if (btnCheckUpdate) {
@@ -2269,11 +2266,10 @@
   });
 
   btnCheckUpdate?.addEventListener('click', () => checkUpdates(true));
-  $('#btnPreviewUpdModal')?.addEventListener('click', () => {
-    showUpdatePopup(state.updateRelease || { tag_name: 'v' + APP_VERSION, published_at: new Date() }, !state.hasNewerUpdate);
-  });
   btnDownloadUpdate?.addEventListener('click', () => {
-    showUpdatePopup(state.updateRelease || { tag_name: 'v' + APP_VERSION, published_at: new Date() }, !state.hasNewerUpdate);
+    if (state.hasNewerUpdate && state.updateRelease) {
+      runDirectMobileUpdate();
+    }
   });
 
   $('#btnUpdPopNow')?.addEventListener('click', runDirectMobileUpdate);
