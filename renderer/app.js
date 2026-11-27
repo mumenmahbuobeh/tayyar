@@ -137,7 +137,7 @@
       acknowledgments: 'License (MIT)',
       appUpdates: 'App updates',
       upToDate: 'Tayyar is up to date',
-      upToDateDesc: 'Version 1.0.27 is the latest available release.',
+      upToDateDesc: 'Version 1.0.28 is the latest available release.',
       updateNow: 'Update Now',
       downloadingUpdate: 'Downloading update directly...',
       check: 'Check',
@@ -372,7 +372,7 @@
       acknowledgments: 'الترخيص (MIT)',
       appUpdates: 'تحديثات البرنامج',
       upToDate: 'برنامج تيّار محدّث لأحدث إصدار',
-      upToDateDesc: 'الإصدار 1.0.27 هو أحدث إصدار متوفر حالياً.',
+      upToDateDesc: 'الإصدار 1.0.28 هو أحدث إصدار متوفر حالياً.',
       updateNow: 'تحديث الآن',
       downloadingUpdate: 'جاري تحميل التحديث مباشرة...',
       check: 'فحص',
@@ -548,6 +548,7 @@
     while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
     return `${n >= 100 || i === 0 ? Math.round(n) : n.toFixed(1)} ${u[i]}`;
   };
+  const fmtBytes = fmtSize;
 
   const fmtSpeed = (b) => {
     if (!b || b <= 0) return '0 B/s';
@@ -4261,6 +4262,9 @@
       analyzeBtn.addEventListener('click', triggerAnalyze);
     }
     if (urlInput) {
+      urlInput.addEventListener('input', () => {
+        currentResolved = null;
+      });
       urlInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') triggerAnalyze();
       });

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Tayyar Download Manager Integration — تيّار",
   "short_name": "Tayyar",
-  "version": "1.0.27",
+  "version": "1.0.28",
   "description": "Send downloads, media files, and links directly to the Tayyar multi-connection desktop download manager.",
   "permissions": [
     "contextMenus",
